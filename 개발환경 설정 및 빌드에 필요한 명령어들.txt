@@ -1,0 +1,24 @@
+Coconut
+
+
+# Docker 관련
+해당 컨테이너만 빠르게 껏다 켜는 명령어
+docker-compose up -d --build 컨테이너명
+
+바뀐 서비스만 알아서 재빌드 및 재시작
+docker-compose up -d --build
+
+모든 컨테이너를 끄고 네트워크까지 새로 생성
+docker -compose down && docker-compose up -d
+
+DB 데이터까지 싹 지우는 거
+docker-compose down -v
+
+백엔드 개발 시 로그 확인하기
+docker logs -f spring-api
+
+# 기존 플러그인을 삭제
+npm uninstall @vitejs/plugin-react
+
+# react-swc관련 코드 오류 있으면
+npm install @vitejs/plugin-react-swc
