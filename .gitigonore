@@ -1,0 +1,9 @@
+# 최상위 루트의 환경 변수 파일 보호
+
+
+# OS 파일
+.DS_Store
+
+# IDE 설정
+.idea/
+.vscode/
