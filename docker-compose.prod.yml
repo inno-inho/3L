@@ -1,0 +1,88 @@
+version: '3.8'
+
+services:
+  # Nginx(외부 진입용)
+  nginx:
+    build:
+      context: .
+      dockerfile: ./docker/nginx/Dockerfile.prod
+    container_name: coconutTalk-nginx
+    ports:
+      - "80:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # 1. Database (MySQL)
+  db:
+    image: mysql:8.0
+    container_name: coconutTalk-db-prod
+    environment:
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+
+  # 2. Cache (Redis)
+  redis:
+    image: redis:alpine
+    container_name: redis-prod
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  # 3. Backend (Spring Boot)
+  backend:
+    build: ./BN
+    container_name: coconutTalk-backend-prod
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/${DB_NAME}
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: ${DB_ROOT_PASSWORD}
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILE}
+    expose:
+      - "8080"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+
+
+  # # 4. Frontend (React + Vite)
+  # frontend:
+  #   build: ./FN
+  #   container_name: react-dev
+  #   depends_on:
+  #     - backend
+  #   environment:
+  #     VITE_API_URL: http://localhost:8080
+  #     CHOKIDAR_USEPOLLING: "true" # 파일 변경 감지 성능 향상 (Windows 환경 필수)
+  #   ports:
+  #     - "${VITE_PORT:-5173}:5173"
+  #   volumes:
+  #     - ./FN:/app   # 내 컴퓨터의 FN 폴더를 컨테이너의 /app에 연결
+  #     - /app/node_modules   # 컨테이너 안의 node_modules는 보호(삭제 방지)
+  #   stdin_open: true
+  #   tty: true
+
+volumes:
+  mysql_data:

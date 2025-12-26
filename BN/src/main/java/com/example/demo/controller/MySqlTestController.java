@@ -5,11 +5,13 @@ import com.example.demo.entity.TestEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/api")
 public class MySqlTestController {
 
     private final TestRepository testRepository;
@@ -17,7 +19,7 @@ public class MySqlTestController {
     @GetMapping("/mysql/save")
     public String save() {
         TestEntity user = new TestEntity();
-        user.setName("inho");
+        user.setName("helen");
         testRepository.save(user);
         return "saved";
     }

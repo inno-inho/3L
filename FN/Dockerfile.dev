@@ -1,4 +1,4 @@
-# 개발 /빌드 환겨
+# 개발 /빌드 환경
 FROM node:20-alpine
 WORKDIR /app
 
@@ -13,4 +13,7 @@ EXPOSE 5173
 
 # 개발 서버 실행(운영 시에는 빌드 후 nginx로 서빙하도록 수정 가능)
 CMD ["npm", "run", "dev", "--", "--host"]
+
+
+
 

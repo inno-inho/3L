@@ -1,23 +1,30 @@
-MySQL과 Redis 서비스에서 실행중인거 중지하기(로컬에서 쓰는 port번호랑 Docker Container안에서 돌아가는 port번호랑 같으면 안 돌아가니까)
+Coconut
+
 
 # Docker 관련
-해당 컨테이너만 빠르게 껏다 켜는 명령어
-docker-compose up -d --build 컨테이너명
+
+컨테이너만 정지 및 삭제
+docker-compose -f docker-compose.dev.yml down
+
+개발 시 도커 실행 명령어
+docker-compose -f docker-compose.dev.yml --env-file .env.dev up -d --build
+
+운영 시 도커 실행 명령어
+docker-compose -f docker-compose.prod.yml --env-file .env.prod up -d --build
 
 바뀐 서비스만 알아서 재빌드 및 재시작
-docker-compose up -d --build
+docker-compose -f docker-compose.dev.yml --env-file .env.dev up -d --build
 
-모든 컨테이너를 끄고 네트워크까지 새로 생성
-docker -compose down && docker-compose up -d
-
-DB 데이터까지 싹 지우는 거
-docker-compose down -v
+해당 컨테이너만 빠르게 껏다 켜는 명령어
+docker-compose -f docker-compose.dev.yml --env-file .env.dev up -d --build 컨테이너명(ex: backend)
 
 백엔드 개발 시 로그 확인하기
-docker logs -f spring-api
+docker-compose -f docker-compose.dev.yml logs -f backend
 
+
+###### react-swc관련 코드 오류 있으면 기존 플러그인 삭제 후 재 설치해야함
 # 기존 플러그인을 삭제
 npm uninstall @vitejs/plugin-react
-
-# react-swc관련 코드 오류 있으면
+# 설치
 npm install @vitejs/plugin-react-swc
+

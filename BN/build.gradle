@@ -47,6 +47,9 @@ dependencies {
     //OAUTH2 CLIENT
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
 
+    // healthCheck
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+
     //JWT
     implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
     runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
@@ -55,9 +58,6 @@ dependencies {
     //REDIS
     implementation 'org.springframework.boot:spring-boot-starter-data-redis:3.4.5'
     implementation 'org.springframework.session:spring-session-data-redis:3.4.3'
-
-    //
-    implementation 'org.springframework.boot:spring-boot-starter-actuator'
 
     //TEST
     testImplementation 'org.springframework.boot:spring-boot-starter-test'

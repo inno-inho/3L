@@ -12,7 +12,7 @@ function App() {
 
   return (
     <div style={{ padding: '20px' }}>
-      <h1>CoconutTalk 바로바로 반응하네 ㅇㅋㄷㅋ</h1>
+      <h1>CoconutTalk 놀러 가고 싶다 운영배포/ 개발 분리 </h1>
       <p>백엔드 메시지: <strong>{message}</strong></p>
     </div>
   )

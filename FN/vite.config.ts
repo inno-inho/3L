@@ -10,7 +10,7 @@ export default defineConfig({
       '/api': {
         target: 'http://backend:8080',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, '') // 이 부분 슬래시 확인!
+        // rewrite: (path) => path.replace(/^\/api/, '') // 이 부분 슬래시 확인!
       }
     }
   }
