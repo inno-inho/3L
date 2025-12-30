@@ -168,44 +168,7 @@
 
 ### NOTICE
 - id (PK)
-- title
-- content
-- author_id
-- view_count
-- is_pinned          -- 상단 고정 여부
-- is_important       -- 중요 공지 여부
-- open_at            -- 예약 공개 시간
-- created_at
-- updated_at
-
----
-
-### NOTICE_COMMENT
-- id (PK)
-- notice_id (FK)
-- user_id (FK)
-- parent_id (nullable)
-- content
-- created_at
-
----
-
-## 5. API 엔드포인트 설계
-
-### 5.1 인증 / 회원
-```
-POST   /auth/signup                   //  회원가입(is_verified=true)인지 확인 후 가입
-POST   /auth/login                    //  로그인
-POST   /auth/logout                   //  로그아웃
-POST   /auth/refresh                  //  리프레시토큰발급
-POST   /auth/email/send               //  이메일 인증 요청
-POST   /auth/email/verify             //  이메일 인증 완료
-
-```
-
-### 5.2 회원 / 프로필
-```
-GET    /user/{email}
+- titl회GGGET    /user/{email}
 PUT    /user/{email}
 DELETE /user/{email}
 GET    /user/search
