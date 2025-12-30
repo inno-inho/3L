@@ -1,8 +1,0 @@
-1. docker-compose.dev.yml 파일 수정
-- frontend의 depends on을 주석처리한다
-
-2. FN의 vite.config.ts 수정
-- targer의 대상을 로컬 컴퓨터로 바꿔준다
-
-3. BN의 application-dev.properties
-- Redis와 DB의 url host를 localhost로 바꿔준다

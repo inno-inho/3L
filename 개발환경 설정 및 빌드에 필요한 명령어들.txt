@@ -38,14 +38,14 @@ docker-compose -f docker-compose.dev.yml logs -f backend
 2. IDE에서 DemoApplication Run버튼 옆에 변수 설정 맞추기
 - Edit에 클릭 후 Environment Variables에 아래의 변수 추가 후 적용 + OK
 - 이제 IDE에서 RUN버튼 누르면 백엔드 동작 함
-DB_NAME=coconutTalk;
-DB_ROOT_PASSWORD=lll123;
-SPRING_PROFILE=dev;
-SPRING_PROFILES_ACTIVE=dev,local
+DB_NAME = coconutTalk
+DB_ROOT_PASSWORD = lll123
+SPRING_PROFILE = dev;
+SPRING_PROFILES_ACTIVE = dev,local
 
 3. 명령어 모음
 - 백엔드는 로컬에서 실행할 시 도커 실행 명령어
-docker-compose -f docker-compose.local.yml --env-file .env.local up -d build
+docker-compose -f docker-compose.local.yml --env-file .env.local up -d --build
 
 - 로컬에서 백엔드 실행하고 있을 시 도커 다운 명령어
 docker-compose -f docker-compose.local.yml --env-file .env.local down
