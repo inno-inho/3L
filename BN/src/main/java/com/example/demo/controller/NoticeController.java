@@ -27,8 +27,10 @@ public class NoticeController {
     // @PathVariable : URL 경로 값 추출 notices/{id}
 
     // 공지 생성
-    @PostMapping(consumes= MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<NoticeResponseDto> createNotice(@RequestBody NoticeRequestDto noticeRequest, @RequestPart MultipartFile file){
+//    @PostMapping(consumes= MediaType.MULTIPART_FORM_DATA_VALUE)
+//    , @RequestPart MultipartFile file
+    @PostMapping()
+    public ResponseEntity<NoticeResponseDto> createNotice(@RequestBody NoticeRequestDto noticeRequest){
         System.out.println("[Notice:CreateNotice] " + noticeRequest);
         NoticeEntity notice = noticeService.createNotice(noticeRequest); // DTO -> Entity 변환 : DB 저장
         return ResponseEntity.ok(new NoticeResponseDto(notice)); // Entity -> ResponseDto 변환, HTTP 200 + Json 응답
