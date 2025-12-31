@@ -1,21 +1,22 @@
-import { useEffect, useState } from 'react'
+import './App.css';
+import React from 'react'; // React import 추가
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider, useAuth } from './context/AuthContext';
+import ConnectionTest from './components/test/ConnectionTest';
 
-function App() {
-  const [message, setMessage] = useState('백엔드 연결 중...')
+const App: React.FC = () => {
 
-  useEffect(() => {
-    fetch('/api/hello') // vite.config.ts의 proxy 설정으로 인해 백엔드로 연결됨
-      .then(res => res.text())
-      .then(data => setMessage(data))
-      .catch(err => setMessage('연결 실패: ' + err))
-  }, [])
 
-  return (
-    <div style={{ padding: '20px' }}>
-      <h1>CoconutTalk 놀러 가고 싶다 운영배포/ 개발 분리 성공! </h1>
-      <p>백엔드 메시지: <strong>{message}</strong></p>
-    </div>
+  return(
+    <>
+      <div className="App"></div>
+        <Router>
+          <AuthProvider>
+            <ConnectionTest />
+          </AuthProvider>
+        </Router>
+    </>
   )
 }
 
-export default App
+export default App;

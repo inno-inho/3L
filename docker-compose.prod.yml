@@ -51,6 +51,8 @@ services:
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: ${DB_ROOT_PASSWORD}
       SPRING_PROFILES_ACTIVE: ${SPRING_PROFILE}
+      SPRING_REDIS_HOST: redis
+      SPRING_REDIS_PORT: 6379
     expose:
       - "8080"
     depends_on:

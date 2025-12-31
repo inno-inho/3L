@@ -3,11 +3,14 @@ Coconut
 
 # Docker 관련
 
-#############################
-- 도커 돌리기 전에 컴퓨터의 서비서에서 MySQL이랑 Redis 중지 한 다음에 도커 실행해주세요(Local과 port 충돌 방지)
-
-컨테이너만 정지 및 삭제
+컨테이너만 정지 및 삭제(개발 시)
 docker-compose -f docker-compose.dev.yml down
+
+볼륨도 같이 지울 때
+docker-compose -f docker-compose.dev.yml --env-file .env.dev down -v
+
+전부 다 지울 때
+docker-compose -f docker-compose.dev.yml --env-file .env.dev down -v --rmi all
 
 개발 시 도커 실행 명령어
 docker-compose -f docker-compose.dev.yml --env-file .env.dev up -d --build
@@ -24,10 +27,43 @@ docker-compose -f docker-compose.dev.yml --env-file .env.dev up -d --build 컨�
 백엔드 개발 시 로그 확인하기
 docker-compose -f docker-compose.dev.yml logs -f backend
 
+########################################################
+백엔드는 로컬에서만 돌릴 시
+########################################################
 
-###### react-swc관련 코드 오류 있으면 기존 플러그인 삭제 후 재 설치해야함
+1. FN의 vite.config.ts확인
+- True -> target: 'http://host.docker.internal:8080' 
+- False -> target: 'http://backend:8080'
+
+2. IDE에서 DemoApplication Run버튼 옆에 변수 설정 맞추기
+- Edit에 클릭 후 Environment Variables에 아래의 변수 추가 후 적용 + OK
+- 이제 IDE에서 RUN버튼 누르면 백엔드 동작 함
+DB_NAME = coconutTalk
+DB_ROOT_PASSWORD = lll123
+SPRING_PROFILE = dev;
+SPRING_PROFILES_ACTIVE = dev,local
+
+3. 명령어 모음
+- 백엔드는 로컬에서 실행할 시 도커 실행 명령어
+docker-compose -f docker-compose.local.yml --env-file .env.local up -d --build
+
+- 로컬에서 백엔드 실행하고 있을 시 도커 다운 명령어
+docker-compose -f docker-compose.local.yml --env-file .env.local down
+
+
+
+
+########################################## 
+react-swc관련 코드 오류 있으면 기존 플러그인 삭제 후 재 설치해야함
+##########################################
+
 # 기존 플러그인을 삭제
 npm uninstall @vitejs/plugin-react
 # 설치
 npm install @vitejs/plugin-react-swc
 
+
+
+
+- 원격이랑 로컬 어느 게 최신인지 비교하는 명령어
+git log --oneline --decorate --graph dev..origin/dev

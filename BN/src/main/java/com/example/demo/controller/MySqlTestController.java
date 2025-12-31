@@ -19,7 +19,7 @@ public class MySqlTestController {
     @GetMapping("/mysql/save")
     public String save() {
         TestEntity user = new TestEntity();
-        user.setName("helen");
+        user.setName("Inno is Helen's");
         testRepository.save(user);
         return "saved";
     }

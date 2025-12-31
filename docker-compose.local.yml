@@ -1,0 +1,67 @@
+version: '3.8'
+
+services:
+  # 1. Database (MySQL)
+  db:
+    image: mysql:8.0
+    container_name: coconutTalk-db-dev
+    environment:
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  # 2. Cache (Redis)
+  redis:
+    image: redis:alpine
+    container_name: redis-dev
+    ports:
+      - "6379:6379"
+
+  # 3. Backend (Spring Boot)
+  # backend:
+  #   build: ./BN
+  #   container_name: coconutTalk-backend-dev
+  #   environment:
+  #     SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/${DB_NAME}
+  #     SPRING_DATASOURCE_USERNAME: root
+  #     SPRING_DATASOURCE_PASSWORD: ${DB_ROOT_PASSWORD}
+  #     SPRING_PROFILES_ACTIVE: ${SPRING_PROFILE}
+  #     SPRING_REDIS_HOST: redis
+  #     SPRING_REDIS_PORT: 6379
+  #   ports:
+  #     - "8080:8080"
+  #   depends_on:
+  #     - db
+  #     - redis
+  #   restart: unless-stopped
+  #   healthcheck:
+  #     test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 5
+  #     start_period: 30s
+
+  # 4. Frontend (React + Vite)
+  frontend:
+    build:
+      context: ./FN
+      dockerfile: Dockerfile
+    container_name: react-dev
+    # depends_on:     // 백엔드도 도커로 할거면 의존관계 풀어야함
+    #   - backend
+    environment:
+      VITE_API_URL: http://localhost:8080
+      CHOKIDAR_USEPOLLING: "true" # 파일 변경 감지 성능 향상 (Windows 환경 필수), Hot reload
+    ports:
+      - "${VITE_PORT:-5173}:5173"
+    volumes:
+      - ./FN:/app   # 내 컴퓨터의 FN 폴더를 컨테이너의 /app에 연결
+      - /app/node_modules   # 컨테이너 안의 node_modules는 보호(삭제 방지)
+    stdin_open: true
+    tty: true
+
+volumes:
+  mysql_data:
