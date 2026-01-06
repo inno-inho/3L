@@ -1,8 +1,11 @@
 ```
 # docker 실행 명령어
-docker-compose -f docker-compose.dev.yml up -d
+docker-compose -f docker-compose.local.yml --env-file .env.local up -d --build
 
-docker-compose -f docker-compose.dev.yml down
+docker-compose -f docker-compose.local.yml --env-file .env.local up
+docker-compose -f docker-compose.local.yml --env-file .env.local down
+
+# bn -> demoapplication run
 ```
 
 [메신저 구현](https://qkrqkrrlrl.tistory.com/193)  
