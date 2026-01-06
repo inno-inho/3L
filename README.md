@@ -20,3 +20,61 @@
     docker-compose -f docker-compose.local.yml --env-file .env.local down
     ```
 
+### 백엔드 구조
+```
+Back
+└─src
+    ├─main
+    │  ├─generated
+    │  ├─java
+    │  │  └─com
+    │  │      └─example
+    │  │          └─demo
+    │  │              ├─apiController
+    │  │              ├─config
+    │  │              │  └─auth
+    │  │              │      ├─exceptionHandler
+    │  │              │      ├─jwt
+    │  │              │      ├─loginHandler
+    │  │              │      ├─logoutHandler
+    │  │              │      ├─provider
+    │  │              │      ├─redis
+    │  │              │      └─scheduled
+    │  │              ├─controller
+    │  │              ├─domain
+    │  │              │  ├─dto
+    │  │              │  ├─entity
+    │  │              │  └─repository
+    │  │              └─service
+    │  └─resources
+    │      ├─static
+    │      │  ├─css
+    │      │  ├─font
+    │      │  ├─image
+    │      │  └─js
+    │      └─templates
+    │          ├─board
+    │          └─user
+    └─test
+
+Front
+└─src
+    ├─api
+    ├─assets
+    ├─components
+    │  ├─board
+    │  ├─notice
+    │  └─user
+    ├─context
+    ├─css
+    ├─data
+    ├─hooks
+    ├─services
+    └─utils
+
+Ml
+├─app
+│  └─__pycache__
+├─data
+└─models
+```
