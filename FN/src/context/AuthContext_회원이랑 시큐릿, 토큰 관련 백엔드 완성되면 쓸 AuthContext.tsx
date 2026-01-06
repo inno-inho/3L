@@ -86,7 +86,7 @@
 //       setIsLoggedIn(false);
 //       setUser(null);
 //       localStorage.removeItem("accessToken"); // 토큰 삭제
-//       window.location.href = '/login';  // 로그인 화면으로 이동
+//       window.location.href = '/';  // 로그인 화면으로 이동
 //     }
 //   };
 

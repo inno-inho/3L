@@ -6,7 +6,7 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 
 import ConnectionTest from './components/test/ConnectionTest';
 import LoginPage from './components/user/LoginPage';
-import MainLayout from './components/layout/MainLayout';
+import MainLayout from './components/common/MainLayout';
 import ChatPage from './components/chat/ChatPages';
 
 const App: React.FC = () => {
