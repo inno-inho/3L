@@ -1,3 +1,5 @@
+### docker 명령어
+
 ```
 # docker 실행 명령어
 docker-compose -f docker-compose.local.yml --env-file .env.local up -d --build
@@ -6,6 +8,28 @@ docker-compose -f docker-compose.local.yml --env-file .env.local up
 docker-compose -f docker-compose.local.yml --env-file .env.local down
 
 # bn -> demoapplication run
+```
+
+### notice 관련
+```
+POST   api/notices                     // 공지 등록 (관리자)
+GET    api/notices                     // 공지 목록 조회
+GET    api/notices/{id}                // 공지 상세 조회
+PUT    api/notices/{id}                // 공지 수정 (관리자)
+DELETE api/notices/{id}                // 공지 삭제 (관리자)
+
+PUT    api/notices/{id}/pin             // 상단 고정/해제
+PUT    api/notices/{id}/important       // 중요 공지 설정
+
+POST   api/notices/{id}/schedule        // 예약 공지 설정
+
+GET    api/notices/search               // 제목/내용 검색
+GET    api/notices/filter               // 기간/중요 공지 필터
+
+POST   api/notices/{id}/files           // 파일 첨부
+GET    api/notices/{id}/files/{fileId}  // 파일 다운로드
+
+POST   api/notices/{id}/comments
 ```
 
 [메신저 구현](https://qkrqkrrlrl.tistory.com/193)  
