@@ -1,7 +1,8 @@
 package com.example.demo.controller;
 
-import com.example.demo.Repository.TestRepository;
-import com.example.demo.entity.TestEntity;
+
+import com.example.demo.domain.Repository.TestRepository;
+import com.example.demo.domain.entity.TestEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;

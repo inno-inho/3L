@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react'
 import { useAuth } from '../../context/AuthContext'
+import { Link } from 'react-router-dom';    
 
 import ProfileImage from './ProfileImage';
 import coconuttalk_bg from '@/assets/image/coconuttalk_bg.png';
@@ -25,12 +26,17 @@ const Header: React.FC = () => {
         <>
             <header className='ml-11 mr-11 flex justify-between items-center px-6 py-3 bg-transparent'>
                 {/* 로고 영역 */}
-                <div className='flex itmes-center gap-2'>
+                <Link 
+                    to="/chatPages" 
+                    className='flex items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer'
+                >
                     <div className='w-8 h-8 flex items-center justify-center text-white font-bold'>
-                        <img className="" src={coconuttalk_bg} alt="코코넛 톡 로그" />
+                        <img src={coconuttalk_bg} alt="코코넛 톡 로고" />
                     </div>
-                    <span className='text-2xl font-black text-[#6F4E37] tracking-tight'>CoconutTalk</span>
-                </div>
+                    <span className='text-2xl font-black text-[#6F4E37] tracking-tight'>
+                        CoconutTalk
+                    </span>
+                </Link>
 
                 {/* 오른쪽: 사용자 정보 및 드롭다운 */}
                 <div className='relative' ref={dropdownRef}>
@@ -39,7 +45,7 @@ const Header: React.FC = () => {
                         onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                     >
                             <ProfileImage
-                                url={user?.profileImageUrl}
+                                url={user?.userProfileImageUrl}
                                 nickname={user?.nickname}
                                 size='sm'
                             />

@@ -1,6 +1,6 @@
-package com.example.demo.Repository;
+package com.example.demo.domain.Repository;
 
-import com.example.demo.entity.TestEntity;
+import com.example.demo.domain.entity.TestEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface TestRepository extends JpaRepository<TestEntity, Long> {
