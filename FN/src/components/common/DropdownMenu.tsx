@@ -1,14 +1,12 @@
 import React, { useState } from 'react';
 
-
 interface DropdownMenuProps {
     isOpen: boolean;
     onClose: () => void;
     onLogout: () => void;
-    nickname?: string;
 }
 
-const DropdownMenu = ({ isOpen, onClose, onLogout, nickname }: DropdownMenuProps) => {
+const DropdownMenu = ({ isOpen, onClose, onLogout }: DropdownMenuProps) => {
     // 채팅알림 ON/OFF 상태 관리(기본값은 true)
     const [isNotifyOn, setIsNotifyOn] = useState(true);
 

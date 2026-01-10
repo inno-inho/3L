@@ -21,6 +21,7 @@ export interface ChatMessageDto{
 export interface ChatRoomDto{
     roomId: string;
     roomName: string;
+    chatRoomType: 'GROUP' | 'FRIEND';
     lastMessage: string;
     lastMessageTime: string;
     unreadCount: number;

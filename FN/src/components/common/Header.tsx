@@ -65,7 +65,7 @@ const Header: React.FC = () => {
                         isOpen = {isDropdownOpen}
                         onClose={() => setIsDropdownOpen(false)}
                         onLogout={logout}
-                        nickname={user?.nickname}
+                        // nickname={user?.nickname}
                     />
                 </div>
             </header>

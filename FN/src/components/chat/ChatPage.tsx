@@ -12,6 +12,7 @@ const dummyRooms: ChatRoomDto[] = [
     {
         roomId: '1',
         roomName: '코코넛톡 테스트방1',
+        chatRoomType: 'GROUP',
         lastMessage: '자 이제 시작이야!',
         lastMessageTime: '오후 4:32',
         unreadCount: 3,
@@ -21,6 +22,7 @@ const dummyRooms: ChatRoomDto[] = [
     {
         roomId: '2',
         roomName: '테스트톡 코코넛방2',
+        chatRoomType: 'FRIEND',
         lastMessage: '내 꿈을 위한 여행',
         lastMessageTime: '오전 4:32',
         unreadCount: 10,

@@ -1,8 +1,10 @@
-import React, { StrictMode, useEffect } from "react";
+import React, { StrictMode, useEffect, useRef } from "react";
 import { useState } from "react";
 
 import type { ChatMessageDto, ChatRoomDto } from "../../types/chat";
 import type { User } from "../../context/AuthContext";
+
+import ChatDropdownMenu from "./ChatDropdownMenu";
 
 import more_vert from "@/assets/image/more_vert.png"
 import text from "@/assets/image/text.svg";
@@ -24,6 +26,20 @@ const ChatWindow = ({ roomInfo, currentUser}: ChatWindowProps) => {
     // 방 ID에 따라 다른 초기 메시지를 보여주고 싶을 때
     const [messages, setMessages] = useState<ChatMessageDto[]>([]);
 
+    // 드롭다운 메뉴 상태 관리
+    const [ isChatDropdownOpen, setChatIsDropdownOpen ] = useState(false);
+    const chatDropdownRef = useRef<HTMLDivElement>(null);
+
+    // 외부 클릭 시 닫기
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if(chatDropdownRef.current && !chatDropdownRef.current.contains(event.target as Node)){
+                setChatIsDropdownOpen(false);
+            }
+        };
+        document.addEventListener('mousedown' , handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
 
     // 해당 방의 메시지를 가져오는 로직 적을거야
     useEffect(() => {
@@ -109,9 +125,24 @@ const ChatWindow = ({ roomInfo, currentUser}: ChatWindowProps) => {
                             )}
                         </div>
                     </div>
-                    <button className="hover:bg-gray-100 w-10 h-10 flex items-center flex-col rounded-3xl">
-                        <img src={more_vert} alt="채팅알람 관련 설정" className="w-7 h-10" />
-                    </button>
+                    {/* 누르면 드롭다운메뉴 나오는 곳 ... */}
+                    <div 
+                        className="relative"
+                        ref={chatDropdownRef}
+                    >
+                        <button 
+                            className=" hover:bg-gray-100 w-10 h-10 flex items-center justify-center rounded-full"
+                            onClick={() => setChatIsDropdownOpen(!isChatDropdownOpen)}
+                        >
+                            <img src={more_vert} alt="채팅알람 관련 설정" className="w-7 h-7" />
+                        </button>
+
+                        {/* 드롭다운 컴포넌트 적용 */}
+                        <ChatDropdownMenu 
+                            isOpen = {isChatDropdownOpen}
+                            chatRoomType={roomInfo.chatRoomType}
+                        />
+                    </div>        
                 </div>
 
                 {/* 메시지 리스트 영역 */}
