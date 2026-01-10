@@ -11,14 +11,14 @@ import text from "@/assets/image/text.svg";
 import addPhoto from "@/assets/image/addPhoto.svg";
 import addReaction from "@/assets/image/addReaction.svg";
 import coconuttalk_bg from "@/assets/image/coconuttalk_bg.png";
-
+import stat_minus from "@/assets/image/stat_minus.png";
 
 interface ChatWindowProps {
     roomInfo: ChatRoomDto;
     currentUser: User | null;
 }
 
-const ChatWindow = ({ roomInfo, currentUser}: ChatWindowProps) => {
+const ChatWindow = ({ roomInfo, currentUser }: ChatWindowProps) => {
 
     // 입력창의 텍스트를 관리하는 상태
     const [inputText, setInputText] = useState("");
@@ -26,18 +26,45 @@ const ChatWindow = ({ roomInfo, currentUser}: ChatWindowProps) => {
     // 방 ID에 따라 다른 초기 메시지를 보여주고 싶을 때
     const [messages, setMessages] = useState<ChatMessageDto[]>([]);
 
+    // 추가할 상태와 Ref
+    const [showScrollBtn, setSshowScrollBtn] = useState(false);   // 아래로 이동하는 버튼 보여주는 상태
+    const scrollRef = useRef<HTMLDivElement>(null); // 메시지 리스트 컨테이너 
+    const messagesEndRef = useRef<HTMLDivElement>(null);    // 리스트의 제일 마지막 지점
+
+    // 최하단으로 스크롤하는 함수
+    const scrollToBottom = () => {
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }
+
+    // 새 메시지가 올 때마다 자동 스크롤
+    useEffect(() => {
+        scrollToBottom();
+    }, [messages]);
+
+    // 스크롤 위치를 감지하여 버튼 표시 여부 결정
+    const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+        const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
+
+        // 바닥에서 200px 이상 위로 올라가면 버튼 표시
+        if (scrollHeight - scrollTop - clientHeight > 200) {
+            setSshowScrollBtn(true);
+        } else {
+            setSshowScrollBtn(false);
+        }
+    }
+
     // 드롭다운 메뉴 상태 관리
-    const [ isChatDropdownOpen, setChatIsDropdownOpen ] = useState(false);
+    const [isChatDropdownOpen, setChatIsDropdownOpen] = useState(false);
     const chatDropdownRef = useRef<HTMLDivElement>(null);
 
     // 외부 클릭 시 닫기
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
-            if(chatDropdownRef.current && !chatDropdownRef.current.contains(event.target as Node)){
+            if (chatDropdownRef.current && !chatDropdownRef.current.contains(event.target as Node)) {
                 setChatIsDropdownOpen(false);
             }
         };
-        document.addEventListener('mousedown' , handleClickOutside);
+        document.addEventListener('mousedown', handleClickOutside);
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
@@ -56,7 +83,7 @@ const ChatWindow = ({ roomInfo, currentUser}: ChatWindowProps) => {
             message: `${roomInfo.roomName}에 입장했습니다.`,
             isDeleted: false,
             createdAt: new Date().toISOString(),
-            unreadCount: roomInfo.userCount - 1 
+            unreadCount: roomInfo.userCount - 1
         };
         setMessages([welcomeMsg]);
     }, [roomInfo.roomId])
@@ -66,7 +93,7 @@ const ChatWindow = ({ roomInfo, currentUser}: ChatWindowProps) => {
     // ##################################################
     const handleSend = () => {
         // 내용이 없으면 전송하지 않음
-        if(!inputText.trim()) return;
+        if (!inputText.trim()) return;
 
         // 새 메시지 객체 생성
         const newMessage: ChatMessageDto = {
@@ -92,9 +119,9 @@ const ChatWindow = ({ roomInfo, currentUser}: ChatWindowProps) => {
     }
 
 
-    return(
+    return (
         <>
-            <div className="flex-1 bg-white rounded-3xl shadow-sm border border-[#E5E0D5] flex flex-col overflow-hidden">
+            <div className="relative flex-1 bg-white rounded-3xl shadow-sm border border-[#E5E0D5] flex flex-col overflow-hidden">
                 {/* 상단 헤더 (image_31027f.png 참조) */}
                 <div className="h-16 border-b border-gray-100 flex items-center px-6 justify-between bg-white">
                     <div className="flex items-center gap-3">
@@ -110,9 +137,9 @@ const ChatWindow = ({ roomInfo, currentUser}: ChatWindowProps) => {
                             ) : (
                                 // 이미지가 없을 때 보여줄 기본 아이콘이나 대체 텍스트
                                 <img src={coconuttalk_bg} alt="코코넛톡 기본 이미지" />
-                            )}               
+                            )}
                         </div>
-                        
+
                         {/* 방 이름 및 인원수 */}
                         <div className="flex">
                             <span className="font-bold text-[#4A3F35] leading-none">
@@ -126,11 +153,11 @@ const ChatWindow = ({ roomInfo, currentUser}: ChatWindowProps) => {
                         </div>
                     </div>
                     {/* 누르면 드롭다운메뉴 나오는 곳 ... */}
-                    <div 
+                    <div
                         className="relative"
                         ref={chatDropdownRef}
                     >
-                        <button 
+                        <button
                             className=" hover:bg-gray-100 w-10 h-10 flex items-center justify-center rounded-full"
                             onClick={() => setChatIsDropdownOpen(!isChatDropdownOpen)}
                         >
@@ -138,15 +165,19 @@ const ChatWindow = ({ roomInfo, currentUser}: ChatWindowProps) => {
                         </button>
 
                         {/* 드롭다운 컴포넌트 적용 */}
-                        <ChatDropdownMenu 
-                            isOpen = {isChatDropdownOpen}
+                        <ChatDropdownMenu
+                            isOpen={isChatDropdownOpen}
                             chatRoomType={roomInfo.chatRoomType}
                         />
-                    </div>        
+                    </div>
                 </div>
 
                 {/* 메시지 리스트 영역 */}
-                <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-white">
+                <div
+                    className="flex-1 overflow-y-auto p-6 space-y-6 bg-white"
+                    onScroll={handleScroll}     // 스크롤 이벤트 연결
+                    ref={scrollRef}
+                >
                     {messages.map((msg) => {
                         const isMine = msg.sender === currentUser?.email;
                         const isSystem = msg.messageType === 'SYSTEM';
@@ -162,21 +193,20 @@ const ChatWindow = ({ roomInfo, currentUser}: ChatWindowProps) => {
                         }
 
                         return (
-                            <div key={msg.messageId} className={`flex ${isMine ? 'justify-end' : 'justify-start'}`}>    
+                            <div key={msg.messageId} className={`flex ${isMine ? 'justify-end' : 'justify-start'}`}>
                                 {!isMine && (
                                     <div className="w-10 h-10 bg-gray-200 rounded-full mr-3 mt-1 flex-shrink-0" />
                                 )}
                                 <div className={`flex flex-col ${isMine ? 'items-end' : 'items-start'}`}>
                                     {!isMine && <span className="text-xs font-bold text-[#4A3F35] mb-1">{msg.senderName}</span>}
-                                    
+
                                     {/* 말풍선과 시간이나 안 읽은 사람 수를 감싸는 컨테이너 */}
                                     <div className={`flex items-end gap-2 ${isMine ? 'flex-row-reverse' : 'flex-row'}`}>
                                         {/* 말풍선 */}
-                                        <div className={`max-w-[300px] px-4 py-2.5 rounded-2xl text-sm shadow-sm whitespace-pre-wrap break-words ${
-                                            isMine 
-                                            ? 'bg-[#FFF9ED] text-[000000] font-semibold rounded-tr-none' 
+                                        <div className={`max-w-[300px] px-4 py-2.5 rounded-2xl text-sm shadow-sm whitespace-pre-wrap break-words ${isMine
+                                            ? 'bg-[#FFF9ED] text-[000000] font-semibold rounded-tr-none'
                                             : 'bg-[#743F24] bg-opacity-20 text-[000000] font-semibold rounded-tl-none'
-                                        }`}>
+                                            }`}>
                                             {msg.message}
                                         </div>
                                         {/* 시간 및 안 읽은 사람 수 표시하는 영역 */}
@@ -191,13 +221,33 @@ const ChatWindow = ({ roomInfo, currentUser}: ChatWindowProps) => {
                                             </span>
                                         </div>
 
-                                        
+
                                     </div>
                                 </div>
                             </div>
                         );
                     })}
+
+                    {/* 메시지 끝 지점 표시(여기로 스크롤되서 내려올거야) */}
+                    <div ref={messagesEndRef} />
                 </div>
+
+
+                {/* 하단으로 가는 스크롤 버튼 */}
+                {showScrollBtn && (
+                    <div className="absolute bottom-56 right-8 z-30 opacity-85">
+                        <button
+                            onClick={scrollToBottom}
+                            className="bg-white border border-gray-200 shadow-lg rounded-full w-10 h-10 flex items-center justify-center hover:bg-gray-50 transition-all z-10 animate-bounce"
+                        >
+                            <img
+                                src={stat_minus}
+                                alt="밑으로 가는 이동버튼"
+                                className="w-6 h-6"
+                            />
+                        </button>
+                    </div>
+                )}
 
                 {/* 하단 메시지 입력창 영역 */}
                 <div className="p-4 bg-white border-t border-gray-50">
@@ -209,7 +259,7 @@ const ChatWindow = ({ roomInfo, currentUser}: ChatWindowProps) => {
                             onChange={(e) => setInputText(e.target.value)}  // 입력할 때마다 상태 업데이트
                             onKeyDown={(e) => {
                                 // Enter키를 누르면 전송 (Shift+Enter는 줄바꿈)
-                                if (e.key === 'Enter' && !e.shiftKey){
+                                if (e.key === 'Enter' && !e.shiftKey) {
                                     e.preventDefault();
                                     handleSend();
                                 }
@@ -218,37 +268,37 @@ const ChatWindow = ({ roomInfo, currentUser}: ChatWindowProps) => {
                         <div className="flex justify-between items-center mt-2">
                             <div className="flex gap-3">
                                 <button className="hover:bg-gray-200 h-12 w-12 flex items-center justify-center rounded-full">
-                                    <img 
-                                        src = {addPhoto}
-                                        alt = "사진이나 파일 추가"
+                                    <img
+                                        src={addPhoto}
+                                        alt="사진이나 파일 추가"
                                         className="h-8 w-8"
                                     />
                                 </button>
                                 <button className="hover:bg-gray-200 h-12 w-12 flex items-center justify-center rounded-full">
-                                    <img 
-                                        src = {text}
-                                        alt = "파일 추가"
+                                    <img
+                                        src={text}
+                                        alt="파일 추가"
                                         className="h-8 w-8"
                                     />
                                 </button>
                                 <button className="hover:bg-gray-200 h-12 w-12 flex items-center justify-center rounded-full">
-                                    <img 
-                                        src = {addReaction}
-                                        alt = "리액션"
+                                    <img
+                                        src={addReaction}
+                                        alt="리액션"
                                         className="h-8 w-8"
                                     />
                                 </button>
                             </div>
-                            <button 
+                            <button
                                 onClick={handleSend}    // 클릭 시 전송 함수 실행
                                 className="bg-[#B5A492] hover:bg-[#8B4513] text-white px-6 py-1.5 rounded-xl text-sm transition-colors font-medium"
                             >
-                            전송
+                                전송
                             </button>
-                        </div>                      
+                        </div>
                     </div>
                 </div>
-            </div>        
+            </div>
         </>
     );
 };
