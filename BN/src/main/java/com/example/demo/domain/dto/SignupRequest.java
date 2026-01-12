@@ -16,6 +16,7 @@ import lombok.NoArgsConstructor;
  */
 
 @Getter
+//@Getter로 getEmail(), getPassword()...등과 같은 메서드 자동생성됨(다른 필드값도 마찬가지임)
 @NoArgsConstructor
 
 public class SignupRequest {
@@ -29,6 +30,9 @@ public class SignupRequest {
     /*
     * 비밀번호는 DTO에서는 평문 상태
     * -> Service에서 암호화
+    * -> 회원가입 이후 Entity의 password 필드에는
+    *    Service에서 생성한 암호화된 비밀번호 값(encodedPassword)이 저장되어 있음
+    * -> Entity는 이 값이 어디에서 왔는지 모름. 그저 자신의 password 필드에 저장된 값일 뿐
     * */
     @NotBlank
     private String password;

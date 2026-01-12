@@ -53,6 +53,11 @@ public class User {
      * BCrypt로 암호화된 비밀번호만 저장
      * ❌ 절대 평문 저장 금지
      */
+
+    /**
+     * 회원가입 이후 Entity의 password 필드에는
+     * Service에서 생성한 암호화된 비밀번호 값(encodedPassword)이 저장되어 있음
+     */
     @Column(nullable = false)
     private String password;
 

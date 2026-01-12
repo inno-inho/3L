@@ -21,4 +21,5 @@ public interface UserRepository extends JpaRepository<User,Long> { //<Entity타�
     * SELECT COUNT(*) FROM users WHERE email =?
     * */
     boolean existsByEmail(String email);
+            //이메일 중복 여부 확인메서드
 }
