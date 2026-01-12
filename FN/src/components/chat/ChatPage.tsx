@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import { useAuth } from '../../context/AuthContext';
 
-import ChatSidebar from './ChatSidebar';
+import ChatSidebar from '../common/ChatSidebar';
 import ChatRoomList from './ChatRoomList';
 import ChatEmptyState from './ChatEmptyState';
 import ChatWindow from './ChatWindow';

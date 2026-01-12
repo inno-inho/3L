@@ -3,8 +3,8 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext'
 import type { User } from '../../context/AuthContext';
 
-import ChatPage from './ChatPage';
-import ProfileImage from '../common/ProfileImage';
+import ChatPage from '../chat/ChatPage';
+import ProfileImage from './ProfileImage';
 import chats from '@/assets/image/chats.svg';
 import users from '@/assets/image/users.svg';
 import megaphone from '@/assets/image/megaphone.png';
