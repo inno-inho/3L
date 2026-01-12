@@ -10,6 +10,16 @@ docker-compose -f docker-compose.local.yml --env-file .env.local down
 # bn -> demoapplication run
 ```
 
+### @ 사용 설정 & 폰트 설정
+```
+“@ = src” 라는 약속을 따로 설정해줘야 함 vite.config.ts 설정 필요
+tailwind.config.js 설정 + index.html에 google font link 추가 + Header.tsx 37줄 : className에 font-nerko 추가
+↓
+build 다시 해줘야함(삭제 안해도 ok, 빌드만 해서 compose up 하면 적용 됨)
+```
+
+
+
 ### notice 관련
 ```
 POST   api/notices                     // 공지 등록 (관리자)
