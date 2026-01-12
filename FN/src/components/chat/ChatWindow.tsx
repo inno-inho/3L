@@ -12,6 +12,7 @@ import addPhoto from "@/assets/image/addPhoto.svg";
 import addReaction from "@/assets/image/addReaction.svg";
 import coconuttalk_bg from "@/assets/image/coconuttalk_bg.png";
 import stat_minus from "@/assets/image/stat_minus.png";
+import search from "@/assets/image/search.png";
 
 interface ChatWindowProps {
     roomInfo: ChatRoomDto;
@@ -31,10 +32,22 @@ const ChatWindow = ({ roomInfo, currentUser }: ChatWindowProps) => {
     const scrollRef = useRef<HTMLDivElement>(null); // 메시지 리스트 컨테이너 
     const messagesEndRef = useRef<HTMLDivElement>(null);    // 리스트의 제일 마지막 지점
 
+    // 검색어 상태
+    const [searchQuery, setSearchQuery] = useState("");
+    // 검색된 메시지 Id들을 저장(순차 이동용)
+    const [searchResults, setSearchResults] = useState<string[]>([]);
+    const [currentSearchIndex, setCurrentSearchIndex] = useState(-1);
+
+    // 각 메시지 엘리먼트를 참조하기 위한 Map Ref(타입 지정)
+    const messageRefs = useRef<Map<string, HTMLDivElement>>(new Map());
+
     // 최하단으로 스크롤하는 함수
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }
+
+    // 검색창 활성화 여부
+    const [isSearchMode, setIsSearchMode] = useState(false);
 
     // 새 메시지가 올 때마다 자동 스크롤
     useEffect(() => {
@@ -118,58 +131,179 @@ const ChatWindow = ({ roomInfo, currentUser }: ChatWindowProps) => {
         setInputText("");
     }
 
+    // 검색 및 스크롤 이동 함수
+    const handleSearch = (query: string) => {
+        setSearchQuery(query);
+        if (!query.trim()) {
+            setSearchResults([]);
+            setCurrentSearchIndex(-1);
+            return;
+        }
+
+        // 메시지 중 텍스트 타입이고 검색어를 포함하는 ID 추출
+        const foundIds = messages
+            .filter(msg => msg.messageType === 'TEXT' && msg.message.includes(query))
+            .map(msg => msg.messageId)
+
+        setSearchResults(foundIds);
+
+        if (foundIds.length > 0) {
+            setCurrentSearchIndex(0);
+            const targetElement = messageRefs.current.get(foundIds[0]);
+            if (targetElement) {
+                targetElement.scrollIntoView({ behavior: "smooth", block: "center" });
+
+                // 검색해서 찾아진 메시지에 대한 시각적 효과 (하이라이트)
+                targetElement.style.backgroundColor = "#FEF9C3";
+                setTimeout(() => {
+                    targetElement.style.backgroundColor = "";
+                }, 2000);
+            }
+        }
+    }
+
+    // 검색 결과 이동 함수(방햐이 'next' | 'prev')
+    const moveSearchIndex = (direction: 'next' | 'prev') => {
+        if (searchResults.length === 0) return;
+
+        let nextIndex = currentSearchIndex;
+        if (direction === 'next') {
+            nextIndex = (currentSearchIndex + 1) % searchResults.length;
+        } else {
+            nextIndex = (currentSearchIndex - 1 + searchResults.length) % searchResults.length;
+        }
+
+        setCurrentSearchIndex(nextIndex);
+        const targetId = searchResults[nextIndex];
+        const targetElement = messageRefs.current.get(targetId);
+
+        if (targetElement) {
+            targetElement.scrollIntoView({ behavior: "smooth", block: "center" });
+            // 강조효과
+            targetElement.style.backgroundColor = "#FEF9C3";
+            setTimeout(() => { targetElement.style.backgroundColor = ""; }, 1500);
+        }
+    };
+
+    // 검색 종료(취소) 함수
+    const handleCloseSearch = () => {
+        setIsSearchMode(false);
+        setSearchQuery("");
+        setSearchResults([]);
+        setCurrentSearchIndex(-1);
+    }
 
     return (
         <>
             <div className="relative flex-1 bg-white rounded-3xl shadow-sm border border-[#E5E0D5] flex flex-col overflow-hidden">
-                {/* 상단 헤더 (image_31027f.png 참조) */}
-                <div className="h-16 border-b border-gray-100 flex items-center px-6 justify-between bg-white">
-                    <div className="flex items-center gap-3">
+                {/* 상단 헤더 (통합프레임) */}
+                <div className="h-16 border-b border-gray-100 flex items-center justify-between px-6 bg-white">
+                    {!isSearchMode ? (
+                        // 기본 모드
+                        <>               
+                            <div className="flex items-center gap-3">
+                                {/* roomImage 처리 */}
+                                <div className="w-10 h-10 bg-gray-200 rounded-full overflow-hidden flex items-center justify-center">
+                                    {roomInfo.roomImageUrls && roomInfo.roomImageUrls.length > 0 ? (
+                                        <img
+                                            src={roomInfo.roomImageUrls[0]}
+                                            alt={roomInfo.roomName}
+                                            className="w-full h-full object-cover"
+                                        />
+                                    ) : (
+                                        // 이미지가 없을 때 보여줄 기본 아이콘이나 대체 텍스트
+                                        <img src={coconuttalk_bg} alt="코코넛톡 기본 이미지" />
+                                    )}
+                                </div>
 
-                        {/* roomImage 처리 */}
-                        <div className="w-10 h-10 bg-gray-200 rounded-full overflow-hidden flex items-center justify-center">
-                            {roomInfo.roomImageUrls && roomInfo.roomImageUrls.length > 0 ? (
-                                <img
-                                    src={roomInfo.roomImageUrls[0]}
-                                    alt={roomInfo.roomName}
-                                    className="w-full h-full object-cover"
+                                {/* 방 이름 및 인원수 and Search Icon */}
+                                <div className="flex items-center">
+                                    <span className="font-bold text-[#4A3F35] leading-none">
+                                        {roomInfo.roomName}
+                                    </span>
+                                    {roomInfo.userCount > 2 && (
+                                        <span className="text-xs text-gray-400 pl-3">
+                                            {roomInfo.userCount}명
+                                        </span>
+                                    )}
+                                    <button
+                                        className="h-8 w-8 pl-3"
+                                        onClick={() => setIsSearchMode(true)}
+                                    >
+                                        <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                            {/* 누르면 드롭다운메뉴 나오는 곳 ... */}
+                            <div
+                                className="relative"
+                                ref={chatDropdownRef}
+                            >
+                                <button
+                                    className=" hover:bg-gray-100 w-10 h-10 flex items-center justify-center rounded-full"
+                                    onClick={() => setChatIsDropdownOpen(!isChatDropdownOpen)}
+                                >
+                                    <img src={more_vert} alt="채팅알람 관련 설정" className="w-7 h-7" />
+                                </button>
+                                
+                                {/* 드롭다운 컴포넌트 적용 */}
+                                <ChatDropdownMenu
+                                    isOpen={isChatDropdownOpen}
+                                    chatRoomType={roomInfo.chatRoomType}
                                 />
-                            ) : (
-                                // 이미지가 없을 때 보여줄 기본 아이콘이나 대체 텍스트
-                                <img src={coconuttalk_bg} alt="코코넛톡 기본 이미지" />
-                            )}
-                        </div>
-
-                        {/* 방 이름 및 인원수 */}
-                        <div className="flex">
-                            <span className="font-bold text-[#4A3F35] leading-none">
-                                {roomInfo.roomName}
-                            </span>
-                            {roomInfo.userCount > 2 && (
-                                <span className="text-xs text-gray-400 pl-3">
-                                    {roomInfo.userCount}명
-                                </span>
-                            )}
-                        </div>
-                    </div>
-                    {/* 누르면 드롭다운메뉴 나오는 곳 ... */}
-                    <div
-                        className="relative"
-                        ref={chatDropdownRef}
-                    >
-                        <button
-                            className=" hover:bg-gray-100 w-10 h-10 flex items-center justify-center rounded-full"
-                            onClick={() => setChatIsDropdownOpen(!isChatDropdownOpen)}
-                        >
-                            <img src={more_vert} alt="채팅알람 관련 설정" className="w-7 h-7" />
-                        </button>
-
-                        {/* 드롭다운 컴포넌트 적용 */}
-                        <ChatDropdownMenu
-                            isOpen={isChatDropdownOpen}
-                            chatRoomType={roomInfo.chatRoomType}
-                        />
-                    </div>
+                            </div>
+                        </>
+                    ) : (
+                        // 검색창 모드
+                        <>                        
+                            <div className="flex items-center gap-4 w-full animate-in silde-in-from-top-1 duration-200">
+                                {/* 검색창 */}
+                                <div className="flex-1 flex items-center bg-[#F8F6F2] rounded-xl px-4 py-2 border border-transparent focus-within:border-[#B5A492] transition-all">
+                                    <svg className="w-4 h-4 text-gray-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                    </svg>
+                                    <input
+                                        autoFocus
+                                        className="bg-transparent flex-1 outline-none text-sm"
+                                        placeholder="Search"
+                                        value={searchQuery}
+                                        onChange={(e) => handleSearch(e.target.value)}
+                                    />
+                                    {/* 검색 결과 컨트롤(결과가 있을 때만 표시) */}
+                                    {searchResults.length > 0 && (
+                                        <div className="flex items-center gap-3 border-1 border-gray-300 ml-2 pl-3 text-gray-500">
+                                            <span className="text-[11px] font-medium min-w-[35px]">
+                                                {currentSearchIndex + 1} / {searchResults.length}
+                                            </span>
+                                            <div className="flex gap-1">
+                                                <button onClick={() => moveSearchIndex('prev')} className="p-1 hover:bg-gray-200 rounded-3xl h-5 w-5">
+                                                    <img
+                                                        src={stat_minus}
+                                                        alt="채팅 검색 내용 위로 이동"
+                                                        className="rotate-180"
+                                                    />
+                                                </button>
+                                                <button onClick={() => moveSearchIndex('next')} className="p-1 hover:bg-gray-200 rounded-3xl h-5 w-5">
+                                                    <img
+                                                        src={stat_minus}
+                                                        alt="채팅 검색 내용 아래로 이동"
+                                                    />
+                                                </button>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                                <button
+                                    onClick={handleCloseSearch}
+                                    className="text-sm text-gray-500 hover:text-[#743F24] px-1 transition-colors font-semibold"
+                                >
+                                    X
+                                </button>
+                            </div>            
+                        </>
+                    )}
                 </div>
 
                 {/* 메시지 리스트 영역 */}
