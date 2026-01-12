@@ -149,18 +149,10 @@ const ChatWindow = ({ roomInfo, currentUser }: ChatWindowProps) => {
 
         if (foundIds.length > 0) {
             setCurrentSearchIndex(0);
-            const targetElement = messageRefs.current.get(foundIds[0]);
-            if (targetElement) {
-                targetElement.scrollIntoView({ behavior: "smooth", block: "center" });
-
-                // 검색해서 찾아진 메시지에 대한 시각적 효과 (하이라이트)
-                targetElement.style.backgroundColor = "#FEF9C3";
-                setTimeout(() => {
-                    targetElement.style.backgroundColor = "";
-                }, 2000);
-            }
+        } else {
+            setCurrentSearchIndex(-1);
         }
-    }
+    };
 
     // 검색 결과 이동 함수(방햐이 'next' | 'prev')
     const moveSearchIndex = (direction: 'next' | 'prev') => {
@@ -270,6 +262,17 @@ const ChatWindow = ({ roomInfo, currentUser }: ChatWindowProps) => {
                                         placeholder="Search"
                                         value={searchQuery}
                                         onChange={(e) => handleSearch(e.target.value)}
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter') {
+                                                e.preventDefault();         // 페이지 새로고침 
+                                                
+                                                // 검색 결과가 있는 상태(화살표가 있음)에서 엔터를 치면
+                                                if(searchResults.length > 0){
+                                                    moveSearchIndex('next');    // 엔터 누르면 다음 결과로 이동
+                                                }
+                                                
+                                            }
+                                        }}
                                     />
                                     {/* 검색 결과 컨트롤(결과가 있을 때만 표시) */}
                                     {searchResults.length > 0 && (
@@ -297,7 +300,7 @@ const ChatWindow = ({ roomInfo, currentUser }: ChatWindowProps) => {
                                 </div>
                                 <button
                                     onClick={handleCloseSearch}
-                                    className="text-sm text-gray-500 hover:text-[#743F24] px-1 transition-colors font-semibold"
+                                    className="text-sm text-darkgray-50 hover:text-[#743F24] px-1 transition-colors font-semibold"
                                 >
                                     X
                                 </button>
@@ -327,7 +330,14 @@ const ChatWindow = ({ roomInfo, currentUser }: ChatWindowProps) => {
                         }
 
                         return (
-                            <div key={msg.messageId} className={`flex ${isMine ? 'justify-end' : 'justify-start'}`}>
+                            <div 
+                                key={msg.messageId}
+                                ref={(el) => {
+                                    if (el) messageRefs.current.set(msg.messageId, el);
+                                    else messageRefs.current.delete(msg.messageId);    
+                                }}    
+                                className={`flex ${isMine ? 'justify-end' : 'justify-start'}`}
+                            >
                                 {!isMine && (
                                     <div className="w-10 h-10 bg-gray-200 rounded-full mr-3 mt-1 flex-shrink-0" />
                                 )}
