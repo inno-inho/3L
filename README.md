@@ -82,6 +82,17 @@ content
 created_at  
 
 
+### Vite 프로젝트 구조
+```
+project-root/
+├─ index.html        
+├─ src/
+│  ├─ main.tsx
+│  └─ App.tsx
+├─ public/
+│  └─ vite.svg
+
+```
 
 
 [메신저 구현](https://qkrqkrrlrl.tistory.com/193)  
