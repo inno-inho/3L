@@ -327,3 +327,50 @@ POST   api/notices/{id}/comments
 4. 친구 기능
 5. 공지사항
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+### 모달 쓰는 법
+쓰는 페이지나 컴포넌트에서 상태설정
+```
+const ChatWindow = ({ roomInfo, currentUser }: ChatWindowProps) => {
+
+    const [ modalShow, setModalShow ] = useState(false);
+    const [ modalMessage, setModalMessage ] = useState("");
+```
+
+return (<></>) 제일 하단에 붙여넣기
+```
+{/* 모달 컴포넌트 */}
+            <AlertModal 
+                show={modalShow}
+                onHide={() => setModalShow(false)}
+                title="알림"
+                message={modalMessage}
+            />
+```
+
+필요한 로직에다가 붙여넣기
+```
+} catch(error) {
+            console.error("전송 에러: ", error);
+            setModalMessage("메시지 전송에 실패했습니다.");
+            setModalShow(true);
+        }
+```
