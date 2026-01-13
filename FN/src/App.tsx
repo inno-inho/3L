@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { AuthProvider, useAuth } from './context/AuthContext';
 import ConnectionTest from './components/test/ConnectionTest';
 import NoticeForm from './components/notice/NoticeForm';
+import NoticeList from './components/notice/NoticeList';
 import MainLayout from './components/common/MainLayout';
 import LoginPage from './components/user/LoginPage';
 
@@ -19,7 +20,9 @@ const App: React.FC = () => {
               {/* 홈페이지 입장하면 제일 먼저 보일 기본페이지, 로그인 페이지 */}
               <Route path='/' element={<LoginPage />} />
               <Route element={<MainLayout />} >
-                <Route path="/notices" element={<NoticeForm />} />
+                <Route path="/notices" element={<NoticeList />} />
+                <Route path="/notices/write" element={<NoticeForm />} />
+                
 
                 {/* test용 */}
                 <Route path='/test' element={<ConnectionTest />} />

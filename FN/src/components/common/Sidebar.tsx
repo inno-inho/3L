@@ -1,7 +1,6 @@
 import React from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext'
-import type { User } from '../../context/AuthContext';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
+import { useAuth, User } from '../../context/AuthContext'
 
 import ProfileImage from './ProfileImage';
 import chats from '@/assets/image/chats.svg';
@@ -54,9 +53,12 @@ const Sidebar = () => {
                         <img src = {megaphone} alt='확성기' className='w-7 h-7'/>
                     </div>
                     {/* 설정 아이콘 */}
-                    <div className='w-12 h-12 flex items-center justify-center rounded-2xl cursor-pointer hover:bg-[#f2ebe0] transition-colors opacity-50 hover:opacity-100'>
+                    <Link to="/notices">
+                        <div className='w-12 h-12 flex items-center justify-center rounded-2xl cursor-pointer hover:bg-[#f2ebe0] transition-colors opacity-50 hover:opacity-100'>
                         <img src={setting} alt='설정' className='w-7 h-7' />
                     </div>
+                    </Link>
+                    
                     {/* 나가기 아이콘 */}
                     <div className='w-12 h-12 flex items-center justify-center rounded-2xl cursor-pointer hover:bg-[#f2ebe0] transition-colors opacity-50 hover:opacity-100'>
                         <img src={exit} alt='나가기' className='w-7 h-7' />
