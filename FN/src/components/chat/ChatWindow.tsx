@@ -1,19 +1,14 @@
 import React, { StrictMode, useEffect, useRef } from "react";
 import { useState } from "react";
+import { Client } from "@stomp/stompjs";
 
 import type { ChatMessageDto, ChatRoomDto } from "../../types/chat";
 import type { User } from "../../context/AuthContext";
+import api from "../../api/api";
 
-import ChatDropdownMenu from "./ChatDropdownMenu";
-import ChatSearchHeader from "./chatSearchHeader";
+import ChatSearchHeader from "./ChatSearchHeader";
 
-import more_vert from "@/assets/image/more_vert.png"
-import text from "@/assets/image/text.svg";
-import addPhoto from "@/assets/image/addPhoto.svg";
-import addReaction from "@/assets/image/addReaction.svg";
-import coconuttalk_bg from "@/assets/image/coconuttalk_bg.png";
 import stat_minus from "@/assets/image/stat_minus.png";
-import search from "@/assets/image/search.png";
 import ChatInputSection from "./ChatInputSection";
 
 interface ChatWindowProps {
@@ -40,18 +35,51 @@ const ChatWindow = ({ roomInfo, currentUser }: ChatWindowProps) => {
     const [searchResults, setSearchResults] = useState<string[]>([]);
     const [currentSearchIndex, setCurrentSearchIndex] = useState(-1);
 
-
-
     // 검색창 활성화 여부
     const [isSearchMode, setIsSearchMode] = useState(false);
 
     // 각 메시지 엘리먼트를 참조하기 위한 Map Ref(타입 지정)
     const messageRefs = useRef<Map<string, HTMLDivElement>>(new Map());
 
-
     // 드롭다운 메뉴 상태 관리
     const [isChatDropdownOpen, setChatIsDropdownOpen] = useState(false);
     const chatDropdownRef = useRef<HTMLDivElement>(null);
+
+    // 미리보기 파일들 상태 관리
+    const [pendingFiles, setPendingFiles] = useState<{
+        id: string,
+        file: File,
+        type: "IMAGE" | "VIDEO" | "FILE",
+        previewUrl: string
+    }[]>([]);
+
+    // 웹 소켓 클라이언트
+    const client = useRef<Client | null>(null);
+
+    // 웹 소켓 클라이언트 
+    useEffect(() => {
+        // 웹 소켓 클라이언트 설정
+        client.current = new Client({
+            brokerURL: 'ws://localhost:8080/ws/chat',
+            onConnect: () => {
+                console.log("웹 소켓 클라이언트 연결 성공!");
+
+                // 해당 방을 구독(누가 메시지를 보내면 나한테 알려달라고 구독 신청)
+                client.current?.subscribe(`/topic/chat/${roomInfo.roomId}`, (message) => {
+                    const newMessages = JSON.parse(message.body);
+
+                    // 메시지 리스트를 업데이트하면 실시간으로 메시지가 화면에 뜸
+                    setMessages((prev) => [...prev, newMessages]);
+                });
+            },
+        });
+
+        client.current.activate();  // 연결 시작
+
+        return () => {
+            client.current?.deactivate();  // 나갈 때 연락 끊기
+        };
+    }, [roomInfo.roomId]);
 
     // 최하단으로 스크롤하는 함수
     const scrollToBottom = () => {
@@ -88,55 +116,72 @@ const ChatWindow = ({ roomInfo, currentUser }: ChatWindowProps) => {
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
-    // 해당 방의 메시지를 가져오는 로직 적을거야
+    // #######################################
+    // 해당 방의 메시지를 가져오는 로직
+    // #######################################
     useEffect(() => {
-        // 실제로는 여기서 서버에 roomId를 보내서 메시지 목록을 가져와야하지만
-        // 지금은 임시로 데이터 만들어놓음
-        const welcomeMsg: ChatMessageDto = {
-            messageId: 'welcome',
-            messageType: 'SYSTEM',
-            chatType: 'GROUP',
-            roomId: roomInfo.roomId,
-            sender: 'system',
-            senderName: '시스템',
-            senderInitial: 'ㅅ',
-            message: `${roomInfo.roomName}에 입장했습니다.`,
-            isDeleted: false,
-            createdAt: new Date().toISOString(),
-            unreadCount: roomInfo.userCount - 1
+        const fetchChatHistory = async () => {
+            try {
+                const response = await api.get(`/chatrooms/${roomInfo.roomId}/messages`);
+
+                // 메시지 불러온거 세팅하기
+                setMessages(response.data);
+            } catch (error) {
+                console.error("채팅 내역 로딩 실패: ", error);
+            }
         };
-        setMessages([welcomeMsg]);
+
+        if (roomInfo.roomId) {
+            fetchChatHistory();
+        }
+
     }, [roomInfo.roomId])
 
     // ##################################################
     // 전송 버튼 함수
     // ##################################################
-    const handleSend = () => {
-        // 내용이 없으면 전송하지 않음
-        if (!inputText.trim()) return;
+    const handleSend = async () => {
+        // 유효성 검사
+        if (!inputText.trim() && pendingFiles.length === 0) return;
 
-        // 새 메시지 객체 생성
-        const newMessage: ChatMessageDto = {
-            messageId: Date.now().toString(), // 실제 DB에 넣을 ID대신 현재 시간을 ID로 임시 사용
-            messageType: 'TEXT',
-            chatType: 'GROUP',
-            roomId: roomInfo.roomId,
-            sender: currentUser?.email ?? "",
-            senderName: currentUser?.nickname ?? "나",
-            senderInitial: 'ㄴ',
-            message: inputText,
-            isDeleted: false,
-            sentTime: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-            createdAt: new Date().toISOString(),
-            unreadCount: roomInfo.userCount - 1
+        try {
+            // FormData 생성 (텍스트와 파일)
+            const formData = new FormData();
+            formData.append("roomId", roomInfo.roomId);
+            formData.append("message", inputText.trim());
+            formData.append("sender", currentUser?.email ?? "");
+
+            pendingFiles.forEach((p) => {
+                formData.append("files", p.file);   // 서버의 RequsePart랑 이름 맞춰야함
+            });
+
+            // 서버 전송(서버로 보내면 WebSocket subscribu가 담당)
+            await api.post(`/chatrooms/${roomInfo.roomId}/send`, formData, {
+                headers: { "Content-Type": "multipart/form-data" }
+            });
+
+            // 성공 시 입력창 비우기
+            setInputText("");
+            setPendingFiles([]); 
+        } catch(error) {
+            console.error("전송 에러: ", error);
+            alert("메시지 전송에 실패했습니다.")
+        }
+    };
+
+    const handleFileUpload = (file: File, type: "IMAGE" | "VIDEO" | "FILE") => {
+        // 임시 미리보기 URL 생성
+        const tempUrl = URL.createObjectURL(file);
+        const newFile = {
+            id: Math.random().toString(36).substring(2, 11),    // 고유 ID 추가
+            file,
+            type,
+            previewUrl: tempUrl
         };
 
-        // 기존 메시지 목록에 새 메시지 추가
-        setMessages([...messages, newMessage]);
-
-        // 입력창 비우기
-        setInputText("");
-    }
+        // 메시지로 바로 보내지 않고 대기 상태에 저장
+        setPendingFiles(prev => [...prev, newFile]);
+    };
 
     // 검색 및 스크롤 이동 함수
     const handleSearch = (query: string) => {
@@ -190,6 +235,10 @@ const ChatWindow = ({ roomInfo, currentUser }: ChatWindowProps) => {
         setSearchQuery("");
         setSearchResults([]);
         setCurrentSearchIndex(-1);
+    }
+
+    const handleCancelFile = (id: string) => {
+        setPendingFiles(prev => prev.filter(f => f.id !== id));
     }
 
     return (
@@ -249,13 +298,54 @@ const ChatWindow = ({ roomInfo, currentUser }: ChatWindowProps) => {
 
                                     {/* 말풍선과 시간이나 안 읽은 사람 수를 감싸는 컨테이너 */}
                                     <div className={`flex items-end gap-2 ${isMine ? 'flex-row-reverse' : 'flex-row'}`}>
+
                                         {/* 말풍선 */}
-                                        <div className={`max-w-[300px] px-4 py-2.5 rounded-2xl text-sm shadow-sm whitespace-pre-wrap break-words ${isMine
-                                            ? 'bg-[#FFF9ED] text-[000000] font-semibold rounded-tr-none'
-                                            : 'bg-[#743F24] bg-opacity-20 text-[000000] font-semibold rounded-tl-none'
+                                        {/* 메시지 타입별 렌더링 */}
+                                        <div className={`max-w-[300px] overflow-hidden shadow-sm ${msg.messageType === 'TEXT'
+                                            ? `px-4 py-2.5 rounded-2xl text-sm whitespace-pre-wrap break-words ${isMine ? 'bg-[#FFF9ED] font-semibold rounded-tr-none' : 'bg-[#743F24] bg-opacity-20 font-semibold rounded-tl-none'
+                                            }`
+                                            : ''    // 이미지나 파일일 때는 배경색과 패딩을 별도로
                                             }`}>
-                                            {msg.message}
+
+                                            {/* 이미지 메시지 */}
+                                            {msg.messageType === 'IMAGE' && (
+                                                <div className="rounded-xl overflow-hidden border border-gray-100">
+                                                    <img
+                                                        src={msg.fileUrl} alt="첨부 이미지"
+                                                        className="w-full h-auto cursor-pointer hover:scale-[1.02] transition-transform"
+                                                    />
+                                                </div>
+                                            )}
+
+                                            {/* 비디오 메시지 */}
+                                            {msg.messageType === "VIDEO" && (
+                                                <div className="rounded-xl overflow-hidden border border-gray-100 bg-black">
+                                                    <video src={msg.fileUrl} controls className="w-full" />
+                                                </div>
+                                            )}
+
+                                            {/* 일반 파일 메시지 */}
+                                            {msg.messageType === 'FILE' && (
+                                                <div className={`flex items-center gap-3 p-3 rounded-2xl border ${isMine ? 'bg-white border-[#B5A492]' : 'bg-gray-50 border-gray-200'
+                                                    }`}>
+                                                    <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                                        <span className="text-xl">📄</span>
+                                                    </div>
+                                                    <div className="flex flex-col overflow-hidden text-left">
+                                                        <span className="text-sm font-bold truncate max-w-[150px]">{msg.message}</span>
+                                                        <span className="text-[10px] text-gray-500 font-medium">문서 파일</span>
+                                                    </div>
+                                                    <a href={msg.fileUrl} download={msg.message} className="ml-2 text-gray-400 hover:text-gray-600">
+                                                        ⬇️
+                                                    </a>
+                                                </div>
+                                            )}
+
+                                            {/* 기존 텍스트 메시지 */}
+                                            {msg.messageType === "TEXT" && msg.message}
+
                                         </div>
+
                                         {/* 시간 및 안 읽은 사람 수 표시하는 영역 */}
                                         <div className={`flex flex-col mb-1 ${isMine ? 'items-end' : 'items-start'}`}>
                                             {msg.unreadCount > 0 && (
@@ -301,6 +391,9 @@ const ChatWindow = ({ roomInfo, currentUser }: ChatWindowProps) => {
                     inputText={inputText}
                     setInputText={setInputText}
                     handleSend={handleSend}
+                    onFileUpload={handleFileUpload}
+                    pendingFiles={pendingFiles}
+                    onCancelFile={handleCancelFile}
                 />
             </div>
         </>
