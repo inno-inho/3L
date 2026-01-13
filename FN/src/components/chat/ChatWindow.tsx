@@ -7,6 +7,7 @@ import type { User } from "../../context/AuthContext";
 import api from "../../api/api";
 
 import ChatSearchHeader from "./ChatSearchHeader";
+import AlertModal from "../common/AlertModal";
 
 import stat_minus from "@/assets/image/stat_minus.png";
 import ChatInputSection from "./ChatInputSection";
@@ -17,6 +18,9 @@ interface ChatWindowProps {
 }
 
 const ChatWindow = ({ roomInfo, currentUser }: ChatWindowProps) => {
+
+    const [ modalShow, setModalShow ] = useState(false);
+    const [ modalMessage, setModalMessage ] = useState(""); 
 
     // 입력창의 텍스트를 관리하는 상태
     const [inputText, setInputText] = useState("");
@@ -165,7 +169,8 @@ const ChatWindow = ({ roomInfo, currentUser }: ChatWindowProps) => {
             setPendingFiles([]); 
         } catch(error) {
             console.error("전송 에러: ", error);
-            alert("메시지 전송에 실패했습니다.")
+            setModalMessage("메시지 전송에 실패했습니다.");
+            setModalShow(true);
         }
     };
 
@@ -396,6 +401,14 @@ const ChatWindow = ({ roomInfo, currentUser }: ChatWindowProps) => {
                     onCancelFile={handleCancelFile}
                 />
             </div>
+
+            {/* 모달 컴포넌트 */}
+            <AlertModal 
+                show={modalShow}
+                onHide={() => setModalShow(false)}
+                title="알림"
+                message={modalMessage}
+            />
         </>
     );
 };

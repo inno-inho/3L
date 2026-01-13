@@ -24,7 +24,7 @@ export interface ChatRoomDto{
     chatRoomType: 'GROUP' | 'FRIEND';
     lastMessage: string;
     lastMessageTime: string;
-    unreadCount: number;
+    unreadCount?: number;
     userCount: number;
     roomImageUrls: string[];
 }

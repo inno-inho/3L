@@ -7,6 +7,8 @@ import lombok.*;
 import org.springframework.messaging.Message;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 
 @Getter
 @Setter
@@ -33,13 +35,13 @@ public class ChatMessageDto {
     }
 
     @Schema(description = "메시지 고유 ID(삭제/읽음 식별용)", example = "1004")
-    private Long messageId;
+    private String messageId;
 
     @Schema(description = "메시지 타입", example = "IMAGE", required = true)
     private MessageType messageType;
 
     @Schema(description = "채팅방 종류", example = "GROUP")
-    private ChatType chatType;
+    private ChatType chatRoomType;
 
     @Schema(description = "채팅방 고유 ID", example = "room-abc-123", required = true)
     private String roomId;
@@ -82,6 +84,14 @@ public class ChatMessageDto {
     // #######################################
     @Schema(description = "화면 표시용 시간", example = "오후 2:30")
     private String sentTime;
+
+    // 시간 변경
+    public void setSentTimeFromCreatedAt() {
+        if(this.createdAt != null){
+            DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("a h:mm", Locale.KOREAN);
+            this.sentTime = this.createdAt.format(dateTimeFormatter);
+        }
+    }
 
     @JsonProperty("createdAt")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSSSS")

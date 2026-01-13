@@ -1,6 +1,7 @@
 import './App.css';
 import React from 'react'; // React import 추가
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 import { AuthProvider, useAuth } from './context/AuthContext';
 
