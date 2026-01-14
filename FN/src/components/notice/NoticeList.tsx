@@ -1,41 +1,26 @@
 import { Link } from 'react-router-dom';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import search from '@/assets/image/search.png';
-
-const DUMMY_NOTICES = [
-  {
-    id: 1,
-    title: "코코넛톡 운영정책 개정 안내",
-    content: "안녕하세요. 시스템 안정화를 위한 정기 점검이 예정되어 있습니다. 점검 시간 동안은 서비스 이용이 제한될 수 있으니 양해 부탁드립니다.",
-    date: "2025.06.30",
-    views: 432
-  },
-  {
-    id: 2,
-    title: "쓰는 이에 집중, 쓰기 좋게 맞춤 🌟 25.08.15 업데이트 안내",
-    content: "새로운 아코디언 스타일의 공지사항 UI가 적용되었습니다. 이제 목록에서 바로 내용을 확인하고 상세 페이지로 이동할 수 있습니다.",
-    date: "2025.08.15",
-    views: 11326
-  },
-  {
-    id: 3,
-    title: "기온은 낮아져도 관계의 온도는 높게 🥐🥨🥯🍞🧈🥞🧇🍳🧀🥖🍪🍩🍨🎂🍰🧁🍫🍬🍭🍡 25.10.31 업데이트 안내",
-    content: "제목이 긴 공지내용에 대해 확인 가능합니다. ",
-    date: "2025.08.15",
-    views: 11326
-  },
-
-];
-
-
+import type { Notice } from '@/types/notice';
+import { getNotices } from '@/api/noticeApi';
+import { formatDate } from '@/utils/date';
 
 // 전체 목록 조회
 const NoticeList = () => {
 
-    const [notices] = useState(DUMMY_NOTICES); // 임시로
+    const [notices, setNotices] = useState<Notice[]>([]); // 처음엔 빈 배열, 나중에 서버 데이터로 교체
+
+    useEffect(()=> {
+        getNotices().then((data) => {
+            console.log("공지목록 : " + data);
+            setNotices(data);
+        });
+    }, []);
+
     const [expandedId, setExpandedId] = useState<number | null>(null); 
     // 현재 어떤 공지사항의 상세 내용이 펼쳐져 있는지를 기억하는 메모장
     // 처음엔 아무것도 안열려 있으니까 null -> setExpandedId(1) 이 실행되면 1이라는 ID의 내용만 보여지게되도록
+    
     return(
         <div className="flex bg-white">
             <main className="flex-1 bg-white">
@@ -60,8 +45,8 @@ const NoticeList = () => {
                                                 {notice.title}
                                             </div>
                                         </td>
-                                        <td className="py-4 px-4 w-[120px] text-sm text-gray tabular-nums">{notice.date} &gt; </td>
-                                        <td className="py-4 px-6 w-[100px] text-sm text-gray">{notice.views}</td>
+                                        <td className="py-4 px-4 w-[120px] text-sm text-gray tabular-nums">{formatDate(notice.createdAt, notice.updatedAt)} &gt; </td>
+                                        <td className="py-4 px-6 w-[100px] text-sm text-gray">{notice.viewCount}</td>
                                     </tr>
 
                                     {expandedId === notice.id && (
@@ -77,47 +62,6 @@ const NoticeList = () => {
                             ))}
                         </tbody>
                     </table>
-                            {/* <tr className="border-b border-[#743F24] last:border-0 hover:bg-[#FFF9ED] transition-colors cursor-pointer group">
-                                <td className="py-6 px-4 w-16 text-sm text-gray">4</td>
-                                <td className="py-6 px-4">
-                                    <div className="truncate font-semibold text-gray-800 text-left group-hover:text-[#743F24]" title="여기에 전체 제목을 넣으면 마우스 올릴 때 툴팁으로 보입니다">
-                                        기온은 낮아져도 관계의 온도는 높게 🥐🥨🥯🍞🧈🥞🧇🍳🧀🥖🍪🍩🍨🎂🍰🧁🍫🍬🍭🍡 25.10.31 업데이트 안내
-                                    </div>
-                                </td>
-                                <td className="py-4 px-4 w-[120px] text-sm text-gray tabular-nums">2025.10.31 &gt; </td>
-                                <td className="py-4 px-6 w-[100px] text-sm text-gray">2599</td>
-                            </tr>
-                            <tr className="border-b border-[#743F24] last:border-0 hover:bg-[#FFF9ED] transition-colors cursor-pointer group">
-                                <td className="py-6 px-4 w-16 text-sm text-gray">3</td>
-                                <td className="py-6 px-4">
-                                    <div className="truncate font-semibold text-gray-800 text-left group-hover:text-[#743F24]" title="여기에 전체 제목을 넣으면 마우스 올릴 때 툴팁으로 보입니다">
-                                        코코넛톡 운영정책 개정 안내
-                                    </div>
-                                </td>
-                                <td className="py-4 px-4 w-[120px] text-sm text-gray tabular-nums">2025.10.01 &gt; </td>
-                                <td className="py-4 px-6 w-[100px] text-sm text-gray">45532</td>
-                            </tr>
-                            <tr className="border-b border-[#743F24] last:border-0 hover:bg-[#FFF9ED] transition-colors cursor-pointer group">
-                                <td className="py-6 px-4 w-16 text-sm text-gray">2</td>
-                                <td className="py-6 px-4">
-                                    <div className="truncate font-semibold text-gray-800 text-left group-hover:text-[#743F24]" title="여기에 전체 제목을 넣으면 마우스 올릴 때 툴팁으로 보입니다">
-                                        쓰는 이에 집중, 쓰기 좋게 맞춤 🌟 25.08.15 업데이트 안내
-                                    </div>
-                                </td>
-                                <td className="py-4 px-4 w-[120px] text-sm text-gray tabular-nums">2025.08.15 &gt; </td>
-                                <td className="py-4 px-6 w-[100px] text-sm text-gray">11326</td>
-                            </tr>
-                            <tr className="border-b border-[#743F24] last:border-0 hover:bg-[#FFF9ED] transition-colors cursor-pointer group">
-                                <td className="py-6 px-4 w-16 text-sm text-gray">1</td>
-                                <td className="py-6 px-4">
-                                    <div className="truncate font-semibold text-gray-800 text-left group-hover:text-[#743F24]" title="여기에 전체 제목을 넣으면 마우스 올릴 때 툴팁으로 보입니다">
-                                        코코넛톡 운영정책 개정 안내
-                                    </div>
-                                </td>
-                                <td className="py-4 px-4 w-[120px] text-sm text-gray tabular-nums">2025.06.30 &gt; </td>
-                                <td className="py-4 px-6 w-[100px] text-sm text-gray">432</td>
-                            </tr> */}
-
                 </div>
 
                 {/* 페이지 네이션 */}

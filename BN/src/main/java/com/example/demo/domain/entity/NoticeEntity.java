@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
@@ -12,6 +13,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Entity
 @Table(name="notice")
+@EntityListeners(AuditingEntityListener.class)
 public class NoticeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,6 +38,7 @@ public class NoticeEntity {
 
     // 시간은 Auditing 설정 없으면 동작 안함??
     @CreatedDate // 생성시점
+    @Column(updatable = false)
     private LocalDateTime createdAt; // 작성 날짜
 
     @LastModifiedDate // 수정 날짜

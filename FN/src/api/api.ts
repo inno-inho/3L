@@ -1,6 +1,12 @@
 import axios from 'axios';
 
-import type { AxiosInstance, InternalAxiosRequestConfig, AxiosResponse, AxiosError, Axios } from 'axios'; // 타입(Type) 전용
+import type { 
+    AxiosInstance,
+    InternalAxiosRequestConfig, 
+    AxiosResponse, 
+    AxiosError, 
+    Axios 
+} from 'axios'; // 타입(Type) 전용
 
 // 확장된 설정 타입을 위한 인터페이스 (무한 루프 방지용 _retry flag)
 interface CustomInternalAxiosRequestConfig extends InternalAxiosRequestConfig{
@@ -8,12 +14,13 @@ interface CustomInternalAxiosRequestConfig extends InternalAxiosRequestConfig{
 }
 
 const api: AxiosInstance = axios.create({
-    baseURL: '/api', // Vite.config.ts에 적은 프록시 설정을 활용하기 위해 /api로 시작
-    withCredentials: true,
-    timeout: 10000,
+    baseURL: '/api', // 실제 요청 주소, Vite proxy 설정에 의해 http://localhost:8080/api/notices로 변환됨
+    withCredentials: true, // 쿠키를 요청에 포함
+    timeout: 10000, // 10초 이상 응답 없으면 에러
     headers: { "Content-Type": "application/json" },
 })
 
+// 토큰 재발급 엔드포인트
 const REFRESH_URL = '/reissue';
 
 // -----------------------------------
@@ -21,10 +28,13 @@ const REFRESH_URL = '/reissue';
 // -----------------------------------
 api.interceptors.request.use(
     (config: InternalAxiosRequestConfig) => {
-        const publicPaths = ['/login', '/join'];
-        if (publicPaths.some(path => config.url?.includes(path))){
+        const publicPaths = ['/login', '/join']; // 인증이 필요 없는 경로
+        if (publicPaths.some(path => config.url?.includes(path))){ // 요청 URL이 로그인/회원가입이면 그대로 통과
             return config;
         }
+
+        // 여기서 보통 Authorization 헤더 추가, accessToken 붙이기 같은 작업 
+
         return config;
     },
     (error: Axios) => {
@@ -39,26 +49,30 @@ api.interceptors.request.use(
 api.interceptors.response.use(
     (response: AxiosResponse) => {
         // 백엔드 응답 구조에 맞게 수정
+        // 백엔드에서 auth=false 라고 내려주면 "로그인 안 된 상태"라고 판단
         if (response.data?.auth === false){
             window.location.href = '/login';
             return Promise.reject(new Error('세션이 만료되었습니다. '));
         }
-        return response;
+        return response; // 문제 없으면 응답 그대로 반환
     },
     async (error: AxiosError) => {
         const originalRequest = error.config as CustomInternalAxiosRequestConfig;
         const status = error.response?.status;
 
-        // 401 에러 및 토큰 재발급 로직
+        // 401 에러 및 토큰 재발급 로직 : 401 + 아직 재시도 X + 재발급 요청이 아닐때 
         if (status === 401 &&  originalRequest.url !== REFRESH_URL && originalRequest.url !== REFRESH_URL && !originalRequest._retry) {
-            originalRequest._retry = true;
+            originalRequest._retry = true; // 무한 루프 방지
 
             try{
+                // Refresh Token으로 AccessToken 재발급
                 await api.post(REFRESH_URL, null);
                 console.log("Access Token 재발급 성공")
+
                 return api(originalRequest);    // 기존 요청 재시도 
             } catch(refreshError){
                 console.error("Refresh Token 만료, 로그인 필요");
+                
                 if (window.location.pathname !== '/login'){
                     window.location.href = "/login";
                 }

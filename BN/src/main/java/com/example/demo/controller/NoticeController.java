@@ -44,8 +44,9 @@ public class NoticeController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<NoticeEntity> getNoticesById(@PathVariable Long id){
-        return ResponseEntity.ok(noticeService.getNoticesById(id));
+    public ResponseEntity<NoticeResponseDto> getNoticesById(@PathVariable Long id){
+        NoticeEntity notice = noticeService.getNoticesById(id);
+        return ResponseEntity.ok(new NoticeResponseDto(notice));
     }
 
     // 공지 수정

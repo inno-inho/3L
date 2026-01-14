@@ -1,6 +1,7 @@
 package com.example.demo.domain.dto;
 
 import com.example.demo.domain.entity.NoticeEntity;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
@@ -14,7 +15,11 @@ public class NoticeResponseDto {
     private String content;
     private String authorId;
     private int viewCount;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdAt;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime updatedAt;
 
     public NoticeResponseDto(NoticeEntity entity) {
