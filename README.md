@@ -272,7 +272,7 @@ GET    api/chatrooms/{roomId}/search
 
 ### 5.7 WebSocket
 ```
-/ws/chat
+/ws
 SUBSCRIBE /sub/chat/{roomId}
 SEND      /app/chat/{roomId}
 SEND      /app/read/{roomId}
