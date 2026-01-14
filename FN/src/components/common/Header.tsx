@@ -3,7 +3,7 @@ import { useAuth } from '../../context/AuthContext'
 import { Link } from 'react-router-dom';    
 
 import ProfileImage from './ProfileImage';
-import coconuttalk_bg from '@/assets/image/coconuttalk_bg.png';
+import coconuttalk from '@/assets/image/coconuttalk.png';
 import DropdownMenu from './DropdownMenu';
 
 const Header: React.FC = () => {
@@ -28,10 +28,10 @@ const Header: React.FC = () => {
                 {/* 로고 영역 */}
                 <Link 
                     to="/chatPages" 
-                    className='flex items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer'
+                    className='flex items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer no-underline'
                 >
                     <div className='w-8 h-8 flex items-center justify-center text-white font-bold'>
-                        <img src={coconuttalk_bg} alt="코코넛 톡 로고" />
+                        <img src={coconuttalk} alt="코코넛 톡 로고" />
                     </div>
                     <span className='text-2xl font-black text-[#6F4E37] tracking-tight'>
                         CoconutTalk

@@ -19,8 +19,8 @@ interface ChatWindowProps {
 
 const ChatWindow = ({ roomInfo, currentUser }: ChatWindowProps) => {
 
-    const [ modalShow, setModalShow ] = useState(false);
-    const [ modalMessage, setModalMessage ] = useState(""); 
+    const [modalShow, setModalShow] = useState(false);
+    const [modalMessage, setModalMessage] = useState("");
 
     // 입력창의 텍스트를 관리하는 상태
     const [inputText, setInputText] = useState("");
@@ -166,8 +166,8 @@ const ChatWindow = ({ roomInfo, currentUser }: ChatWindowProps) => {
 
             // 성공 시 입력창 비우기
             setInputText("");
-            setPendingFiles([]); 
-        } catch(error) {
+            setPendingFiles([]);
+        } catch (error) {
             console.error("전송 에러: ", error);
             setModalMessage("메시지 전송에 실패했습니다.");
             setModalShow(true);
@@ -315,17 +315,30 @@ const ChatWindow = ({ roomInfo, currentUser }: ChatWindowProps) => {
                                             {/* 이미지 메시지 */}
                                             {msg.messageType === 'IMAGE' && (
                                                 <div className="rounded-xl overflow-hidden border border-gray-100">
-                                                    <img
-                                                        src={msg.fileUrl} alt="첨부 이미지"
-                                                        className="w-full h-auto cursor-pointer hover:scale-[1.02] transition-transform"
-                                                    />
+                                                    {msg.fileUrls && msg.fileUrls.map((url, index) => (
+                                                        <img
+                                                            key={index}
+                                                            src={url}
+                                                            alt={`첨부 이미지 ${index}`}
+                                                            className="w-full h-auto cursor-pointer hover:scale-[1.02] transition-transform"
+                                                        />
+                                                    ))}
                                                 </div>
                                             )}
 
                                             {/* 비디오 메시지 */}
                                             {msg.messageType === "VIDEO" && (
                                                 <div className="rounded-xl overflow-hidden border border-gray-100 bg-black">
-                                                    <video src={msg.fileUrl} controls className="w-full" />
+                                                    {msg.fileUrls && msg.fileUrls.map((url, index) => (
+                                                        <video
+                                                            key={index}
+                                                            src={url}
+                                                            controls
+                                                            className="w-full max-h-[300px] object-cover"
+                                                            preload="metadata"  // 메타데이터만 미리 로드해서 로딩 속도 향상 
+                                                        />
+                                                    ))}
+
                                                 </div>
                                             )}
 
@@ -338,11 +351,25 @@ const ChatWindow = ({ roomInfo, currentUser }: ChatWindowProps) => {
                                                     </div>
                                                     <div className="flex flex-col overflow-hidden text-left">
                                                         <span className="text-sm font-bold truncate max-w-[150px]">{msg.message}</span>
-                                                        <span className="text-[10px] text-gray-500 font-medium">문서 파일</span>
+                                                        <span className="text<-[10px] text-gray-500 font-medium">문서 파일</span>
                                                     </div>
-                                                    <a href={msg.fileUrl} download={msg.message} className="ml-2 text-gray-400 hover:text-gray-600">
-                                                        ⬇️
-                                                    </a>
+                                                    {/* 파일일 경우 채팅메시지 */}
+                                                    {msg.fileUrls && msg.fileUrls.map((url, index) => (
+                                                        <div key={index} className={`flex items-center gap-3 p-3 rounded-2xl border mb-2 ...`}>
+                                                            <span className="text-xl">📄</span>
+                                                            <div className="flex flex-col overflow-hidden text-left flex-1">
+                                                                <span className="text-sm font-bold truncate">파일 {index + 1}</span>
+                                                            </div>
+                                                            <a 
+                                                                href={url} 
+                                                                download 
+                                                                className="ml-2 text-gray-400 hover:text-gray-600"
+                                                            >
+                                                                ⬇️
+                                                            </a>
+                                                        </div>
+                                                    ))}
+
                                                 </div>
                                             )}
 
@@ -403,7 +430,7 @@ const ChatWindow = ({ roomInfo, currentUser }: ChatWindowProps) => {
             </div>
 
             {/* 모달 컴포넌트 */}
-            <AlertModal 
+            <AlertModal
                 show={modalShow}
                 onHide={() => setModalShow(false)}
                 title="알림"

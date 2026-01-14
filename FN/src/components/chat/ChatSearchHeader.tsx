@@ -1,5 +1,5 @@
 import more_vert from "@/assets/image/more_vert.png";
-import coconuttalk_bg from "@/assets/image/coconuttalk_bg.png";
+import coconuttalk from "@/assets/image/coconuttalk.png";
 import stat_minus from "@/assets/image/stat_minus.png";
 import ChatDropdownMenu from "./ChatDropdownMenu";
 import type { ChatRoomDto } from "../../types/chat";
@@ -40,7 +40,7 @@ const ChatSearchHeader = ({
                                 />
                             ) : (
                                 // 이미지가 없을 때 보여줄 기본 아이콘이나 대체 텍스트
-                                <img src={coconuttalk_bg} alt="코코넛톡 기본 이미지" />
+                                <img src={coconuttalk} alt="코코넛톡 기본 이미지" />
                             )}
                         </div>
 

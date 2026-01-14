@@ -8,6 +8,7 @@ import org.springframework.messaging.Message;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Locale;
 
 @Getter
@@ -62,7 +63,7 @@ public class ChatMessageDto {
     // 멀티미디어 기능 관련 필드
     // #######################################
     @Schema(description = "미디어/파일 실체 URL", example = "https://s3.coconut.com/images/a.jpg")
-    private String fileUrl;
+    private List<String> fileUrls;
 
     @Schema(description = "이미지/영상 썸네일 URL", example = "https://s3.coconut.com/thumb/a.jpg")
     private String thumbnailUrl;

@@ -1,7 +1,7 @@
 // components/ProfileImage.tsx
 import React from 'react';
 
-import coconuttalk_bg from '@/assets/image/coconuttalk_bg.png';
+import coconuttalk from '@/assets/image/coconuttalk.png';
 
 interface ProfileImageProps {
   url?: string;         // 이미지 주소
@@ -22,7 +22,7 @@ const ProfileImage = ({ url, nickname, size = 'md' }: ProfileImageProps) => {
   const customStyle = typeof size === 'number' ? {width: size, height: size} : {};
 
   // 기본 이미지
-  const defaultImage = coconuttalk_bg;
+  const defaultImage = coconuttalk;
 
   return (
     <>

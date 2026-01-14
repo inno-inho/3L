@@ -1,6 +1,6 @@
 import React from 'react';
 import { Modal, Button } from 'react-bootstrap';
-import coconuttalk_bg from "@/assets/image/coconuttalk_bg.png";
+import coconuttalk from "@/assets/image/coconuttalk.png";
 
 interface AlertModalProps {
     show: boolean;
@@ -23,7 +23,7 @@ const AlertModal = ({ show, title, message, onHide }: AlertModalProps) => {
                     <Modal.Header className='border-0 pt-4 px-3 flex items-center justify-between'>
                         <div className='flex items-center'>
                             <img 
-                                src={coconuttalk_bg} alt='코코넛톡 기본 배경' 
+                                src={coconuttalk} alt='코코넛톡 기본 배경' 
                                 className='h-10 w-10 ml-3 object-contain'
                             />
                             <Modal.Title className='font-bold text-[#4A3F35] text-2xl ml-3'>{title}</Modal.Title> 
