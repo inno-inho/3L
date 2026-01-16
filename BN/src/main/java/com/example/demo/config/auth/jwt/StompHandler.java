@@ -46,6 +46,7 @@ public class StompHandler implements ChannelInterceptor {       // ChannelInterc
 //                } else {
 //                    log.warn("[StompHandler] 유효하지 않은 토큰입니다.");
 //                    // 필요하면 여기서 예외를 던져서 연결을 끊는 것도 가능
+
 //                }
 //            } catch (Exception e) {
 //                log.warn("[StompHandler] 토큰 검증 오류: {}", e.getMessage());

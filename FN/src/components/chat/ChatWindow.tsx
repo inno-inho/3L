@@ -62,20 +62,40 @@ const ChatWindow = ({ roomInfo, currentUser }: ChatWindowProps) => {
 
     // 웹 소켓 클라이언트 
     useEffect(() => {
+
+        // localStorage에서 직접 토큰을 꺼내온다
+        const token = localStorage.getItem("accessToken");
+
         // 웹 소켓 클라이언트 설정
         client.current = new Client({
-            brokerURL: 'ws://localhost:8080/ws/chat',
+
+            // /ws는 EndPoint, /websocket은 순수 소켓 연결을 위한 STOMP 표준 주소
+            brokerURL: 'ws://localhost:8080/ws',
+            connectHeaders: {
+                // Authorization: token ? `Bearer ${token}` : ""
+            },
+
+            // 연결 성공 시 로직
             onConnect: () => {
                 console.log("웹 소켓 클라이언트 연결 성공!");
 
-                // 해당 방을 구독(누가 메시지를 보내면 나한테 알려달라고 구독 신청)
-                client.current?.subscribe(`/topic/chat/${roomInfo.roomId}`, (message) => {
+                // 해당 방을 구독(누가 메시지를 보내면 나한테 알려달라고 구독 신청), `/topic/chat/${roomInfo.roomId}는 ChatController에서 잡아논 주소
+                client.current?.subscribe(`/sub/chat/${roomInfo.roomId}`, (message) => {
+                    console.log("메시지 원본: ", message.body);
+                    
                     const newMessages = JSON.parse(message.body);
 
+                    console.log("수신 데이터: ", newMessages);
                     // 메시지 리스트를 업데이트하면 실시간으로 메시지가 화면에 뜸
-                    setMessages((prev) => [...prev, newMessages]);
+                    setMessages((prev) => {
+                        // 이미 리스트에 있는 ID라면 추가하지 않음
+                        if(prev.some(m => m.messageId === newMessages.messageId)) return prev;
+                        return [...prev, newMessages];
+                    });
                 });
             },
+            // 콘솔에서 통신 과정 다 볼 수 있음
+            debug: (str) => console.log(str),
         });
 
         client.current.activate();  // 연결 시작
@@ -154,6 +174,7 @@ const ChatWindow = ({ roomInfo, currentUser }: ChatWindowProps) => {
             formData.append("roomId", roomInfo.roomId);
             formData.append("message", inputText.trim());
             formData.append("sender", currentUser?.email ?? "");
+            formData.append("messageType", "TEXT");
 
             pendingFiles.forEach((p) => {
                 formData.append("files", p.file);   // 서버의 RequsePart랑 이름 맞춰야함

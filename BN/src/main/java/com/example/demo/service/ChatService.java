@@ -8,6 +8,7 @@ import com.example.demo.domain.entity.ChatMessageEntity;
 import com.example.demo.domain.entity.ChatMessageFileEntity;
 import com.example.demo.eventListener.ChatMessageEvent;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -19,6 +20,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ChatService {
@@ -64,8 +66,10 @@ public class ChatService {
         // Entity를 Dto로 변환
         ChatMessageDto savedDto = convertToDto(chatMessageEntity);
 
+        log.info("이벤트 발행 직전: {}" , savedDto.getMessage());
         // 이벤트 발행 (하지만 아직 리스너가 실행되지는 않음. 커밋될 때까지 대기)
         applicationEventPublisher.publishEvent(new ChatMessageEvent(chatMessageRequestDto.getRoomId(), savedDto));
+        log.info("이벤트 발행 완료");
 
         // Redis에는 변환된 Dto를 저장
         String redisKey = "chatroom:last_msg:" + chatMessageRequestDto.getRoomId();
@@ -104,9 +108,10 @@ public class ChatService {
         // 빌더를 통해서 DTO 생성 및 매핑
         ChatMessageDto chatMessageDto = ChatMessageDto.builder()
                 .messageId(String.valueOf(chatMessageEntity.getMessageId()))    // Long타입으로 저장된 messageId가 String으로 바뀌어서 Dto에 담김
-                .messageType(chatMessageEntity.getMessageType())
+                .messageType(chatMessageEntity.getMessageType() != null ? chatMessageEntity.getMessageType() : ChatMessageDto.MessageType.TEXT) // 기본값 설정
                 .roomId(chatMessageEntity.getRoomId())
                 .sender(chatMessageEntity.getSender())
+                .senderName(chatMessageEntity.getSender()) // 우선 이메일을 이름으로 세팅 (유저 기능 연동 전까지)
                 .message(chatMessageEntity.getMessage())
                 .fileUrls(urls)
                 .createdAt(chatMessageEntity.getCreatedAt())

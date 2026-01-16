@@ -45,11 +45,11 @@ public class ChatController {
         return ResponseEntity.ok(savedMessage);
     }
 
-    // 커밋이 성공한 후에만 실행되는 리스너
-    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    public void handleChatEvent (ChatMessageEvent chatMessageEvent) {
-        simpMessagingTemplate.convertAndSend("/topic/chat/" + chatMessageEvent.roomId(), chatMessageEvent.chatMessageDto());        // 구독 주소 잡기
-    }
+//    // 커밋이 성공한 후에만 실행되는 리스너
+//    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+//    public void handleChatEvent (ChatMessageEvent chatMessageEvent) {
+//        simpMessagingTemplate.convertAndSend("/sub/chat/" + chatMessageEvent.roomId(), chatMessageEvent.chatMessageDto());        // 구독 주소 잡기
+//    }
 
     // 채팅 내역 불러오기
     @GetMapping("/{roomId}/messages")
