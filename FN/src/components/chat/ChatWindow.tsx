@@ -8,9 +8,13 @@ import api from "../../api/api";
 
 import ChatSearchHeader from "./ChatSearchHeader";
 import AlertModal from "../common/AlertModal";
+import VideoMessage from "./chatTypeComponent/VideoMessages";
+import ChatInputSection from "./ChatInputSection";
+import FileMessages from "./chatTypeComponent/FileMessages";
+import ImageMessage from "./chatTypeComponent/ImageMessages";
 
 import stat_minus from "@/assets/image/stat_minus.png";
-import ChatInputSection from "./ChatInputSection";
+
 
 interface ChatWindowProps {
     roomInfo: ChatRoomDto;
@@ -149,7 +153,10 @@ const ChatWindow = ({ roomInfo, currentUser }: ChatWindowProps) => {
                 const response = await api.get(`/chatrooms/${roomInfo.roomId}/messages`);
 
                 // 메시지 불러온거 세팅하기
-                setMessages(response.data);
+                // 데이터가 최신 -> 과거 순으로 오므로 
+                // 프론트엔드 화면에 마자게 과거 -> 최신순으로 뒤집는다
+                const sortedMessages = [...response.data].reverse();
+                setMessages(sortedMessages);
             } catch (error) {
                 console.error("채팅 내역 로딩 실패: ", error);
             }
@@ -333,37 +340,24 @@ const ChatWindow = ({ roomInfo, currentUser }: ChatWindowProps) => {
                                             : ''    // 이미지나 파일일 때는 배경색과 패딩을 별도로
                                             }`}>
 
-                                            {/* 이미지 메시지 */}
-                                            {msg.messageType === 'IMAGE' && (
-                                                <div className="rounded-xl overflow-hidden border border-gray-100">
-                                                    {msg.fileUrls && msg.fileUrls.map((url, index) => (
-                                                        <img
-                                                            key={index}
-                                                            src={url}
-                                                            alt={`첨부 이미지 ${index}`}
-                                                            className="w-full h-auto cursor-pointer hover:scale-[1.02] transition-transform"
-                                                        />
-                                                    ))}
-                                                </div>
+                                            {/* 이미지 메시지라면 */}
+                                            {msg.messageType === "IMAGE" && (
+                                                <ImageMessage msg={msg}/>
                                             )}
 
-                                            {/* 비디오 메시지 */}
-                                            {msg.messageType === "VIDEO" && (
-                                                <div className="rounded-xl overflow-hidden border border-gray-100 bg-black">
-                                                    {msg.fileUrls && msg.fileUrls.map((url, index) => (
-                                                        <video
-                                                            key={index}
-                                                            src={url}
-                                                            controls
-                                                            className="w-full max-h-[300px] object-cover"
-                                                            preload="metadata"  // 메타데이터만 미리 로드해서 로딩 속도 향상 
-                                                        />
-                                                    ))}
+                                            {/* 비디오 메시지라면 */}
+                                            {msg.messageType === "VIDEO" && msg.files?.map((file, i) => (
+                                                <VideoMessage key={i} url={file.fileUrl}/>
+                                            ))}
 
-                                                </div>
+                                            {/* 파일 타입 메시지라면 */}
+                                            {msg.messageType === "FILE" && (
+                                                <FileMessages msg={msg} isMine={isMine} />
                                             )}
 
-                                            {/* 일반 파일 메시지 */}
+
+
+                                            {/* 일반 파일 메시지
                                             {msg.messageType === 'FILE' && (
                                                 <div className={`flex items-center gap-3 p-3 rounded-2xl border ${isMine ? 'bg-white border-[#B5A492]' : 'bg-gray-50 border-gray-200'
                                                     }`}>
@@ -373,9 +367,9 @@ const ChatWindow = ({ roomInfo, currentUser }: ChatWindowProps) => {
                                                     <div className="flex flex-col overflow-hidden text-left">
                                                         <span className="text-sm font-bold truncate max-w-[150px]">{msg.message}</span>
                                                         <span className="text<-[10px] text-gray-500 font-medium">문서 파일</span>
-                                                    </div>
+                                                    </div> */}
                                                     {/* 파일일 경우 채팅메시지 */}
-                                                    {msg.fileUrls && msg.fileUrls.map((url, index) => (
+                                                    {/* {msg.fileUrls && msg.fileUrls.map((url, index) => (
                                                         <div key={index} className={`flex items-center gap-3 p-3 rounded-2xl border mb-2 ...`}>
                                                             <span className="text-xl">📄</span>
                                                             <div className="flex flex-col overflow-hidden text-left flex-1">
@@ -392,10 +386,12 @@ const ChatWindow = ({ roomInfo, currentUser }: ChatWindowProps) => {
                                                     ))}
 
                                                 </div>
-                                            )}
+                                            )} */}
 
-                                            {/* 기존 텍스트 메시지 */}
-                                            {msg.messageType === "TEXT" && msg.message}
+                                            {/* 텍스트 타입 */}
+                                            {msg.messageType === "TEXT" && (  
+                                                <p className="whitespace-pre-wrap">{msg.message}</p>
+                                            )}
 
                                         </div>
 

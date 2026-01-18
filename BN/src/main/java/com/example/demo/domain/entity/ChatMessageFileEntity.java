@@ -18,6 +18,8 @@ public class ChatMessageFileEntity {
 
     private String fileUrl;
 
+    private String originalFileName;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "chat_message_id")
     private ChatMessageEntity chatMessage;

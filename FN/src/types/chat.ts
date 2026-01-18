@@ -8,7 +8,11 @@ export interface ChatMessageDto{
     senderName: string;
     senderInitial: string;
     message: string;
-    fileUrls?: string[];
+    files?: {
+        fileUrl: string;
+        fileName: string;
+        originalFileName: string;
+    }[];
     thumbnailUrl?: string;
     metadata?: string;
     isDeleted: boolean;

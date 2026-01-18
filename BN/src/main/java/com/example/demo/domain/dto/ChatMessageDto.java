@@ -62,8 +62,24 @@ public class ChatMessageDto {
     // #######################################
     // 멀티미디어 기능 관련 필드
     // #######################################
-    @Schema(description = "미디어/파일 실체 URL", example = "https://s3.coconut.com/images/a.jpg")
-    private List<String> fileUrls;
+    @Schema(description = "미디어/파일 URL, 이름", example = "https://s3.coconut.com/images/a.jpg")
+    private List<FileResponse> files;
+
+    @Data
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class FileResponse {
+        @Schema(description = "서버에 저장된 파일 접근 URL", example = "/uploads/uuid_original.png")
+        private String fileUrl;
+
+        @Schema(description = "서버에 저장된 실제 파일명(난수 포함)", example = "uuid_original.png")
+        private String fileName;
+
+        @Schema(description = "사용자가 올린 원본 파일명", example = "maltese.png")
+        private String originalFileName;
+    }
+
 
     @Schema(description = "이미지/영상 썸네일 URL", example = "https://s3.coconut.com/thumb/a.jpg")
     private String thumbnailUrl;
