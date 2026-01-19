@@ -3,6 +3,27 @@
 src/utils/date.ts : 날짜 포맷 2026.01.01 형태
 ```
 
+### '@' 사용 설정 & 폰트 설정
+```
+“@ = src” 라는 약속을 따로 설정해줘야 함 vite.config.ts 설정 필요
+tailwind.config.js 설정 + index.html에 google font link 추가 + Header.tsx 37줄 : className에 font-nerko 추가
+↓
+build 다시 해줘야함(삭제 안해도 ok, 빌드만 해서 compose up 하면 적용 됨)
+```
+
+
+
+### Outlet 기반 방식  
+React Router + Outelt 레이아웃 패턴  
+- MainLayout 에 Header, SideBar 지정해둔 상태로 common 폴더 그대로 사용
+- App.tsx  
+  ```
+  <Route element={<MainLayout />}>
+    <Route path="/notices" element={<NoticeList />} />
+    <Route path="/chatPage" element={<ChatPage />} />
+  </Route>
+  ```
+
 
 
 
@@ -18,13 +39,6 @@ docker-compose -f docker-compose.local.yml --env-file .env.local down
 # bn -> demoapplication run
 ```
 
-### @ 사용 설정 & 폰트 설정
-```
-“@ = src” 라는 약속을 따로 설정해줘야 함 vite.config.ts 설정 필요
-tailwind.config.js 설정 + index.html에 google font link 추가 + Header.tsx 37줄 : className에 font-nerko 추가
-↓
-build 다시 해줘야함(삭제 안해도 ok, 빌드만 해서 compose up 하면 적용 됨)
-```
 
 
 
@@ -51,33 +65,32 @@ POST   api/notices/{id}/comments
 ```
 
 ### 공지사항 (관리자)
-공지사항 CRUD (목록 / 상세 조회 포함)
-파일 첨부 및 다운로드
-메타 정보 관리
-제목
-내용 (텍스트 / 에디터)
-작성자 (관리자)
-작성일 / 수정일
-조회수
-권한 관리
-관리자: 생성 / 수정 / 삭제
-일반 사용자: 조회만 가능
-목록 UX
-최신순 정렬
-페이지네이션
-추가 기능
-고정 공지 기능
-상단 고정
-고정 / 해제 토글
-예약 공지
-특정 날짜 / 시간에 자동 공개
-이벤트 / 점검 공지 활용
-검색 & 필터
-제목 / 내용 검색
-기간별 필터
-중요 공지만 보기
-중요 공지 알림
-중요 공지 등록 시 자동 푸시 알림
+공지사항 CRUD (목록 / 상세 조회 포함)  
+파일 첨부 및 다운로드  
+메타 정보 관리  
+제목  
+내용 (텍스트 / 에디터)  
+작성자 (관리자)  
+작성일 / 수정일  
+조회수  
+권한 관리  
+관리자: 생성 / 수정 / 삭제  
+일반 사용자: 조회만 가능  
+목록 UX  
+최신순 정렬  
+페이지네이션  
+추가 기능  
+고정 공지 기능  
+상단 고정  
+고정 / 해제 토글  
+예약 공지  
+특정 날짜 / 시간에 자동 공개  
+이벤트 / 점검 공지 활용  
+검색 & 필터  
+제목 / 내용 검색  
+중요 공지만 보기  
+중요 공지 알림  
+중요 공지 등록 시 자동 푸시 알림  
 
 ### NOTICE DB 저장목록
 id (PK)  
