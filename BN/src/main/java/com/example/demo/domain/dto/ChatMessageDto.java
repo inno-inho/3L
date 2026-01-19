@@ -84,8 +84,27 @@ public class ChatMessageDto {
     @Schema(description = "이미지/영상 썸네일 URL", example = "https://s3.coconut.com/thumb/a.jpg")
     private String thumbnailUrl;
 
-    @Schema(description = "파일 메타데이터(파일명, 용량, 재생시간 등 JSON 형태)", example = "{\\\"fileName\\\": \\\"vacation.mp4\\\", \\\"fileSize\\\": 20480, \\\"duration\\\": \\\"00:15\\\"}")
-    private String metadata;
+
+    @Data
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class ChatMetadata {
+        @Schema(description = "사이트 제목", example = "Google")
+        private String ogTitle;
+
+        @Schema(description = "사이트 설명", example = "Google 검색 엔진입니다")
+        private String ogDescription;
+
+        @Schema(description = "사이트 대표 이미지 URL", example = "https://google.com/logo.png")
+        private String ogImage;
+
+        @Schema(description = "원본 URL", example = "https://google.com")
+        private String url;
+    }
+
+    @Schema(description = "메타데이터 (URL_LINK일 경우 UrlMetadata 객체 포함)" )
+    private Object metadata;
 
     // #######################################
     // 상태 관리 기능 관련 필드

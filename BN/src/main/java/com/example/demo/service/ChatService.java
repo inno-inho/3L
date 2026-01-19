@@ -4,8 +4,8 @@ import com.example.demo.domain.Repository.ChatMessageRepository;
 import com.example.demo.domain.Repository.Local_S3_FileService.FileService;
 import com.example.demo.domain.dto.ChatMessageDto;
 import com.example.demo.domain.dto.ChatMessageRequestDto;
-import com.example.demo.domain.entity.ChatMessageEntity;
-import com.example.demo.domain.entity.ChatMessageFileEntity;
+import com.example.demo.domain.entity.ChatEntities.ChatMessageEntity;
+import com.example.demo.domain.entity.ChatEntities.ChatMessageFileEntity;
 import com.example.demo.eventListener.ChatMessageEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,7 +15,8 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.data.domain.Pageable;
+
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +30,9 @@ public class ChatService {
     private final FileService fileService;
     private final RedisTemplate<String, Object> redisTemplate;
     private final ApplicationEventPublisher applicationEventPublisher;
+
+    // 정규식 패턴 (URL 추출용)
+    private static final String URL_REGEX = "https?://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]";
 
     private ChatMessageDto convertToDto(ChatMessageEntity chatMessageEntity) {
         // 자식 엔티티 리스트에서 fileUrl 필드만 추출하여 List<String>으로 변환
@@ -50,6 +54,7 @@ public class ChatService {
                 .senderName(chatMessageEntity.getSender()) // 우선 이메일을 이름으로 세팅 (유저 기능 연동 전까지)
                 .message(chatMessageEntity.getMessage())
                 .files(fileResponses)
+                .metadata(chatMessageEntity.getMetadata())
                 .createdAt(chatMessageEntity.getCreatedAt())
                 .build();
 
@@ -84,6 +89,61 @@ public class ChatService {
         return ChatMessageDto.MessageType.FILE; // 파일이 있다면 기본값으로 FILE
     }
 
+    // ####################################
+    // URL 추출
+    // ####################################
+    private String extractOnlyOneUrl(String content) {
+        if (content == null || content.isEmpty()) return null;
+
+        java.util.regex.Pattern pattern = java.util.regex.Pattern.compile(URL_REGEX);
+        java.util.regex.Matcher matcher = pattern.matcher(content);
+
+        List<String> urls = new ArrayList<>();
+        while (matcher.find()) {
+            urls.add(matcher.group());
+        }
+
+        // URL이 정확히 딱 1개 있을 때만 해당 URL 반환
+        if (urls.size() == 1) {
+            return urls.get(0);
+        }
+
+        // 0개거나 2개 이상이면 null -> 썸네일 안 보여줌
+        return null;
+    }
+
+    // 메타데이터 생성
+    private ChatMessageDto.ChatMetadata buildUrlMetadata(String message) {
+        try {
+            // 딱 하나만 있는 URL 추출
+            String url = extractOnlyOneUrl(message);
+
+            // URL이 없거나 여러 개면 바로 null 리턴
+            if (url == null) return null;
+
+            // 실제 Jsoup 연결 (Timeout 설정 권장)
+            org.jsoup.nodes.Document doc = org.jsoup.Jsoup.connect(url) // 클래스명 Jsoup 추가
+                    .timeout(3000)
+                    .get();
+
+            // OpenGraph 메타 태그 추출
+            String title = doc.select("meta[property=og:title]").attr("content");
+            if (title.isEmpty()) title = doc.title(); // og:title 없으면 기본 <title>
+
+            String description = doc.select("meta[property=og:description]").attr("content");
+            String image = doc.select("meta[property=og:image]").attr("content");
+
+            return ChatMessageDto.ChatMetadata.builder()
+                    .url(url)
+                    .ogTitle(title)
+                    .ogDescription(description)
+                    .ogImage(image)
+                    .build();
+        } catch (Exception e) {
+            log.error("메타데이터 추출 실패: {}", e.getMessage());
+            return null;
+        }
+    }
 
 
     // ####################################
@@ -93,19 +153,25 @@ public class ChatService {
     public ChatMessageDto saveMessage(ChatMessageRequestDto chatMessageRequestDto) {
 
         ChatMessageDto.MessageType determinedType;
+        ChatMessageDto.ChatMetadata chatMetadata = null;    // 메타데이터 변수 초기화
 
-        // 파일이 있는 경우 판별 메서드 호출
+
+        // 파일이 있는 경우(IMAGE, FILE, VIDEO)
         if (chatMessageRequestDto.getFiles() != null && !chatMessageRequestDto.getFiles().isEmpty()) {
             determinedType = determineMessageType(chatMessageRequestDto.getFiles());
+        } else {
+            String singleUrl = extractOnlyOneUrl(chatMessageRequestDto.getMessage());
+            if (singleUrl != null) { // 파일은 없는데 URL이 딱 하나 포함된 경우
+                determinedType = ChatMessageDto.MessageType.URL_LINK;
+                chatMetadata = buildUrlMetadata(chatMessageRequestDto.getMessage());    // 여기서 JSOUP 작동
+            } else if (chatMessageRequestDto.getMessageType() != null) {    // Enter, Quit 등 수동 지정타입
+                determinedType = chatMessageRequestDto.getMessageType();
+            } else {    // 일반 텍스트
+                determinedType = ChatMessageDto.MessageType.TEXT;
+            }
+
         }
-        //  파일은 없는데 DTO에 타입이 이미 지정되어 온 경우 (예: ENTER, QUIT 등)
-        else if (chatMessageRequestDto.getMessageType() != null) {
-            determinedType = chatMessageRequestDto.getMessageType();
-        }
-        // 아무것도 없는 경우 일반 텍스트
-        else {
-            determinedType = ChatMessageDto.MessageType.TEXT;
-        }
+
 
         // 엔티티 생성
         ChatMessageEntity chatMessageEntity = ChatMessageEntity.builder()
@@ -113,6 +179,7 @@ public class ChatService {
                 .sender(chatMessageRequestDto.getSender())
                 .message(chatMessageRequestDto.getMessage())
                 .messageType(determinedType)
+                .metadata(chatMetadata) // 추출된 메타데이터 객체를 그대로 넣으면 컨버터가 알아서 JSON으로 변환함
                 .createdAt(LocalDateTime.now())
                 .files(new ArrayList<>())
                 .build();

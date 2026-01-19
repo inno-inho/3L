@@ -12,6 +12,8 @@ import VideoMessage from "./chatTypeComponent/VideoMessages";
 import ChatInputSection from "./ChatInputSection";
 import FileMessages from "./chatTypeComponent/FileMessages";
 import ImageMessage from "./chatTypeComponent/ImageMessages";
+import UrlMessages from "./chatTypeComponent/UrlMessages";
+import SystemMessages from "./chatTypeComponent/SystemMessages";
 
 import stat_minus from "@/assets/image/stat_minus.png";
 
@@ -365,6 +367,13 @@ const ChatWindow = ({ roomInfo, currentUser }: ChatWindowProps) => {
                                                         {msg.messageType === "IMAGE" && <ImageMessage msg={msg}/>}
                                                         {msg.messageType === "VIDEO" && msg.files?.map((file, i) => <VideoMessage key={i} url={file.fileUrl}/>)}
                                                         {msg.messageType === "FILE" && <FileMessages msg={msg} isMine={isMine}/>}
+                                                        {/* URL_LINK 타입일 때 */}
+                                                        {msg.messageType === "URL_LINK" && (
+                                                            <div className="flex flex-col gap-2">
+                                                                {/* <p className="leading-relaxed">{msg.message}</p> */}
+                                                                <UrlMessages msg={msg} isMine= {isMine} />
+                                                            </div>
+                                                        )}
                                                         {msg.messageType === "TEXT" && <p className="leading-relaxed">{msg.message}</p>}
                                                     </div>
                                                     
