@@ -300,120 +300,94 @@ const ChatWindow = ({ roomInfo, currentUser }: ChatWindowProps) => {
                     onScroll={handleScroll}     // 스크롤 이벤트 연결
                     ref={scrollRef}
                 >
-                    {messages.map((msg) => {
+                    {messages.map((msg, index) => {
                         const isMine = msg.sender === currentUser?.email;
                         const isSystem = msg.messageType === 'SYSTEM';
 
-                        if (isSystem) {
-                            return (
-                                <div key={msg.messageId} className="flex justify-center">
-                                    <span className="bg-gray-100 text-gray-500 text-xs px-4 py-1 rounded-full">
-                                        {msg.message}
-                                    </span>
-                                </div>
-                            );
-                        }
+                        // 날짜 구분선 로직
+                        // 현재 메시지의 날짜 추출 (예: 2024-01-19)
+                        const currentDate = msg.createdAt.split('T')[0];
+
+                        // 이전 메시지의 날짜 추출(첫 번째 메시지라면 비교 대상 없음)
+                        const prevDate = index > 0 ? messages[index - 1].createdAt.split('T')[0] : null;
+
+                        // 이전 메시지와 날짜가 다르다면 구분선 표지 여부 결정
+                        const showDataDivider = currentDate !== prevDate;
 
                         return (
-                            <div
-                                key={msg.messageId}
-                                ref={(el) => {
-                                    if (el) messageRefs.current.set(msg.messageId, el);
-                                    else messageRefs.current.delete(msg.messageId);
-                                }}
-                                className={`flex ${isMine ? 'justify-end' : 'justify-start'}`}
-                            >
-                                {!isMine && (
-                                    <div className="w-10 h-10 bg-gray-200 rounded-full mr-3 mt-1 flex-shrink-0" />
-                                )}
-                                <div className={`flex flex-col ${isMine ? 'items-end' : 'items-start'}`}>
-                                    {!isMine && <span className="text-xs font-bold text-[#4A3F35] mb-1">{msg.senderName}</span>}
-
-                                    {/* 말풍선과 시간이나 안 읽은 사람 수를 감싸는 컨테이너 */}
-                                    <div className={`flex items-end gap-2 ${isMine ? 'flex-row-reverse' : 'flex-row'}`}>
-
-                                        {/* 말풍선 */}
-                                        {/* 메시지 타입별 렌더링 */}
-                                        <div className={`max-w-[300px] overflow-hidden shadow-sm ${msg.messageType === 'TEXT'
-                                            ? `px-4 py-2.5 rounded-2xl text-sm whitespace-pre-wrap break-words ${isMine ? 'bg-[#FFF9ED] font-semibold rounded-tr-none' : 'bg-[#743F24] bg-opacity-20 font-semibold rounded-tl-none'
-                                            }`
-                                            : ''    // 이미지나 파일일 때는 배경색과 패딩을 별도로
-                                            }`}>
-
-                                            {/* 이미지 메시지라면 */}
-                                            {msg.messageType === "IMAGE" && (
-                                                <ImageMessage msg={msg}/>
-                                            )}
-
-                                            {/* 비디오 메시지라면 */}
-                                            {msg.messageType === "VIDEO" && msg.files?.map((file, i) => (
-                                                <VideoMessage key={i} url={file.fileUrl}/>
-                                            ))}
-
-                                            {/* 파일 타입 메시지라면 */}
-                                            {msg.messageType === "FILE" && (
-                                                <FileMessages msg={msg} isMine={isMine} />
-                                            )}
-
-
-
-                                            {/* 일반 파일 메시지
-                                            {msg.messageType === 'FILE' && (
-                                                <div className={`flex items-center gap-3 p-3 rounded-2xl border ${isMine ? 'bg-white border-[#B5A492]' : 'bg-gray-50 border-gray-200'
-                                                    }`}>
-                                                    <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                                                        <span className="text-xl">📄</span>
-                                                    </div>
-                                                    <div className="flex flex-col overflow-hidden text-left">
-                                                        <span className="text-sm font-bold truncate max-w-[150px]">{msg.message}</span>
-                                                        <span className="text<-[10px] text-gray-500 font-medium">문서 파일</span>
-                                                    </div> */}
-                                                    {/* 파일일 경우 채팅메시지 */}
-                                                    {/* {msg.fileUrls && msg.fileUrls.map((url, index) => (
-                                                        <div key={index} className={`flex items-center gap-3 p-3 rounded-2xl border mb-2 ...`}>
-                                                            <span className="text-xl">📄</span>
-                                                            <div className="flex flex-col overflow-hidden text-left flex-1">
-                                                                <span className="text-sm font-bold truncate">파일 {index + 1}</span>
-                                                            </div>
-                                                            <a 
-                                                                href={url} 
-                                                                download 
-                                                                className="ml-2 text-gray-400 hover:text-gray-600"
-                                                            >
-                                                                ⬇️
-                                                            </a>
-                                                        </div>
-                                                    ))}
-
-                                                </div>
-                                            )} */}
-
-                                            {/* 텍스트 타입 */}
-                                            {msg.messageType === "TEXT" && (  
-                                                <p className="whitespace-pre-wrap">{msg.message}</p>
-                                            )}
-
+                            <>
+                                <React.Fragment key={msg.messageId}>
+                                    {/* 날짜 구분선 렌더링 (날짜가 바뀔 때만 렌더링) */}
+                                    {showDataDivider && (
+                                        <div className="flex justify-center my-8">
+                                            <div className="bg-[#FFF9ED] text-black text-[11px] px-4 py-1.5 rounded-full flex items-center gap-2 shadow-sm">
+                                                {/* 날짜 포맷팅: 2024년 01월 19일 형식으로 변환 */}
+                                                {new Date(currentDate).toLocaleDateString('ko-KR', {
+                                                    year: 'numeric',
+                                                    month: 'long',
+                                                    day: 'numeric',
+                                                    weekday: 'long'
+                                                })}
+                                            </div>
                                         </div>
-
-                                        {/* 시간 및 안 읽은 사람 수 표시하는 영역 */}
-                                        <div className={`flex flex-col mb-1 ${isMine ? 'items-end' : 'items-start'}`}>
-                                            {msg.unreadCount > 0 && (
-                                                <span className="text-[10px] text-yellow-600 font-bold leading-none mb-1">
-                                                    {msg.unreadCount}
-                                                </span>
-                                            )}
-                                            <span className="text-[10px] text-gray-400 leading-none">
-                                                {msg.sentTime}
+                                    )}
+                                    
+                                    {/* 메시지 본문 */}
+                                    {isSystem ? (
+                                        <div className="flex justify-center">
+                                            <span className="bg-gray-100 text-gray-500 text-xs px-4 py-1 rounded-full">
+                                                {msg.message}
                                             </span>
                                         </div>
-
-
-                                    </div>
-                                </div>
-                            </div>
+                                    ) : (
+                                        <div
+                                            ref={(e) => {
+                                                if (e) messageRefs.current.set(msg.messageId, e);
+                                                else messageRefs.current.delete(msg.messageId);
+                                            }}
+                                            className={`flex ${isMine ? 'justify-end' : 'justify-start'}`}
+                                        >
+                                            {!isMine && (
+                                                <div className="w-10 h-10 bg-gray-200 rounded-full mr-3 mt-1 flex-shrink-0"/>
+                                            )}
+                                            <div className={`flex flex-col ${isMine ? 'items-end' : 'items-start'}`}>
+                                                {!isMine && <span className="text-xs font-bold text-[#4A3F35] mb-1">{msg.senderName}</span>}
+                                            
+                                                <div className={`flex items-end gap-2 ${isMine ? 'flex-row-reverse' : 'flex-row'}`}>
+                                                    {/* 말풍선 */}
+                                                    <div className={`max-w-[300px] overflow-hidden shadow-sm ${
+                                                        msg.messageType === 'TEXT'
+                                                            ? `px-4 py-2 rounded-2xl text-sm whitespace-pre-wrap break-words flex items-center ${
+                                                                isMine ? 'bg-[#FFF9ED] font-semibold rounded-tr-none' : 'bg-[#743F24] bg-opacity-20 font-semibold rounded-tl-none'
+                                                            }`
+                                                            : ''
+                                                    }`}>
+                                                        {msg.messageType === "IMAGE" && <ImageMessage msg={msg}/>}
+                                                        {msg.messageType === "VIDEO" && msg.files?.map((file, i) => <VideoMessage key={i} url={file.fileUrl}/>)}
+                                                        {msg.messageType === "FILE" && <FileMessages msg={msg} isMine={isMine}/>}
+                                                        {msg.messageType === "TEXT" && <p className="leading-relaxed">{msg.message}</p>}
+                                                    </div>
+                                                    
+                                                    {/* 시간 및 안 읽은 사람 수 */}
+                                                    <div className={`flex flex-col mb-[2px] ${isMine ? 'items-end' : 'items-start'}`}>
+                                                        {msg.unreadCount > 0 && (
+                                                            <span className="text-[10px] text-yellow-600 font-bold leading-none mb-1">
+                                                                {msg.unreadCount}
+                                                            </span>
+                                                        )}
+                                                        <span className="text-[10px] text-gray-400 leading-none whitespace-nowrap">
+                                                            {msg.sentTime}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+                                </React.Fragment>
+                            </>
                         );
                     })}
-
+                        
                     {/* 메시지 끝 지점 표시(여기로 스크롤되서 내려올거야) */}
                     <div ref={messagesEndRef} />
                 </div>

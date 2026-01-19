@@ -1,7 +1,7 @@
 import text from "@/assets/image/text.svg";
 import addPhoto from "@/assets/image/addPhoto.svg";
 import addReaction from "@/assets/image/addReaction.svg";
-import { useReducer, useRef } from "react";
+import { useEffect, useReducer, useRef } from "react";
 
 
 interface Props {
@@ -18,6 +18,19 @@ const ChatInputSection = ({ inputText, setInputText, handleSend, onFileUpload, p
     // 미디어, 파일의 Input을 위한 Ref
     const mediaInputRef = useRef<HTMLInputElement>(null);
     const fileDocInputRef = useRef<HTMLInputElement>(null);
+
+    // 텍스트 입력칸 참조
+    const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+    // 텍스트가 변경될 때마다 높이 조절
+    useEffect(() => {
+        // textareaRef.current가 존재하는지 체크 (Optional Chaining 활용 가능)
+        const textarea = textareaRef.current;
+        if (textarea) {
+            textarea.style.height = 'auto';
+            textarea.style.height = `${textarea.scrollHeight}px`;
+        }
+    }, [inputText]);
 
     // 파일 선택 핸들러
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, category: "MEDIA" | "DOC") => {
@@ -89,7 +102,8 @@ const ChatInputSection = ({ inputText, setInputText, handleSend, onFileUpload, p
                 )}
 
                 <textarea
-                    className="w-full h-24 resize-none outline-none text-sm font-semibold py-2 px-2"
+                    ref={textareaRef}
+                    className="w-full min-h-[40px] max-h-[200px] resize-none outline-none text-sm font-semibold py-2 px-2 overflow-y-auto"
                     placeholder="메시지를 입력해주세요."
                     value={inputText}
                     onChange={(e) => setInputText(e.target.value)}  // 입력할 때마다 상태 업데이트
@@ -98,6 +112,10 @@ const ChatInputSection = ({ inputText, setInputText, handleSend, onFileUpload, p
                         if (e.key === 'Enter' && !e.shiftKey) {
                             e.preventDefault();
                             handleSend();
+                            // 전송 후 높이 초기화
+                            if (textareaRef.current) {
+                                textareaRef.current.style.height = '40px';
+                            }
                         }
                     }}
                     // 이미지 복붙 로직
