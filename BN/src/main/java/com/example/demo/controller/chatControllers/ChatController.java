@@ -1,4 +1,4 @@
-package com.example.demo.controller;
+package com.example.demo.controller.chatControllers;
 
 import com.example.demo.domain.dto.ChatMessageDto;
 import com.example.demo.domain.dto.ChatMessageRequestDto;
