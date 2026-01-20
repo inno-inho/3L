@@ -22,19 +22,30 @@ const Header: React.FC = () => {
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> origin/dev
     return (
         <>
             <header className='ml-11 mr-11 flex justify-between items-center px-6 py-3 bg-transparent'>
                 {/* 로고 영역 */}
                 <Link 
                     to="/chatPages" 
+<<<<<<< HEAD
                     className='flex items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer'
+=======
+                    className='flex items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer no-underline'
+>>>>>>> origin/dev
                 >
                     <div className='w-8 h-8 flex items-center justify-center text-white font-bold'>
                         <img src={coconuttalk} alt="코코넛 톡 로고" />
                     </div>
+<<<<<<< HEAD
                     <span className='text-4xl text-[#6F4E37] tracking-tight font-nerko font-normal'>
+=======
+                    <span className='text-2xl font-black text-[#6F4E37] tracking-tight'>
+>>>>>>> origin/dev
                         CoconutTalk
                     </span>
                 </Link>

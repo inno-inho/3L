@@ -1,7 +1,11 @@
 // components/ProfileImage.tsx
 import React from 'react';
 
+<<<<<<< HEAD
 import coconuttalk from '../../assets/image/coconuttalk.png';
+=======
+import coconuttalk from '@/assets/image/coconuttalk.png';
+>>>>>>> origin/dev
 
 interface ProfileImageProps {
   url?: string;         // 이미지 주소

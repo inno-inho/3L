@@ -1,6 +1,10 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react-swc'
+<<<<<<< HEAD
 import path from 'path'
+=======
+import path from 'path';
+>>>>>>> origin/dev
 
 export default defineConfig({
   plugins: [react()],
@@ -14,6 +18,11 @@ export default defineConfig({
         changeOrigin: true,
         // rewrite: (path) => path.replace(/^\/api/, '') // 백엔드 API가 /api를 포함하지 않는다면 이 주석 해제하면 됨
       },
+      // 이미지 요청을 위한 프록시 추가
+      '/uploads': {
+        target: 'http://host.docker.internal:8080',
+        changeOrigin: true,
+      },
       // 웹소켓(WebSocket) 프록시 설정
       '/ws': {
         // target: 'http://backend:8080',         // 배포 시 혹은 도커로 전부 돌릴거면
@@ -23,9 +32,19 @@ export default defineConfig({
       }
     }
   },
+<<<<<<< HEAD
   resolve: {
     alias: {
       '@': path.resolve(__dirname, 'src'),  // @ === /src
     },
   }
 })
+=======
+
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, 'src'),
+    },
+  },
+});
+>>>>>>> origin/dev
