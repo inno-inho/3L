@@ -8,12 +8,10 @@ import api from "../../api/api";
 
 import ChatSearchHeader from "./ChatSearchHeader";
 import AlertModal from "../common/AlertModal";
-import VideoMessage from "./chatTypeComponent/VideoMessages";
+
 import ChatInputSection from "./ChatInputSection";
-import FileMessages from "./chatTypeComponent/FileMessages";
-import ImageMessage from "./chatTypeComponent/ImageMessages";
-import UrlMessages from "./chatTypeComponent/UrlMessages";
-import SystemMessages from "./chatTypeComponent/SystemMessages";
+
+import ChatMessageList from "./ChatMessageList";
 
 import stat_minus from "@/assets/image/stat_minus.png";
 
@@ -297,108 +295,14 @@ const ChatWindow = ({ roomInfo, currentUser }: ChatWindowProps) => {
                 />
 
                 {/* 메시지 리스트 영역 */}
-                <div
-                    className="flex-1 overflow-y-auto p-6 space-y-6 bg-white"
-                    onScroll={handleScroll}     // 스크롤 이벤트 연결
-                    ref={scrollRef}
-                >
-                    {messages.map((msg, index) => {
-                        const isMine = msg.sender === currentUser?.email;
-                        const isSystem = msg.messageType === 'ENTER' || 
-                                        msg.messageType === 'QUIT' || 
-                                        msg.messageType === 'DELETE' || 
-                                        msg.messageType === 'SYSTEM';;
-
-                        // 날짜 구분선 로직
-                        // 현재 메시지의 날짜 추출 (예: 2024-01-19)
-                        const currentDate = msg.createdAt.split('T')[0];
-
-                        // 이전 메시지의 날짜 추출(첫 번째 메시지라면 비교 대상 없음)
-                        const prevDate = index > 0 ? messages[index - 1].createdAt.split('T')[0] : null;
-
-                        // 이전 메시지와 날짜가 다르다면 구분선 표지 여부 결정
-                        const showDataDivider = currentDate !== prevDate;
-
-                        return (
-                            <>
-                                <React.Fragment key={msg.messageId}>
-                                    {/* 날짜 구분선 렌더링 (날짜가 바뀔 때만 렌더링) */}
-                                    {showDataDivider && (
-                                        <div className="flex justify-center my-8">
-                                            <div className="bg-[#FFF9ED] text-black text-[11px] px-4 py-1.5 rounded-full flex items-center gap-2 shadow-sm">
-                                                {/* 날짜 포맷팅: 2024년 01월 19일 형식으로 변환 */}
-                                                {new Date(currentDate).toLocaleDateString('ko-KR', {
-                                                    year: 'numeric',
-                                                    month: 'long',
-                                                    day: 'numeric',
-                                                    weekday: 'long'
-                                                })}
-                                            </div>
-                                        </div>
-                                    )}
-                                    
-                                    {/* 메시지 본문 */}
-                                    {isSystem ? (
-                                        <SystemMessages msg={msg}/>
-                                    ) : (
-                                        <div
-                                            ref={(e) => {
-                                                if (e) messageRefs.current.set(msg.messageId, e);
-                                                else messageRefs.current.delete(msg.messageId);
-                                            }}
-                                            className={`flex ${isMine ? 'justify-end' : 'justify-start'}`}
-                                        >
-                                            {!isMine && (
-                                                <div className="w-10 h-10 bg-gray-200 rounded-full mr-3 mt-1 flex-shrink-0"/>
-                                            )}
-                                            <div className={`flex flex-col ${isMine ? 'items-end' : 'items-start'}`}>
-                                                {!isMine && <span className="text-xs font-bold text-[#4A3F35] mb-1">{msg.senderName}</span>}
-                                            
-                                                <div className={`flex items-end gap-2 ${isMine ? 'flex-row-reverse' : 'flex-row'}`}>
-                                                    {/* 말풍선 */}
-                                                    <div className={`max-w-[300px] overflow-hidden shadow-sm ${
-                                                        msg.messageType === 'TEXT'
-                                                            ? `px-3 py-1.5 rounded-2xl text-sm whitespace-pre-wrap break-words flex items-center ${
-                                                                isMine ? 'bg-[#FFF9ED] font-semibold rounded-tr-none' : 'bg-[#743F24] bg-opacity-20 font-semibold rounded-tl-none'
-                                                            }`
-                                                            : ''
-                                                    }`}>
-                                                        {msg.messageType === "IMAGE" && <ImageMessage msg={msg}/>}
-                                                        {msg.messageType === "VIDEO" && msg.files?.map((file, i) => <VideoMessage key={i} url={file.fileUrl}/>)}
-                                                        {msg.messageType === "FILE" && <FileMessages msg={msg} isMine={isMine}/>}
-                                                        {/* URL_LINK 타입일 때 */}
-                                                        {msg.messageType === "URL_LINK" && (
-                                                            <div className="flex flex-col gap-2">
-                                                                {/* <p className="leading-relaxed">{msg.message}</p> */}
-                                                                <UrlMessages msg={msg} isMine= {isMine} />
-                                                            </div>
-                                                        )}
-                                                        {msg.messageType === "TEXT" && <p className="leading-tight m-1">{msg.message}</p>}
-                                                    </div>
-                                                    
-                                                    {/* 시간 및 안 읽은 사람 수 */}
-                                                    <div className={`flex flex-col mb-[2px] ${isMine ? 'items-end' : 'items-start'} leading-none`}>
-                                                        {msg.unreadCount > 0 && (
-                                                            <span className="text-[10px] text-yellow-600 font-bold leading-none mb-1">
-                                                                {msg.unreadCount}
-                                                            </span>
-                                                        )}
-                                                        <span className="text-[10px] text-gray-400 leading-none whitespace-nowrap">
-                                                            {msg.sentTime}
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    )}
-                                </React.Fragment>
-                            </>
-                        );
-                    })}
-                        
-                    {/* 메시지 끝 지점 표시(여기로 스크롤되서 내려올거야) */}
-                    <div ref={messagesEndRef} />
-                </div>
+                <ChatMessageList 
+                    messages={messages}
+                    currentUser={currentUser}
+                    scrollRef={scrollRef}
+                    messagesEndRef={messagesEndRef}
+                    messageRefs={messageRefs}
+                    handleScroll={handleScroll}
+                />
 
 
                 {/* 하단으로 가는 스크롤 버튼 */}
