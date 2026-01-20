@@ -4,10 +4,10 @@ import type { ReactNode } from 'react'; // 타입 전용 임포트 분리
 import api from '../api/api';
 
 // 사용자 정보 타입 정의 (임의로)
-interface User {
+export interface User {
   email: string;              // ID
   nickname: string;           // 화면에 표시될 이름
-  profileImageUrl?: string;   // 프로필 이미지 경로(카멜 케이스 권장)
+  userProfileImageUrl?: string;   // 프로필 이미지 경로(카멜 케이스 권장)
   statusMessage?: string;     // 상태 메시지 또는 접속 상태
   role: "USER" | 'ADMIN';     // 권한
   // emailVerified: boolean;   // 인증 여부에 따른 기능 제한 처리용    
@@ -15,7 +15,7 @@ interface User {
 }
 
 // Context가 제공할 값들의 타입 정의
-interface AuthContextType {
+export interface AuthContextType {
   isLoggedIn: boolean;  // 로그인 했는지
   user: User | null;  // 유저 정보
   isLoading: boolean; // 초기 인증 체크 중인지 여부
@@ -32,7 +32,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     email: "test@example.com",
     nickname: "채팅 개발자",
     role: "USER",
-    profileImageUrl: "https://via/placeholder.com/150"
+    userProfileImageUrl: "https://via/placeholder.com/150"
   });
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
@@ -79,7 +79,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       setIsLoggedIn(false);
       setUser(null);
       localStorage.removeItem("accessToken"); // 토큰 삭제
-      window.location.href = '/login';  // 로그인 화면으로 이동
+      window.location.href = '/';  // 로그인 화면으로 이동
     }
   };
 
