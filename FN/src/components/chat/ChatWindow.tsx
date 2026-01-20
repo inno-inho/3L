@@ -76,7 +76,7 @@ const ChatWindow = ({ roomInfo, currentUser }: ChatWindowProps) => {
             // /ws는 EndPoint, /websocket은 순수 소켓 연결을 위한 STOMP 표준 주소
             brokerURL: 'ws://localhost:8080/ws',
             connectHeaders: {
-                // Authorization: token ? `Bearer ${token}` : ""
+                // Authorization: token ? `Bearer ${token}` : ""        // 유저 기능이랑 토큰관련 백엔드 로직 끝나면 추가해야함
             },
 
             // 연결 성공 시 로직
@@ -143,6 +143,7 @@ const ChatWindow = ({ roomInfo, currentUser }: ChatWindowProps) => {
         document.addEventListener('mousedown', handleClickOutside);
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
+
 
     // #######################################
     // 해당 방의 메시지를 가져오는 로직

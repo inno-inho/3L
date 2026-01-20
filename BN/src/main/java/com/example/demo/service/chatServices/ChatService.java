@@ -1,4 +1,4 @@
-package com.example.demo.service;
+package com.example.demo.service.chatServices;
 
 import com.example.demo.domain.Repository.ChatMessageRepository;
 import com.example.demo.domain.Repository.Local_S3_FileService.FileService;
@@ -29,7 +29,7 @@ public class ChatService {
     private final ChatMessageRepository chatMessageRepository;
     private final FileService fileService;
     private final RedisTemplate<String, Object> redisTemplate;
-    private final ApplicationEventPublisher applicationEventPublisher;
+    private final ApplicationEventPublisher applicationEventPublisher;      // 방송국 역할
 
     // 정규식 패턴 (URL 추출용)
     private static final String URL_REGEX = "https?://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]";

@@ -2,14 +2,11 @@ package com.example.demo.controller;
 
 import com.example.demo.domain.dto.ChatMessageDto;
 import com.example.demo.domain.dto.ChatMessageRequestDto;
-import com.example.demo.eventListener.ChatMessageEvent;
-import com.example.demo.service.ChatService;
+import com.example.demo.service.chatServices.ChatService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.transaction.event.TransactionPhase;
-import org.springframework.transaction.event.TransactionalEventListener;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
