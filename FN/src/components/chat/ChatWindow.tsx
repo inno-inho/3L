@@ -304,7 +304,10 @@ const ChatWindow = ({ roomInfo, currentUser }: ChatWindowProps) => {
                 >
                     {messages.map((msg, index) => {
                         const isMine = msg.sender === currentUser?.email;
-                        const isSystem = msg.messageType === 'SYSTEM';
+                        const isSystem = msg.messageType === 'ENTER' || 
+                                        msg.messageType === 'QUIT' || 
+                                        msg.messageType === 'DELETE' || 
+                                        msg.messageType === 'SYSTEM';;
 
                         // 날짜 구분선 로직
                         // 현재 메시지의 날짜 추출 (예: 2024-01-19)
@@ -336,11 +339,7 @@ const ChatWindow = ({ roomInfo, currentUser }: ChatWindowProps) => {
                                     
                                     {/* 메시지 본문 */}
                                     {isSystem ? (
-                                        <div className="flex justify-center">
-                                            <span className="bg-gray-100 text-gray-500 text-xs px-4 py-1 rounded-full">
-                                                {msg.message}
-                                            </span>
-                                        </div>
+                                        <SystemMessages msg={msg}/>
                                     ) : (
                                         <div
                                             ref={(e) => {
@@ -359,7 +358,7 @@ const ChatWindow = ({ roomInfo, currentUser }: ChatWindowProps) => {
                                                     {/* 말풍선 */}
                                                     <div className={`max-w-[300px] overflow-hidden shadow-sm ${
                                                         msg.messageType === 'TEXT'
-                                                            ? `px-4 py-2 rounded-2xl text-sm whitespace-pre-wrap break-words flex items-center ${
+                                                            ? `px-3 py-1.5 rounded-2xl text-sm whitespace-pre-wrap break-words flex items-center ${
                                                                 isMine ? 'bg-[#FFF9ED] font-semibold rounded-tr-none' : 'bg-[#743F24] bg-opacity-20 font-semibold rounded-tl-none'
                                                             }`
                                                             : ''
@@ -374,11 +373,11 @@ const ChatWindow = ({ roomInfo, currentUser }: ChatWindowProps) => {
                                                                 <UrlMessages msg={msg} isMine= {isMine} />
                                                             </div>
                                                         )}
-                                                        {msg.messageType === "TEXT" && <p className="leading-relaxed">{msg.message}</p>}
+                                                        {msg.messageType === "TEXT" && <p className="leading-tight m-1">{msg.message}</p>}
                                                     </div>
                                                     
                                                     {/* 시간 및 안 읽은 사람 수 */}
-                                                    <div className={`flex flex-col mb-[2px] ${isMine ? 'items-end' : 'items-start'}`}>
+                                                    <div className={`flex flex-col mb-[2px] ${isMine ? 'items-end' : 'items-start'} leading-none`}>
                                                         {msg.unreadCount > 0 && (
                                                             <span className="text-[10px] text-yellow-600 font-bold leading-none mb-1">
                                                                 {msg.unreadCount}

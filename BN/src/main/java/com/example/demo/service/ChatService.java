@@ -155,9 +155,15 @@ public class ChatService {
         ChatMessageDto.MessageType determinedType;
         ChatMessageDto.ChatMetadata chatMetadata = null;    // 메타데이터 변수 초기화
 
+        // 우선 DTO에 담겨온 타입을 확인 (프론트에서 ENTER/QUIT를 명시해서 보낼 경우)
+        if (chatMessageRequestDto.getMessageType() != null &&
+                (chatMessageRequestDto.getMessageType() == ChatMessageDto.MessageType.ENTER ||
+                        chatMessageRequestDto.getMessageType() == ChatMessageDto.MessageType.QUIT)) {
+            determinedType = chatMessageRequestDto.getMessageType();
+        }
 
         // 파일이 있는 경우(IMAGE, FILE, VIDEO)
-        if (chatMessageRequestDto.getFiles() != null && !chatMessageRequestDto.getFiles().isEmpty()) {
+        else if (chatMessageRequestDto.getFiles() != null && !chatMessageRequestDto.getFiles().isEmpty()) {
             determinedType = determineMessageType(chatMessageRequestDto.getFiles());
         } else {
             String singleUrl = extractOnlyOneUrl(chatMessageRequestDto.getMessage());
