@@ -33,6 +33,10 @@ React Router + Outelt 레이아웃 패턴
   </Route>
   ```
 
+### CSS 설정
+```
+부트스트랩 사용으로 기존 tailwind css가 밀리는 일 발생하면 → index.css에서 수정하고 main.tsx에서 import index.css를 젤 마지막에 해주기
+```
 
 
 
