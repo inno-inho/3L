@@ -4,8 +4,8 @@ import search from '@/assets/image/search.png';
 import type { Notice } from '@/types/notice';
 import { getNotices } from '@/api/noticeApi';
 import { formatDate } from '@/utils/date';
-// import DoubleArrowLeft from '@/assets/image/double_arrow_left.png';
-// import DoubleArrowRight from '@/assets/image/double_arrow_right.png';
+import DoubleArrowLeft from '@/assets/image/double_arrow_left.png';
+import DoubleArrowRight from '@/assets/image/double_arrow_right.png';
 import ArrowLeft from '@/assets/image/arrow_left.png';
 import ArrowRight from '@/assets/image/arrow_right.png';
 
@@ -16,6 +16,14 @@ const NoticeList = () => {
     const [notices, setNotices] = useState<Notice[]>([]); 
     const [page, setPage] = useState(1); // 1부터 시작(백엔드에서)
     const [totalPages, setTotalPages] = useState(0);
+
+    const PAGE_LIMIT = 5;
+    const startPage = Math.floor((page - 1)/ PAGE_LIMIT) * PAGE_LIMIT + 1;
+    const endPage = Math.floor(startPage + PAGE_LIMIT -1, totalPages);
+    const pageNumbers = Array.from(
+        { length: endPage - startPage + 1 },
+        (_, i) => startPage + i
+    );
 
     // Page<Notice> 는 배열이 아닌 객체가 오도록
     useEffect(()=> {
@@ -74,16 +82,23 @@ const NoticeList = () => {
                 </div>
 
                 {/* 페이지 네이션 */}
-                <div className="max-w-full px-8 my-20">
+                <div className="max-w-full px-8 my-20 flex item-center justify-center gap-2">
+                    <button onClick={() => setPage(1)}
+                            disabled={page === 1}
+                            className="w-8 h-8 flex items-center justify-center disabled:opacity-40"
+                    >
+                        <img src={DoubleArrowLeft} alt="맨 첫 페이지" />
+                    </button>
                     <button onClick={() => setPage(prev => Math.max(prev - 1, 1))}
                             disabled={page === 1}
+                            className="w-8 h-8 flex items-center"
                     >
-                        <img src={ArrowLeft} alt="이전 페이지" />    
+                        <img src={ArrowLeft} alt="이전 페이지"  />    
                     </button>
                     {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
                         <button key={pageNum}
                             onClick={() => setPage(pageNum)}
-                            className={`px-2 ${page == pageNum ? 'bg-orange-400 text-white' : ''}`}
+                            className={`px-2 ${page == pageNum ? '' : 'hover:bg-gray-300'}`}
                         >
                             {pageNum}
                         </button>
@@ -91,8 +106,15 @@ const NoticeList = () => {
                     ))}
                     <button onClick={() => setPage(prev => Math.min(prev + 1, totalPages))}
                             disabled={page === totalPages}
+                            className="px-2 w-8 h-8 flex items-center"
                     >
                         <img src={ArrowRight} alt="다음 페이지" />
+                    </button>
+                    <button onClick={() => setPage(totalPages)}
+                            disabled={page === totalPages}
+                            className="w-8 h-8 flex items-center justify-center disabled:opacity-40"
+                    >
+                        <img src={DoubleArrowRight} alt="맨 마지막 페이지" />
                     </button>
                 </div>
                 <div className="flex justify-between max-w-full px-8 mt-4 mb-10" >

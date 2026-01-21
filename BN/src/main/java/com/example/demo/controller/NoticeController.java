@@ -45,10 +45,13 @@ public class NoticeController {
     // 페이지하기 위해 ResponseEntity<Page<NoticeResponseDto>>
     @GetMapping("")
     public ResponseEntity<Page<NoticeResponseDto>> getAllNotices(
-            @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int size
+            @PageableDefault(
+                    size = 10,
+                    sort = "createdAt",
+                    direction = Sort.Direction.DESC
+            )
+            Pageable pageable
     ) {
-        Pageable pageable = PageRequest.of(page - 1, size, Sort.by("createdAt").descending());
         return ResponseEntity.ok(noticeService.getAllNotices(pageable));
     }
 
