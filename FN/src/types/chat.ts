@@ -1,3 +1,11 @@
+// 상세 메타데이터 인터페이스
+export interface ChatMetadata {
+    ogTitle?: string;
+    ogDescription?: string;
+    ogImage?: string;
+    url?: string;
+}
+
 // 메시지를 받는 인터페이스 
 export interface ChatMessageDto{
     messageId: string;
@@ -8,9 +16,13 @@ export interface ChatMessageDto{
     senderName: string;
     senderInitial: string;
     message: string;
-    fileUrls?: string[];
+    files?: {
+        fileUrl: string;
+        fileName: string;
+        originalFileName: string;
+    }[];
     thumbnailUrl?: string;
-    metadata?: string;
+    metadata?: ChatMetadata;
     isDeleted: boolean;
     sentTime?: string;
     createdAt: string;

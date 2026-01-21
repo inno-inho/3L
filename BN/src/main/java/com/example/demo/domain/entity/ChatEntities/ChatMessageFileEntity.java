@@ -1,4 +1,4 @@
-package com.example.demo.domain.entity;
+package com.example.demo.domain.entity.ChatEntities;
 
 
 import jakarta.persistence.*;
@@ -17,6 +17,8 @@ public class ChatMessageFileEntity {
     private Long id;
 
     private String fileUrl;
+
+    private String originalFileName;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "chat_message_id")

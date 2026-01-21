@@ -2,14 +2,11 @@ package com.example.demo.controller;
 
 import com.example.demo.domain.dto.ChatMessageDto;
 import com.example.demo.domain.dto.ChatMessageRequestDto;
-import com.example.demo.eventListener.ChatMessageEvent;
-import com.example.demo.service.ChatService;
+import com.example.demo.service.chatServices.ChatService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.transaction.event.TransactionPhase;
-import org.springframework.transaction.event.TransactionalEventListener;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -45,11 +42,11 @@ public class ChatController {
         return ResponseEntity.ok(savedMessage);
     }
 
-    // 커밋이 성공한 후에만 실행되는 리스너
-    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    public void handleChatEvent (ChatMessageEvent chatMessageEvent) {
-        simpMessagingTemplate.convertAndSend("/topic/chat/" + chatMessageEvent.roomId(), chatMessageEvent.chatMessageDto());        // 구독 주소 잡기
-    }
+//    // 커밋이 성공한 후에만 실행되는 리스너
+//    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+//    public void handleChatEvent (ChatMessageEvent chatMessageEvent) {
+//        simpMessagingTemplate.convertAndSend("/sub/chat/" + chatMessageEvent.roomId(), chatMessageEvent.chatMessageDto());        // 구독 주소 잡기
+//    }
 
     // 채팅 내역 불러오기
     @GetMapping("/{roomId}/messages")

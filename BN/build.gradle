@@ -70,6 +70,12 @@ dependencies {
 
     //WEBSOCKET
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
+
+    // JAVA 8 Time
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
+
+    // Jsoup
+    implementation 'org.jsoup:jsoup:1.17.2'
 }
 
 tasks.named('test') {

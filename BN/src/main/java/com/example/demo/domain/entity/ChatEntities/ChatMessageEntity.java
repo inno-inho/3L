@@ -1,4 +1,4 @@
-package com.example.demo.domain.entity;
+package com.example.demo.domain.entity.ChatEntities;
 
 import com.example.demo.domain.dto.ChatMessageDto;
 import jakarta.persistence.*;
@@ -32,6 +32,10 @@ public class ChatMessageEntity {
     private ChatMessageDto.MessageType messageType;
 
     private String fileUrl;
+
+    @Column(columnDefinition = "TEXT")
+    @Convert(converter = ChatMessageMetadataConverter.class)
+    private ChatMessageDto.ChatMetadata metadata;
 
     @CreatedDate
     private LocalDateTime createdAt;

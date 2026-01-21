@@ -4,7 +4,7 @@ WORKDIR /app
 
 # 의존성 설치(캐시 활용을 위해 package.json 먼저 복사)
 COPY package.json package-lock.json ./
-RUN npm install
+RUN npm ci
 
 COPY . .
 

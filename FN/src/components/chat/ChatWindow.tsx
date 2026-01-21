@@ -9,8 +9,12 @@ import api from "../../api/api";
 import ChatSearchHeader from "./ChatSearchHeader";
 import AlertModal from "../common/AlertModal";
 
-import stat_minus from "@/assets/image/stat_minus.png";
 import ChatInputSection from "./ChatInputSection";
+
+import ChatMessageList from "./ChatMessageList";
+
+import stat_minus from "@/assets/image/stat_minus.png";
+
 
 interface ChatWindowProps {
     roomInfo: ChatRoomDto;
@@ -62,20 +66,40 @@ const ChatWindow = ({ roomInfo, currentUser }: ChatWindowProps) => {
 
     // 웹 소켓 클라이언트 
     useEffect(() => {
+
+        // localStorage에서 직접 토큰을 꺼내온다
+        const token = localStorage.getItem("accessToken");
+
         // 웹 소켓 클라이언트 설정
         client.current = new Client({
-            brokerURL: 'ws://localhost:8080/ws/chat',
+
+            // /ws는 EndPoint, /websocket은 순수 소켓 연결을 위한 STOMP 표준 주소
+            brokerURL: 'ws://localhost:8080/ws',
+            connectHeaders: {
+                // Authorization: token ? `Bearer ${token}` : ""        // 유저 기능이랑 토큰관련 백엔드 로직 끝나면 추가해야함
+            },
+
+            // 연결 성공 시 로직
             onConnect: () => {
                 console.log("웹 소켓 클라이언트 연결 성공!");
 
-                // 해당 방을 구독(누가 메시지를 보내면 나한테 알려달라고 구독 신청)
-                client.current?.subscribe(`/topic/chat/${roomInfo.roomId}`, (message) => {
+                // 해당 방을 구독(누가 메시지를 보내면 나한테 알려달라고 구독 신청), `/topic/chat/${roomInfo.roomId}는 ChatController에서 잡아논 주소
+                client.current?.subscribe(`/sub/chat/${roomInfo.roomId}`, (message) => {
+                    console.log("메시지 원본: ", message.body);
+                    
                     const newMessages = JSON.parse(message.body);
 
+                    console.log("수신 데이터: ", newMessages);
                     // 메시지 리스트를 업데이트하면 실시간으로 메시지가 화면에 뜸
-                    setMessages((prev) => [...prev, newMessages]);
+                    setMessages((prev) => {
+                        // 이미 리스트에 있는 ID라면 추가하지 않음
+                        if(prev.some(m => m.messageId === newMessages.messageId)) return prev;
+                        return [...prev, newMessages];
+                    });
                 });
             },
+            // 콘솔에서 통신 과정 다 볼 수 있음
+            debug: (str) => console.log(str),
         });
 
         client.current.activate();  // 연결 시작
@@ -120,6 +144,7 @@ const ChatWindow = ({ roomInfo, currentUser }: ChatWindowProps) => {
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
+
     // #######################################
     // 해당 방의 메시지를 가져오는 로직
     // #######################################
@@ -129,7 +154,10 @@ const ChatWindow = ({ roomInfo, currentUser }: ChatWindowProps) => {
                 const response = await api.get(`/chatrooms/${roomInfo.roomId}/messages`);
 
                 // 메시지 불러온거 세팅하기
-                setMessages(response.data);
+                // 데이터가 최신 -> 과거 순으로 오므로 
+                // 프론트엔드 화면에 마자게 과거 -> 최신순으로 뒤집는다
+                const sortedMessages = [...response.data].reverse();
+                setMessages(sortedMessages);
             } catch (error) {
                 console.error("채팅 내역 로딩 실패: ", error);
             }
@@ -154,6 +182,7 @@ const ChatWindow = ({ roomInfo, currentUser }: ChatWindowProps) => {
             formData.append("roomId", roomInfo.roomId);
             formData.append("message", inputText.trim());
             formData.append("sender", currentUser?.email ?? "");
+            formData.append("messageType", "TEXT");
 
             pendingFiles.forEach((p) => {
                 formData.append("files", p.file);   // 서버의 RequsePart랑 이름 맞춰야함
@@ -267,139 +296,14 @@ const ChatWindow = ({ roomInfo, currentUser }: ChatWindowProps) => {
                 />
 
                 {/* 메시지 리스트 영역 */}
-                <div
-                    className="flex-1 overflow-y-auto p-6 space-y-6 bg-white"
-                    onScroll={handleScroll}     // 스크롤 이벤트 연결
-                    ref={scrollRef}
-                >
-                    {messages.map((msg) => {
-                        const isMine = msg.sender === currentUser?.email;
-                        const isSystem = msg.messageType === 'SYSTEM';
-
-                        if (isSystem) {
-                            return (
-                                <div key={msg.messageId} className="flex justify-center">
-                                    <span className="bg-gray-100 text-gray-500 text-xs px-4 py-1 rounded-full">
-                                        {msg.message}
-                                    </span>
-                                </div>
-                            );
-                        }
-
-                        return (
-                            <div
-                                key={msg.messageId}
-                                ref={(el) => {
-                                    if (el) messageRefs.current.set(msg.messageId, el);
-                                    else messageRefs.current.delete(msg.messageId);
-                                }}
-                                className={`flex ${isMine ? 'justify-end' : 'justify-start'}`}
-                            >
-                                {!isMine && (
-                                    <div className="w-10 h-10 bg-gray-200 rounded-full mr-3 mt-1 flex-shrink-0" />
-                                )}
-                                <div className={`flex flex-col ${isMine ? 'items-end' : 'items-start'}`}>
-                                    {!isMine && <span className="text-xs font-bold text-[#4A3F35] mb-1">{msg.senderName}</span>}
-
-                                    {/* 말풍선과 시간이나 안 읽은 사람 수를 감싸는 컨테이너 */}
-                                    <div className={`flex items-end gap-2 ${isMine ? 'flex-row-reverse' : 'flex-row'}`}>
-
-                                        {/* 말풍선 */}
-                                        {/* 메시지 타입별 렌더링 */}
-                                        <div className={`max-w-[300px] overflow-hidden shadow-sm ${msg.messageType === 'TEXT'
-                                            ? `px-4 py-2.5 rounded-2xl text-sm whitespace-pre-wrap break-words ${isMine ? 'bg-[#FFF9ED] font-semibold rounded-tr-none' : 'bg-[#743F24] bg-opacity-20 font-semibold rounded-tl-none'
-                                            }`
-                                            : ''    // 이미지나 파일일 때는 배경색과 패딩을 별도로
-                                            }`}>
-
-                                            {/* 이미지 메시지 */}
-                                            {msg.messageType === 'IMAGE' && (
-                                                <div className="rounded-xl overflow-hidden border border-gray-100">
-                                                    {msg.fileUrls && msg.fileUrls.map((url, index) => (
-                                                        <img
-                                                            key={index}
-                                                            src={url}
-                                                            alt={`첨부 이미지 ${index}`}
-                                                            className="w-full h-auto cursor-pointer hover:scale-[1.02] transition-transform"
-                                                        />
-                                                    ))}
-                                                </div>
-                                            )}
-
-                                            {/* 비디오 메시지 */}
-                                            {msg.messageType === "VIDEO" && (
-                                                <div className="rounded-xl overflow-hidden border border-gray-100 bg-black">
-                                                    {msg.fileUrls && msg.fileUrls.map((url, index) => (
-                                                        <video
-                                                            key={index}
-                                                            src={url}
-                                                            controls
-                                                            className="w-full max-h-[300px] object-cover"
-                                                            preload="metadata"  // 메타데이터만 미리 로드해서 로딩 속도 향상 
-                                                        />
-                                                    ))}
-
-                                                </div>
-                                            )}
-
-                                            {/* 일반 파일 메시지 */}
-                                            {msg.messageType === 'FILE' && (
-                                                <div className={`flex items-center gap-3 p-3 rounded-2xl border ${isMine ? 'bg-white border-[#B5A492]' : 'bg-gray-50 border-gray-200'
-                                                    }`}>
-                                                    <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                                                        <span className="text-xl">📄</span>
-                                                    </div>
-                                                    <div className="flex flex-col overflow-hidden text-left">
-                                                        <span className="text-sm font-bold truncate max-w-[150px]">{msg.message}</span>
-                                                        <span className="text<-[10px] text-gray-500 font-medium">문서 파일</span>
-                                                    </div>
-                                                    {/* 파일일 경우 채팅메시지 */}
-                                                    {msg.fileUrls && msg.fileUrls.map((url, index) => (
-                                                        <div key={index} className={`flex items-center gap-3 p-3 rounded-2xl border mb-2 ...`}>
-                                                            <span className="text-xl">📄</span>
-                                                            <div className="flex flex-col overflow-hidden text-left flex-1">
-                                                                <span className="text-sm font-bold truncate">파일 {index + 1}</span>
-                                                            </div>
-                                                            <a 
-                                                                href={url} 
-                                                                download 
-                                                                className="ml-2 text-gray-400 hover:text-gray-600"
-                                                            >
-                                                                ⬇️
-                                                            </a>
-                                                        </div>
-                                                    ))}
-
-                                                </div>
-                                            )}
-
-                                            {/* 기존 텍스트 메시지 */}
-                                            {msg.messageType === "TEXT" && msg.message}
-
-                                        </div>
-
-                                        {/* 시간 및 안 읽은 사람 수 표시하는 영역 */}
-                                        <div className={`flex flex-col mb-1 ${isMine ? 'items-end' : 'items-start'}`}>
-                                            {msg.unreadCount > 0 && (
-                                                <span className="text-[10px] text-yellow-600 font-bold leading-none mb-1">
-                                                    {msg.unreadCount}
-                                                </span>
-                                            )}
-                                            <span className="text-[10px] text-gray-400 leading-none">
-                                                {msg.sentTime}
-                                            </span>
-                                        </div>
-
-
-                                    </div>
-                                </div>
-                            </div>
-                        );
-                    })}
-
-                    {/* 메시지 끝 지점 표시(여기로 스크롤되서 내려올거야) */}
-                    <div ref={messagesEndRef} />
-                </div>
+                <ChatMessageList 
+                    messages={messages}
+                    currentUser={currentUser}
+                    scrollRef={scrollRef}
+                    messagesEndRef={messagesEndRef}
+                    messageRefs={messageRefs}
+                    handleScroll={handleScroll}
+                />
 
 
                 {/* 하단으로 가는 스크롤 버튼 */}

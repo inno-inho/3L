@@ -20,8 +20,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         // 클라이언트가 소켓에 연결할 지점 (SockJS 사용)
         registry.addEndpoint("/ws")
-                .setAllowedOriginPatterns("*")  // CORS 허용
-                .withSockJS();
+                .setAllowedOriginPatterns("*");  // CORS 허용
     }
 
     @Override
