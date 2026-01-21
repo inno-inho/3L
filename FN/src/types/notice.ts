@@ -9,4 +9,18 @@ export interface Notice {
     updatedAt: string | null;
 }
 
-// noticeApi.ts
+// RequestDto
+export interface NoticeCreateRequest {
+    title: string;
+    content: string;
+    // id, createdAt 같은 건 포함 X 
+    // authorid은 지금 고정이거나 서버에서 처리
+}
+
+export interface NoticePageResponse {
+    content: Notice[];
+    totalPages: number;
+    totalElements: number;
+    number: number; // 현재 페이지
+    size: number;
+}

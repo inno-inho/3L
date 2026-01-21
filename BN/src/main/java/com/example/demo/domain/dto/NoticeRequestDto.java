@@ -19,6 +19,4 @@ public class NoticeRequestDto {
 
     // request는 entity를 절대 몰라야한다 => entity -> Dto는 responseDto에서만
 
-
-
 }

@@ -5,12 +5,15 @@ import com.example.demo.domain.dto.NoticeRequestDto;
 import com.example.demo.domain.dto.NoticeResponseDto;
 import com.example.demo.domain.entity.NoticeEntity;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+
 public class NoticeService {
 
     @Autowired
@@ -21,11 +24,10 @@ public class NoticeService {
     }
 
     // 공지 조회
-    public List<NoticeResponseDto> getAllNotices(){
-        return noticeRepository.findAll() // 전체 조회
-                .stream() // 리스트를 스트림으로 변환
-                .map(NoticeResponseDto::new) // Entity -> DTO
-                .toList(); // 다시 List로
+    // List -> Pagenation 추가
+    public Page<NoticeResponseDto> getAllNotices(Pageable pageable) {
+        return noticeRepository.findAll(pageable)
+                .map(NoticeResponseDto::from);
     }
 
     public NoticeEntity getNoticesById(Long id){

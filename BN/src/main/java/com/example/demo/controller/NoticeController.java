@@ -5,6 +5,11 @@ import com.example.demo.domain.dto.NoticeResponseDto;
 import com.example.demo.domain.entity.NoticeEntity;
 import com.example.demo.service.NoticeService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,8 +22,7 @@ import java.util.List;
 public class NoticeController {
 
     // 항상 service를 통해서만 처리(controller가 직접 DB 접근 x)
-    @Autowired
-    private NoticeService noticeService;
+    private final NoticeService noticeService;
 
     public NoticeController(NoticeService noticeService){
         this.noticeService = noticeService;
@@ -33,20 +37,25 @@ public class NoticeController {
     public ResponseEntity<NoticeResponseDto> createNotice(@RequestBody NoticeRequestDto noticeRequest){
         System.out.println("[Notice:CreateNotice] " + noticeRequest);
         NoticeEntity notice = noticeService.createNotice(noticeRequest); // DTO -> Entity 변환 : DB 저장
-        return ResponseEntity.ok(new NoticeResponseDto(notice)); // Entity -> ResponseDto 변환, HTTP 200 + Json 응답
+        return ResponseEntity.ok(NoticeResponseDto.from(notice)); // Entity -> ResponseDto 변환, HTTP 200 + Json 응답
     }
 
+
     // 공지 조회
+    // 페이지하기 위해 ResponseEntity<Page<NoticeResponseDto>>
     @GetMapping("")
-    public List<NoticeResponseDto> getAllNotices(){
-        System.out.println("[Notice:getAllNotices] ");
-        return noticeService.getAllNotices();
+    public ResponseEntity<Page<NoticeResponseDto>> getAllNotices(
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        Pageable pageable = PageRequest.of(page - 1, size, Sort.by("createdAt").descending());
+        return ResponseEntity.ok(noticeService.getAllNotices(pageable));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<NoticeResponseDto> getNoticesById(@PathVariable Long id){
         NoticeEntity notice = noticeService.getNoticesById(id);
-        return ResponseEntity.ok(new NoticeResponseDto(notice));
+        return ResponseEntity.ok(NoticeResponseDto.from(notice));
     }
 
     // 공지 수정
@@ -55,7 +64,7 @@ public class NoticeController {
         System.out.println("[Notice:updateNotice] " + noticeRequest);
 
         NoticeEntity notice = noticeService.updateNotice(id, noticeRequest); // 존재 여부 확인, 필드 수정, 저장
-        return ResponseEntity.ok(new NoticeResponseDto(notice));
+        return ResponseEntity.ok(NoticeResponseDto.from(notice));
     }
 
     // 공지 삭제
