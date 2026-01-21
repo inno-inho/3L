@@ -70,11 +70,16 @@ const ChatWindow = ({ roomInfo, currentUser }: ChatWindowProps) => {
         // localStorage에서 직접 토큰을 꺼내온다
         const token = localStorage.getItem("accessToken");
 
+        // 현재 브라우저가 접속한 프로토콜(http/https)에 맞춰 ws/wss 결정
+        const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        // 현재 브라우저 주소창의 호스트(localhost:5173_리액트 vite 주소)를 자동으로 가져옴
+        const host = window.location.host
+
         // 웹 소켓 클라이언트 설정
         client.current = new Client({
 
             // /ws는 EndPoint, /websocket은 순수 소켓 연결을 위한 STOMP 표준 주소
-            brokerURL: 'ws://localhost:8080/ws',
+            brokerURL: `${protocol}//${host}/ws`,
             connectHeaders: {
                 // Authorization: token ? `Bearer ${token}` : ""        // 유저 기능이랑 토큰관련 백엔드 로직 끝나면 추가해야함
             },
