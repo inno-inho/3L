@@ -20,15 +20,13 @@ public class ChatController {
     private final SimpMessagingTemplate simpMessagingTemplate;
     private final ChatService chatService;
 
+    // ######################################
     //  메시지 전송 및 저장
+    // ######################################
     @PostMapping("/{roomId}/send")
     public ResponseEntity<ChatMessageDto> sendMessage(
             @PathVariable String roomId,
             @ModelAttribute ChatMessageRequestDto chatMessageRequestDto) {
-
-
-
-
 
         // 서비스에서 DB 저장 및 DTO 변환 (파일 업로드 포함)
         ChatMessageDto savedMessage = chatService.saveMessage(chatMessageRequestDto);
@@ -48,7 +46,9 @@ public class ChatController {
 //        simpMessagingTemplate.convertAndSend("/sub/chat/" + chatMessageEvent.roomId(), chatMessageEvent.chatMessageDto());        // 구독 주소 잡기
 //    }
 
+    // ########################################
     // 채팅 내역 불러오기
+    // ########################################
     @GetMapping("/{roomId}/messages")
     public ResponseEntity<List<ChatMessageDto>> getChatHistory(
             @PathVariable String roomId,
@@ -58,4 +58,18 @@ public class ChatController {
 
         return ResponseEntity.ok(history);
     }
+
+    // ########################################
+    // 채팅 삭제하기
+    // ########################################
+    @DeleteMapping("/messages/{messageId}")
+    public ResponseEntity<Void> deleteMessage (
+            @PathVariable Long messageId,
+            @RequestParam String email) {
+
+        chatService.deleteMessage(messageId, email);
+
+        return ResponseEntity.ok().build();
+    }
+
 }

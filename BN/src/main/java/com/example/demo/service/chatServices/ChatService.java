@@ -99,10 +99,10 @@ public class ChatService {
         // Entity를 Dto로 변환
         ChatMessageDto savedDto = chatCommonService.convertToDto(chatMessageEntity);
 
-        log.info("이벤트 발행 직전: {}" , savedDto.getMessage());
+        log.info("메시지 저장 이벤트 발행 직전: {}" , savedDto.getMessage());
         // 이벤트 발행 (하지만 아직 리스너가 실행되지는 않음. 커밋될 때까지 대기)
         applicationEventPublisher.publishEvent(new ChatMessageEvent(chatMessageRequestDto.getRoomId(), savedDto));
-        log.info("이벤트 발행 완료");
+        log.info("메시지 저장 이벤트 발행 완료: {}", savedDto.getMessage());
 
         // Redis에는 변환된 Dto를 저장
         String redisKey = "chatroom:last_msg:" + chatMessageRequestDto.getRoomId();
@@ -130,6 +130,35 @@ public class ChatService {
         return chatMessageEntities.stream()
                 .map(chatCommonService::convertToDto)
                 .toList();
+    }
+
+    // ############################################
+    // 채팅 삭제
+    // ############################################
+    @Transactional
+    public ChatMessageDto deleteMessage(Long messageId, String userEmail) {
+        ChatMessageEntity chatMessageEntity = chatMessageRepository.findById(messageId)
+                .orElseThrow(() -> new RuntimeException("메시지를 찾을 수 없습니다. ChatService_deleteMessage"));
+
+        // 본인 확인 로직
+        if (!chatMessageEntity.getSender().equals(userEmail)) {
+            throw new RuntimeException("본인의 메시지만 삭제할 수 있습니다. ChatService의 deleteMessage");
+        }
+
+        log.info("채팅 메시지 삭제 이벤트: {},  ChatService", chatMessageEntity.getMessage());
+
+        // 상태 변경
+        chatMessageEntity.setMessageType(ChatMessageDto.MessageType.DELETE);
+        chatMessageEntity.setMessage("삭제된 메시지입니다");
+
+        ChatMessageDto chatMessageDto = chatCommonService.convertToDto(chatMessageEntity);
+
+        // 실시간 알림 발행(구독 중인 모든 유저의 화면에서 사라지게 함)
+        applicationEventPublisher.publishEvent(new ChatMessageEvent(chatMessageEntity.getRoomId(), chatMessageDto));
+
+
+
+        return null;
     }
 
 

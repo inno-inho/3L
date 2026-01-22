@@ -8,10 +8,9 @@ import api from "../../api/api";
 
 import ChatSearchHeader from "./ChatSearchHeader";
 import AlertModal from "../common/AlertModal";
-
 import ChatInputSection from "./ChatInputSection";
-
 import ChatMessageList from "./ChatMessageList";
+import ConfirmModal from "../common/ConfirmModal";
 
 import stat_minus from "@/assets/image/stat_minus.png";
 
@@ -61,6 +60,13 @@ const ChatWindow = ({ roomInfo, currentUser }: ChatWindowProps) => {
         previewUrl: string
     }[]>([]);
 
+    // ConfirmModal 상태 관리
+    const [confirmModal, setconfirmModal] = useState({
+        show: false,
+        message: "",
+        onConfirm: () => {},
+    });
+
     // 웹 소켓 클라이언트
     const client = useRef<Client | null>(null);
 
@@ -97,8 +103,15 @@ const ChatWindow = ({ roomInfo, currentUser }: ChatWindowProps) => {
                     console.log("수신 데이터: ", newMessages);
                     // 메시지 리스트를 업데이트하면 실시간으로 메시지가 화면에 뜸
                     setMessages((prev) => {
-                        // 이미 리스트에 있는 ID라면 추가하지 않음
-                        if(prev.some(m => m.messageId === newMessages.messageId)) return prev;
+                        // 이미 리스트에 해당 ID가 있는지 확인 (삭제 등으로 인한 업데이트 메시지인지 확인)
+                        const isExisting = prev.some(m => m.messageId === newMessages.messageId);
+
+                        if (isExisting) {
+                            // 이미 있다면 해당 Id의 메시지만 새 데이터(newMessage)로 교체
+                            return prev.map(m => m.messageId === newMessages.messageId ? newMessages : m);   
+                        }
+
+                        // 완전히 새로운 메시지라면? 기존 배열 끝에 추가
                         return [...prev, newMessages];
                     });
                 });
@@ -268,7 +281,7 @@ const ChatWindow = ({ roomInfo, currentUser }: ChatWindowProps) => {
         }
     };
 
-    // 검색 종료(취소) 함수
+    // 검색창 종료(취소) 함수
     const handleCloseSearch = () => {
         setIsSearchMode(false);
         setSearchQuery("");
@@ -279,6 +292,26 @@ const ChatWindow = ({ roomInfo, currentUser }: ChatWindowProps) => {
     const handleCancelFile = (id: string) => {
         setPendingFiles(prev => prev.filter(f => f.id !== id));
     }
+
+    // 삭제 버튼 클릭 시 실행된 핸들러
+    const handleDeleteClick = (messageId: string) => {
+        setconfirmModal({
+            show: true,
+            message: "메시지를 삭제하시겠습니까?",
+            onConfirm: () => executeDelete(messageId)   // ConfirmModal(메시지 삭제)에서 확인 누르면 실행될 함수
+        })
+    }
+
+    // 실제 삭제 API 호출 로직
+    const executeDelete = async (messageId: string) => {
+        try {
+            await api.delete(`/chatrooms/messages/${messageId}?email=${currentUser?.email}`);
+        } catch (error) {
+            console.error("삭제 실패: ", error);
+            setModalMessage("메시지 삭제에 실패했습니다.");
+            setModalShow(true);
+        }
+    };
 
     return (
         <>
@@ -308,6 +341,7 @@ const ChatWindow = ({ roomInfo, currentUser }: ChatWindowProps) => {
                     messagesEndRef={messagesEndRef}
                     messageRefs={messageRefs}
                     handleScroll={handleScroll}
+                    onDeleteClick={handleDeleteClick}
                 />
 
 
@@ -338,13 +372,23 @@ const ChatWindow = ({ roomInfo, currentUser }: ChatWindowProps) => {
                 />
             </div>
 
-            {/* 모달 컴포넌트 */}
+            {/* AlertModal 컴포넌트 */}
             <AlertModal
                 show={modalShow}
                 onHide={() => setModalShow(false)}
                 title="알림"
                 message={modalMessage}
             />
+
+            {/* ConfirmModal 컴포넌트 */}
+            <ConfirmModal 
+                show={confirmModal.show}
+                title="삭제 확인"
+                message={confirmModal.message}
+                onHide={() => setconfirmModal(prev => ({...prev, show: false}))}
+                onConfirm={confirmModal.onConfirm}
+            />
+
         </>
     );
 };
