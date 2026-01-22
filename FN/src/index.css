@@ -8,3 +8,7 @@
     @apply no-underline text-inherit;
   }
 }
+
+body {
+  @apply font-sans;
+}

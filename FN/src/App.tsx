@@ -8,6 +8,7 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import ConnectionTest from './components/test/ConnectionTest';
 import NoticeForm from './components/notice/NoticeForm';
 import NoticeList from './components/notice/NoticeList';
+import NoticeDetail from './components/notice/NoticeDetail';
 import LoginPage from './components/user/LoginPage';
 import MainLayout from './components/common/MainLayout';
 import ChatPage from './components/chat/ChatPage';
@@ -26,7 +27,7 @@ const App: React.FC = () => {
               <Route element={<MainLayout />} >
                 <Route path="/notices" element={<NoticeList />} />
                 <Route path="/notices/write" element={<NoticeForm />} />
-                
+                <Route path="/notices/:id" element={<NoticeDetail />} />
 
                 {/* test용 */}
                 <Route path='/test' element={<ConnectionTest />} />
