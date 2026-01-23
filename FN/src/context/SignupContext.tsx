@@ -9,8 +9,7 @@ import { createContext, useContext, useState } from "react";
 export type SignupStep =
   | "START"
   | "TERMS"   // 약관동의
-  | "EMAIL"   // 이메일입력
-  | "VERIFY"  // 인증번호확인
+  | "EMAIL"   // 이메일입력 + 인증번호
   | "PROFILE"; // 프로필설정
 
 /**

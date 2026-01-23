@@ -8,9 +8,8 @@
 import { useSignup } from "../../context/SignupContext";
 
 import SignupStart from "./SignupStart";
-// import SignupTerms from "./SignupTerms";
-// import SignupEmail from "./SignupEmail";
-// import SignupVerify from "./SignupVerify";
+import SignupTerms from "./SignupTerms";
+import SignupEmail from "./SignupEmail";
 // import SignupProfile from "./SignupProfile";
 
 const SignupLayout = () => {
@@ -21,12 +20,10 @@ const SignupLayout = () => {
   switch (step) {
     case "START":
       return <SignupStart />; //SignupStart컴포넌트(화면)을 끼워줘
-    // case "TERMS":
-    //   return <SignupTerms />;
-    // case "EMAIL":
-    //   return <SignupEmail />;
-    // case "VERIFY":
-    //   return <SignupVerify />;
+    case "TERMS":
+      return <SignupTerms />;
+    case "EMAIL":
+      return <SignupEmail />;
     // case "PROFILE":
     //   return <SignupProfile />;
     default:
