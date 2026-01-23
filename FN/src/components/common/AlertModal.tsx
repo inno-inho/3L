@@ -47,7 +47,7 @@ const AlertModal = ({ show, title, message, onHide }: AlertModalProps) => {
                             onClick={onHide}
                             className='border-0 rounded-2xl hover:bg-[#8B4513] active:scale-95 transition-colors'
                             style={{ 
-                            backgroundColor: '#B5A492', 
+                            backgroundColor: '#743F24', 
                             color: 'white',
                             width: '100px',
                             height: '48px',
