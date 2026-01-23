@@ -5,11 +5,18 @@
 2) Pull requests 로 병합 요청 → 코드 확인 받은 다음 dev로 병합처리
 ```
 
-
+## FN 주의 사항
 
 ### 공통 유틸 함수(FN)
 ```
 src/utils/date.ts : 날짜 포맷 2026.01.01 형태
+
+```
+
+### 페이지 너비, 높이 고정 XX
+```
+메인 레이아웃에서 width, height 조절
+각자 페이지에서 width, height 건드리지 말 것
 ```
 
 ### '@' 사용 설정 & 폰트 설정
@@ -38,9 +45,9 @@ React Router + Outelt 레이아웃 패턴
 부트스트랩 사용으로 기존 tailwind css가 밀리는 일 발생하면 → index.css에서 수정하고 main.tsx에서 import index.css를 젤 마지막에 해주기
 ```
 
+---
 
-
-### docker 명령어
+## docker 명령어
 
 ```
 # docker 실행 명령어
@@ -55,7 +62,7 @@ docker-compose -f docker-compose.local.yml --env-file .env.local down
 
 
 
-### notice 관련
+## notice 관련
 ```
 POST   api/notices                     // 공지 등록 (관리자)
 GET    api/notices                     // 공지 목록 조회
@@ -126,7 +133,7 @@ content
 created_at  
 
 
-### Vite 프로젝트 구조
+## Vite 프로젝트 구조
 ```
 project-root/
 ├─ index.html        
