@@ -69,6 +69,9 @@ public class ChatService {
                 .metadata(chatMetadata) // 추출된 메타데이터 객체를 그대로 넣으면 컨버터가 알아서 JSON으로 변환함
                 .createdAt(LocalDateTime.now())
                 .files(new ArrayList<>())
+                .parentMessageId(chatMessageRequestDto.getParentMessageId())
+                .parentMessageSenderName(chatMessageRequestDto.getParentMessageSenderName())
+                .parentMessageContent(chatMessageRequestDto.getParentMessageContent())
                 .build();
 
         // 파일이 있으면 업로드 후 자식 엔티티 생성 및 관계 설정

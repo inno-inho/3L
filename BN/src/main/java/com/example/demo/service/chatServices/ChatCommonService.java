@@ -41,6 +41,9 @@ public class ChatCommonService {
                 .message(chatMessageEntity.getMessage())
                 .files(fileResponses)
                 .metadata(chatMessageEntity.getMetadata())
+                .parentMessageId(chatMessageEntity.getParentMessageId() != null ? String.valueOf(chatMessageEntity.getParentMessageId()) : null)
+                .parentMessageSenderName(chatMessageEntity.getParentMessageSenderName())
+                .parentMessageContent(chatMessageEntity.getParentMessageContent())
                 .createdAt(chatMessageEntity.getCreatedAt())
                 .build();
 

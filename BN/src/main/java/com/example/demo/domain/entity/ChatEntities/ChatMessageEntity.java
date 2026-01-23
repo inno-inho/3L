@@ -40,6 +40,15 @@ public class ChatMessageEntity {
     @CreatedDate
     private LocalDateTime createdAt;
 
+    @Column
+    private Long parentMessageId;
+
+    @Column
+    private String parentMessageSenderName;
+
+    @Column(columnDefinition = "TEXT")
+    private String parentMessageContent;
+
     @OneToMany(mappedBy = "chatMessage", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default        // builder 사용 시 리스트 초기화 보장하는 옵션 Default
     private List<ChatMessageFileEntity> files = new ArrayList<>();

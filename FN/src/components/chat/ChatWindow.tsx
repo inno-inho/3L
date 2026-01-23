@@ -52,6 +52,12 @@ const ChatWindow = ({ roomInfo, currentUser }: ChatWindowProps) => {
     const [isChatDropdownOpen, setChatIsDropdownOpen] = useState(false);
     const chatDropdownRef = useRef<HTMLDivElement>(null);
 
+    // 답장 데이터 타입 정의(메시지 ID와 내용 일부)
+    const [replyTarget, setReplyTarget] = useState<ChatMessageDto | null>(null);
+
+    // 사용자가 바닥인지 추적하는 Ref
+    const isAtBottomRef = useRef(true); // 기본값은 true(처음 접속 시 바닥)
+
     // 미리보기 파일들 상태 관리
     const [pendingFiles, setPendingFiles] = useState<{
         id: string,
@@ -134,14 +140,22 @@ const ChatWindow = ({ roomInfo, currentUser }: ChatWindowProps) => {
 
     // 새 메시지가 올 때마다 자동 스크롤
     useEffect(() => {
-        scrollToBottom();
+        // 사용자가 바닥에 있었을 때만 자동으로 스크롤 내림
+        if (isAtBottomRef.current)  {
+            scrollToBottom();
+        }
     }, [messages]);
+
 
 
 
     // 스크롤 위치를 감지하여 버튼 표시 여부 결정
     const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
         const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
+
+        // 바닥 감지 로직: 하단에서 약 50px 이내에 있으면 바닥에 있다고 간주
+        const isBottom = scrollHeight - scrollTop - clientHeight < 50;
+        isAtBottomRef.current = isBottom;
 
         // 바닥에서 200px 이상 위로 올라가면 버튼 표시
         if (scrollHeight - scrollTop - clientHeight > 200) {
@@ -176,6 +190,9 @@ const ChatWindow = ({ roomInfo, currentUser }: ChatWindowProps) => {
                 // 프론트엔드 화면에 마자게 과거 -> 최신순으로 뒤집는다
                 const sortedMessages = [...response.data].reverse();
                 setMessages(sortedMessages);
+
+                // 데이터 로딩 직후에는 강제로 바닥으로 이동
+                setTimeout(() => scrollToBottom(), 100);
             } catch (error) {
                 console.error("채팅 내역 로딩 실패: ", error);
             }
@@ -186,6 +203,17 @@ const ChatWindow = ({ roomInfo, currentUser }: ChatWindowProps) => {
         }
 
     }, [roomInfo.roomId])
+
+    // 답장 취소 함수
+    const handleCancelReply = () => setReplyTarget(null);
+
+    const onReplyClick = (msg: ChatMessageDto) => {
+        setReplyTarget(msg);
+    };
+
+    const onCancelReply = () => {
+        setReplyTarget(null);
+    };
 
     // ##################################################
     // 전송 버튼 함수
@@ -202,6 +230,13 @@ const ChatWindow = ({ roomInfo, currentUser }: ChatWindowProps) => {
             formData.append("sender", currentUser?.email ?? "");
             formData.append("messageType", "TEXT");
 
+            // 답장 대상이 있다면 부모 메시지 ID 전달
+            if (replyTarget) {
+                formData.append("parentMessageId", replyTarget.messageId);
+                formData.append("parentMessageSenderName", replyTarget.senderName);
+                formData.append("parentMessageContent", replyTarget.message);
+            }
+
             pendingFiles.forEach((p) => {
                 formData.append("files", p.file);   // 서버의 RequsePart랑 이름 맞춰야함
             });
@@ -214,6 +249,11 @@ const ChatWindow = ({ roomInfo, currentUser }: ChatWindowProps) => {
             // 성공 시 입력창 비우기
             setInputText("");
             setPendingFiles([]);
+            setReplyTarget(null);
+
+            // 내가 메시지를 보냈을 시에는 사용자가 위를 보고 있더라도 강제로 바닥으로 이동
+            isAtBottomRef.current = true;
+            scrollToBottom();
         } catch (error) {
             console.error("전송 에러: ", error);
             setModalMessage("메시지 전송에 실패했습니다.");
@@ -313,6 +353,8 @@ const ChatWindow = ({ roomInfo, currentUser }: ChatWindowProps) => {
         }
     };
 
+
+
     return (
         <>
             <div className="relative flex-1 bg-white rounded-3xl shadow-sm border border-[#E5E0D5] flex flex-col overflow-hidden">
@@ -342,6 +384,7 @@ const ChatWindow = ({ roomInfo, currentUser }: ChatWindowProps) => {
                     messageRefs={messageRefs}
                     handleScroll={handleScroll}
                     onDeleteClick={handleDeleteClick}
+                    onReplyClick={onReplyClick}
                 />
 
 
@@ -369,6 +412,8 @@ const ChatWindow = ({ roomInfo, currentUser }: ChatWindowProps) => {
                     onFileUpload={handleFileUpload}
                     pendingFiles={pendingFiles}
                     onCancelFile={handleCancelFile}
+                    replyTarget={replyTarget}
+                    onCancelReply={onCancelReply}
                 />
             </div>
 

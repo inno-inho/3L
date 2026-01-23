@@ -113,7 +113,19 @@ public class ChatMessageDto {
     private Integer unreadCount;
 
     @Schema(description = "메시지 삭제 여부(나에게만/모두에게 삭제 처리용)", example = "false")
-    private boolean isDeleted;
+    private boolean deleted;
+
+    // #######################################
+    // 메시지 답장 기능 관련 필드
+    // #######################################
+    @Schema(description = "답장 대상 메시지ID", example = "1003")
+    private String parentMessageId;
+
+    @Schema(description = "답장 보낸 사람 이름", example = "헤렌")
+    private String parentMessageSenderName;
+
+    @Schema(description = "답장한 메시지 내용", example = "사랑해")
+    private String parentMessageContent;
 
     // #######################################
     // 시간 관련 필드
