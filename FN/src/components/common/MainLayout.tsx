@@ -8,14 +8,17 @@ import Header from './Header';
 
 const MainLayout: React.FC = () => {
     return(
-        <div className='w-full min-h-screen bg-[#fff9ed] flex flex-col m-0 p-0'>
-            <Header />
-            
-            <div className="flex-1 flex overflow-hidden">
-                <Sidebar />
-                <main className="flex-1 overflow-y-auto px-6 py-4">
-                    <Outlet /> {/* 바뀌는 영역 */}
-                </main>
+        <div className='w-full min-h-screen bg-[#fff9ed] flex justify-center'>
+            <div className="w-full max-w-screen-xl mx-auto flex flex-col">
+                <Header />
+                <div className="flex-1 flex min-h-0">
+                    <Sidebar />
+                    <main className="flex-1 min-w-0 p-6">
+                        <div className="w-full h-full mx-auto bg-white rounded-xl shoadow-sm p-8">
+                            <Outlet /> {/* 바뀌는 영역 */}
+                        </div>
+                    </main>
+                </div>
             </div>
         </div>
     );

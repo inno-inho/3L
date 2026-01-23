@@ -1,6 +1,6 @@
 import type { ChatRoomDto } from "../../types/chat";
 
-import search from "@/assets/image/search.png"
+import search from "@/assets/image/search.svg"
 
 
 

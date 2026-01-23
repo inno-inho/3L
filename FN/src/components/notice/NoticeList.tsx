@@ -1,11 +1,11 @@
 import { Link } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
-import search from '@/assets/image/search.png';
+import search from '@/assets/image/search.svg';
 import type { Notice } from '@/types/notice';
 import { getNotices } from '@/api/noticeApi';
 import { formatDate } from '@/utils/date';
-import DoubleArrowLeft from '@/assets/image/double_arrow_left.png';
-import DoubleArrowRight from '@/assets/image/double_arrow_right.png';
+import DoubleArrowLeft from '@/assets/image/double_arrow_left.svg';
+import DoubleArrowRight from '@/assets/image/double_arrow_right.svg';
 import ArrowLeft from '@/assets/image/arrow_left.png';
 import ArrowRight from '@/assets/image/arrow_right.png';
 
@@ -69,7 +69,7 @@ const NoticeList = () => {
                                     {expandedId === notice.id && (
                                         <tr>
                                             <td colSpan={4} className="bg-gray-50 p-6 animate-fadeIn">
-                                                <p className="mb-4 text-gray-600">{notice.content}</p>
+                                                <p className="mb-4 text-gray-600 whitespace-pre-line">{notice.content}</p>
                                                 <Link to={`/notices/${notice.id}`} className="text-[#743F24] font-bold">자세히 보기 → 
                                                 </Link>
                                             </td>

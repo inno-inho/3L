@@ -12,7 +12,7 @@ export const getNotices = async (page: number) => {     // page번호를 맏아�
         {
             params: {
                 page: page - 1, // 프론트는 1부터 쓰는게 자연스러움(Spring에서는 0부터 시작)
-                size: 10
+                size: 5
             }
         }
     );

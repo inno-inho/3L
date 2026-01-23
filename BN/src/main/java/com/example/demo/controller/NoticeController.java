@@ -46,7 +46,7 @@ public class NoticeController {
     @GetMapping("")
     public ResponseEntity<Page<NoticeResponseDto>> getAllNotices(
             @PageableDefault(
-                    size = 10,
+                    size = 5,
                     sort = "createdAt",
                     direction = Sort.Direction.DESC
             )

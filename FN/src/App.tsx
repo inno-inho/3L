@@ -13,6 +13,11 @@ import LoginPage from './components/user/LoginPage';
 import MainLayout from './components/common/MainLayout';
 import ChatPage from './components/chat/ChatPage';
 
+import SettingsLayout from './components/settings/SettingsLayout';
+import Profile from './components/settings/Profile';
+import Security from './components/settings/Security';
+
+
 const App: React.FC = () => {
 
 
@@ -29,6 +34,11 @@ const App: React.FC = () => {
                 <Route path="/notices/write" element={<NoticeForm />} />
                 <Route path="/notices/:id" element={<NoticeDetail />} />
 
+                <Route path="/settings" element={<SettingsLayout />} >
+                  <Route index element={<Profile />} /> {/* settings로 들어왔을 때 자동으로 settings/profile로 들어옴 */}
+                  <Route path="profile" element={<Profile />} />
+                  <Route path="security" element={<Security />} />
+                </Route>
                 {/* test용 */}
                 <Route path='/test' element={<ConnectionTest />} />
 

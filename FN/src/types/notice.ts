@@ -24,3 +24,22 @@ export interface NoticePageResponse {
     number: number; // 현재 페이지
     size: number;
 }
+
+export interface NoticeDetail{
+    id: number;
+    title: string;
+    content: string;
+    authorId: string;
+    viewCount: number;
+    createdAt: string | null;
+    updatedAt: string | null;
+    // comment: Comment[];
+}
+
+// 댓글기능 추가할때
+// export type Comment = {
+//   id: number;
+//   content: string;
+//   writer: string;
+//   createdAt: string;
+// };
