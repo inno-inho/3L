@@ -7,10 +7,9 @@ import type { User } from "../../context/AuthContext";
 import api from "../../api/api";
 
 import ChatSearchHeader from "./ChatSearchHeader";
-import AlertModal from "../common/AlertModal";
 import ChatInputSection from "./ChatInputSection";
 import ChatMessageList from "./ChatMessageList";
-import ConfirmModal from "../common/ConfirmModal";
+
 
 import stat_minus from "@/assets/image/stat_minus.png";
 import { useModal } from "../../context/ModalContext";
@@ -23,6 +22,7 @@ interface ChatWindowProps {
 
 const ChatWindow = ({ roomInfo, currentUser }: ChatWindowProps) => {
 
+    // 모달 함수를 useModal(ModalContext)에서 들고온다
     const { showAlert, showConfirm } = useModal();
 
     // 입력창의 텍스트를 관리하는 상태
@@ -66,12 +66,6 @@ const ChatWindow = ({ roomInfo, currentUser }: ChatWindowProps) => {
         previewUrl: string
     }[]>([]);
 
-    // // ConfirmModal 상태 관리
-    // const [confirmModal, setconfirmModal] = useState({
-    //     show: false,
-    //     message: "",
-    //     onConfirm: () => {},
-    // });
 
     // 웹 소켓 클라이언트
     const client = useRef<Client | null>(null);
@@ -334,7 +328,7 @@ const ChatWindow = ({ roomInfo, currentUser }: ChatWindowProps) => {
     }
 
     // 삭제 버튼 클릭 시 실행된 핸들러
-    const handleDeleteClick = (messageId: string) => {
+    const onDeleteClick = (messageId: string) => {
             showConfirm("메시지 삭제", "정말 이 메시지를 삭제하시겠습니까?", () => {
             executeDelete(messageId);
         })
@@ -380,7 +374,7 @@ const ChatWindow = ({ roomInfo, currentUser }: ChatWindowProps) => {
                     messagesEndRef={messagesEndRef}
                     messageRefs={messageRefs}
                     handleScroll={handleScroll}
-                    onDeleteClick={handleDeleteClick}
+                    onDeleteClick={onDeleteClick}
                     onReplyClick={onReplyClick}
                 />
 
