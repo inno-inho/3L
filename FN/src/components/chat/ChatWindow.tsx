@@ -13,6 +13,7 @@ import ChatMessageList from "./ChatMessageList";
 import ConfirmModal from "../common/ConfirmModal";
 
 import stat_minus from "@/assets/image/stat_minus.png";
+import { useModal } from "../../context/ModalContext";
 
 
 interface ChatWindowProps {
@@ -22,8 +23,7 @@ interface ChatWindowProps {
 
 const ChatWindow = ({ roomInfo, currentUser }: ChatWindowProps) => {
 
-    const [modalShow, setModalShow] = useState(false);
-    const [modalMessage, setModalMessage] = useState("");
+    const { showAlert, showConfirm } = useModal();
 
     // 입력창의 텍스트를 관리하는 상태
     const [inputText, setInputText] = useState("");
@@ -66,12 +66,12 @@ const ChatWindow = ({ roomInfo, currentUser }: ChatWindowProps) => {
         previewUrl: string
     }[]>([]);
 
-    // ConfirmModal 상태 관리
-    const [confirmModal, setconfirmModal] = useState({
-        show: false,
-        message: "",
-        onConfirm: () => {},
-    });
+    // // ConfirmModal 상태 관리
+    // const [confirmModal, setconfirmModal] = useState({
+    //     show: false,
+    //     message: "",
+    //     onConfirm: () => {},
+    // });
 
     // 웹 소켓 클라이언트
     const client = useRef<Client | null>(null);
@@ -256,8 +256,7 @@ const ChatWindow = ({ roomInfo, currentUser }: ChatWindowProps) => {
             scrollToBottom();
         } catch (error) {
             console.error("전송 에러: ", error);
-            setModalMessage("메시지 전송에 실패했습니다.");
-            setModalShow(true);
+            showAlert("전송 실패", "메시지 전송에 실패했습니다.");
         }
     };
 
@@ -329,27 +328,25 @@ const ChatWindow = ({ roomInfo, currentUser }: ChatWindowProps) => {
         setCurrentSearchIndex(-1);
     }
 
+    // input창에서 파일 보낼 때 미리보기단걔에서 취소하는 로직
     const handleCancelFile = (id: string) => {
         setPendingFiles(prev => prev.filter(f => f.id !== id));
     }
 
     // 삭제 버튼 클릭 시 실행된 핸들러
     const handleDeleteClick = (messageId: string) => {
-        setconfirmModal({
-            show: true,
-            message: "메시지를 삭제하시겠습니까?",
-            onConfirm: () => executeDelete(messageId)   // ConfirmModal(메시지 삭제)에서 확인 누르면 실행될 함수
+            showConfirm("메시지 삭제", "정말 이 메시지를 삭제하시겠습니까?", () => {
+            executeDelete(messageId);
         })
     }
 
-    // 실제 삭제 API 호출 로직
+    // 실제 삭제 API 호출 로직(ConfrimModal 안에서의 확인 버튼을 누를)
     const executeDelete = async (messageId: string) => {
         try {
             await api.delete(`/chatrooms/messages/${messageId}?email=${currentUser?.email}`);
         } catch (error) {
             console.error("삭제 실패: ", error);
-            setModalMessage("메시지 삭제에 실패했습니다.");
-            setModalShow(true);
+            showAlert("삭제 실패", "메시지 삭제 중 오류가 발생했습니다.");
         }
     };
 
@@ -416,24 +413,6 @@ const ChatWindow = ({ roomInfo, currentUser }: ChatWindowProps) => {
                     onCancelReply={onCancelReply}
                 />
             </div>
-
-            {/* AlertModal 컴포넌트 */}
-            <AlertModal
-                show={modalShow}
-                onHide={() => setModalShow(false)}
-                title="알림"
-                message={modalMessage}
-            />
-
-            {/* ConfirmModal 컴포넌트 */}
-            <ConfirmModal 
-                show={confirmModal.show}
-                title="삭제 확인"
-                message={confirmModal.message}
-                onHide={() => setconfirmModal(prev => ({...prev, show: false}))}
-                onConfirm={confirmModal.onConfirm}
-            />
-
         </>
     );
 };

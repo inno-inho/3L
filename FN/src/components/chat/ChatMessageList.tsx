@@ -54,6 +54,7 @@ const ChatMessageList = ({
                 const isMine = msg.sender === currentUser?.email;
                 const isSystem = msg.messageType === 'ENTER' ||
                     msg.messageType === 'QUIT' ||
+                    msg.messageType === 'DELETE' ||
                     msg.messageType === 'SYSTEM';
 
                 const isDeleted = msg.deleted === true;

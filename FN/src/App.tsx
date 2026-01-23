@@ -9,6 +9,8 @@ import ConnectionTest from './components/test/ConnectionTest';
 import LoginPage from './components/user/LoginPage';
 import MainLayout from './components/common/MainLayout';
 import ChatPage from './components/chat/ChatPage';
+import { ModalProvider } from './context/ModalContext';
+
 
 const App: React.FC = () => {
 
@@ -16,27 +18,29 @@ const App: React.FC = () => {
   return(
     <>
       <div className="App">
-        <Router>
-          <AuthProvider>
-            <Routes>
-              {/* 홈페이지 입장하면 제일 먼저 보일 기본페이지, 로그인 페이지 */}
-              <Route path='/' element={<LoginPage />} />
-              
-              {/* test용 */}
-              <Route 
-                path='/test' 
-                element={
-                <MainLayout>
-                  <ConnectionTest />
-                </MainLayout>
-                }
-              />
+        <ModalProvider>
+          <Router>
+            <AuthProvider>
+              <Routes>
+                {/* 홈페이지 입장하면 제일 먼저 보일 기본페이지, 로그인 페이지 */}
+                <Route path='/' element={<LoginPage />} />
+                
+                {/* test용 */}
+                <Route 
+                  path='/test' 
+                  element={
+                  <MainLayout>
+                    <ConnectionTest />
+                  </MainLayout>
+                  }
+                />
 
-              {/* ChatPage */}
-                <Route path='/chatPage' element={<MainLayout><ChatPage /></MainLayout>}/>
-            </Routes>
-          </AuthProvider>
-        </Router>
+                {/* ChatPage */}
+                  <Route path='/chatPage' element={<MainLayout><ChatPage /></MainLayout>}/>
+              </Routes>
+            </AuthProvider>
+          </Router>
+        </ModalProvider>
       </div>  
     </>
   )

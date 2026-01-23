@@ -32,7 +32,7 @@ const ConfirmModal = ({ show, title, message, onHide, onConfirm }: ConfirmModalP
                     </Modal.Header>
 
                     {/* 바디 */}
-                    <Modal.Body className='px-6 py-4 text-lg text-[#6B7280]'>
+                    <Modal.Body className='ml-3 px-3 py-4 text-lg text-[#6B7280]'>
                         {message}
                     </Modal.Body>
 
@@ -40,8 +40,8 @@ const ConfirmModal = ({ show, title, message, onHide, onConfirm }: ConfirmModalP
                     <Modal.Footer className='border-0 pb-4 px-4 flex justify-end gap-2'>
                         <Button
                             onClick={onHide}    // 모달 닫기
-                            className='border-0 rounded-2xl bg-gray-200 text-gray-600 hover:bg-gray-300 transition-colors'
-                            style={{ width: '100px', height: '48px', fontWeight: '600' }}
+                            className='border-0 rounded-2xl bg-gray-200 hover:bg-gray-300 transition-colors'
+                            style={{ border: '1px', color: 'gray', backgroundColor: '#fff9ed', width: '100px', height: '48px', fontWeight: '600' }}
                         >
                             취소
                         </Button>
@@ -50,8 +50,8 @@ const ConfirmModal = ({ show, title, message, onHide, onConfirm }: ConfirmModalP
                                 onConfirm();    // 실제 확인 버튼 눌렀을 시 동작
                                 onHide();   // 모달 닫기
                             }}  
-                            className='border-0 rounded-2xl text-white hover:bg-[#8B4513] transition-colors'
-                            style={{ backgroundColor: '#B5A492', width: '100px', height: '48px', fontWeight: '600' }}
+                            className='border-0 rounded-2xl hover:bg-[#8B4513] transition-colors'
+                            style={{ backgroundColor: '#743F24', width: '100px', height: '48px', fontWeight: '600' }}
                         >
                             확인
                         </Button>
