@@ -16,6 +16,7 @@ import ChatPage from './components/chat/ChatPage';
 import SettingsLayout from './components/settings/SettingsLayout';
 import Profile from './components/settings/Profile';
 import Security from './components/settings/Security';
+import Support from './components/settings/Support';
 
 
 const App: React.FC = () => {
@@ -35,9 +36,10 @@ const App: React.FC = () => {
                 <Route path="/notices/:id" element={<NoticeDetail />} />
 
                 <Route path="/settings" element={<SettingsLayout />} >
-                  <Route index element={<Profile />} /> {/* settings로 들어왔을 때 자동으로 settings/profile로 들어옴 */}
+                  <Route index element={<Navigate to="profile" replace />} /> {/* settings로 들어왔을 때 자동으로 settings/profile로 들어옴 */}
                   <Route path="profile" element={<Profile />} />
                   <Route path="security" element={<Security />} />
+                  <Route path="support" element={<Support />} />
                 </Route>
                 {/* test용 */}
                 <Route path='/test' element={<ConnectionTest />} />

@@ -5,7 +5,7 @@ const SettingsLayout = () => {
     return(
         <div className="flex h-full">
             <SettingsSidebar />
-            <div className="">
+            <div className="flex-1">
                 <Outlet />
             </div>
         </div>
