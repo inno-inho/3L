@@ -9,7 +9,6 @@ import DoubleArrowRight from '@/assets/image/double_arrow_right.svg';
 import ArrowLeft from '@/assets/image/arrow_left.png';
 import ArrowRight from '@/assets/image/arrow_right.png';
 
-
 // 전체 목록 조회
 const NoticeList = () => {
 

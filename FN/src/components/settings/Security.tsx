@@ -2,45 +2,32 @@
 const Security = () => {
     return(
         <div>
-            <div className="text-left w-full max-w-lg mx-auto my-10">
+            <div className="text-left w-full max-w-lg mx-auto mt-4 mb-10">
                 <h1 className="text-3xl font-bold my-2">보안</h1>
-                <p></p>
+                <p>계정 보안 상태를 진단하고, 로그인 상태를 제어합니다.</p>
             </div>
             <div className="w-full max-w-lg mx-auto p-4 my-10 border-2 border-[#743F24] rounded-lg flex flex-col">
-                <h2 className="text-2xl text-left font-extrabold mb-5">비밀번호 </h2>
+                <h2 className="text-2xl text-left font-extrabold mb-3">보안 기능</h2>
                 <div className="flex justify-between my-3 py-2">
-                    <p className="text-lg">대표 이메일</p>
-                    <p>nasangjo@naver.com</p>
+                    <p className="text-lg">비밀번호 변경</p>
+                    <p>&gt;</p>
                 </div>
                 <hr className="my-2 border-2 border-[#743F24]"/>
                 <div className="flex justify-between my-3 py-2">
-                    <p className="text-lg">전화번호</p>
-                    <p>+82 10-1234-5678</p>
+                    <p className="text-lg">회원 탈퇴</p>
+                    <p>&gt;</p>
                 </div>
             </div>
             <div className="w-full max-w-lg mx-auto p-4 border-2 border-[#743F24] rounded-lg flex flex-col">
-                <h2 className="text-2xl text-left font-extrabold mb-5">프로필 정보</h2>
-                <div className="flex justify-between items-center my-3">
-                    <div className="">
-                        <p className="text-lg text-left">프로필 사진</p>
-                        <p className="text-sm">프로필은 코코넛 서비스에서 활용됩니다.</p>
-                    </div>
-                    <img className="border size-16" />
+                <h2 className="text-2xl text-left font-extrabold mb-3">로그인 관리</h2>
+                <div className="flex justify-between my-3 py-2">
+                    <p className="text-lg">로그인 이력 조회</p>
+                    <p>&gt;</p>
                 </div>
                 <hr className="my-2 border-2 border-[#743F24]"/>
                 <div className="flex justify-between my-3 py-2">
-                    <p className="text-lg">이름</p>
-                    <p>username</p>
-                </div>
-                <hr className="my-2 border-2 border-[#743F24]"/>
-                <div className="flex justify-between my-3 py-2">
-                    <p className="text-lg">닉네임</p>
-                    <p>nasangjo</p>
-                </div>
-                <hr className="my-2 border-2 border-[#743F24]"/>
-                <div className="flex justify-between my-3 py-2">
-                    <p className="text-lg">비밀번호 변경</p>
-                    <p>2026.01.01 변경</p>
+                    <p className="text-lg">서비스 이용 관리</p>
+                    <p>&gt;</p>
                 </div>
             </div>
         </div>
