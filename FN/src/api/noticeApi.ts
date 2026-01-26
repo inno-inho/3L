@@ -3,7 +3,7 @@ import type { Notice, NoticePageResponse } from "@/types/notice";
 
 
 // 공지 목록 조회 
-export const getNotices = async (page: number) => {     // page번호를 맏아서 서버에서 해당 페이지 공지 목록을 가져오는 함수
+export const getNotices = async (page: number, keyword?: string) => {     // page번호를 맏아서 서버에서 해당 페이지 공지 목록을 가져오는 함수
 
     // API 요청(api.ts의 baseURL + '/notices') ex) GET /api/notices?page=0&size=10 
     // api.get(url, config)
@@ -12,8 +12,9 @@ export const getNotices = async (page: number) => {     // page번호를 맏아�
         {
             params: {
                 page: page - 1, // 프론트는 1부터 쓰는게 자연스러움(Spring에서는 0부터 시작)
-                size: 5
-            }
+                size: 5, // 1, 2, 3, 4, 5까지만 보여지도록
+                keyword: keyword || undefined, // keyword ''(빈문자열)이면 undefined, 백엔드의 @RequestParam(required = false) String keyword와 매치
+            },
         }
     );
     

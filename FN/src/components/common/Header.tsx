@@ -24,16 +24,16 @@ const Header: React.FC = () => {
 
     return (
         <>
-            <header className='ml-11 mr-11 flex justify-between items-center px-6 py-3 bg-transparent'>
+            <header className='flex justify-between items-center px-6 py-3 bg-transparent'>
                 {/* 로고 영역 */}
                 <Link 
                     to="/chatPages" 
                     className='flex items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer'
                 >
-                    <div className='w-8 h-8 flex items-center justify-center text-white font-bold'>
+                    <div className='w-12 h-12 flex items-center justify-center text-white font-bold'>
                         <img src={coconuttalk} alt="코코넛 톡 로고" />
                     </div>
-                    <span className='text-4xl text-[#6F4E37] tracking-tight font-nerko font-normal'>
+                    <span className='text-5xl text-[#6F4E37] tracking-tight font-nerko font-normal'>
                         CoconutTalk
                     </span>
                 </Link>
@@ -41,7 +41,7 @@ const Header: React.FC = () => {
                 {/* 오른쪽: 사용자 정보 및 드롭다운 */}
                 <div className='relative' ref={dropdownRef}>
                     <div 
-                        className='flex items-center gap-2 px-3 py-1.5 rounded-full hover:bg-black/5 cursor-pointer transition-colors'
+                        className='flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-black/5 cursor-pointer transition-colors'
                         onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                     >
                             <ProfileImage
@@ -49,7 +49,7 @@ const Header: React.FC = () => {
                                 nickname={user?.nickname}
                                 size='sm'
                             />
-                        <span className='text-[#6F4E37] font-bold text-sm'>{user?.nickname}</span>
+                        <span className='text-[#6F4E37] font-bold text-lg'>{user?.nickname}</span>
                         <svg 
                             className={`w-4 h-4 text-[#6F4E37] transition-transform duration-300 ${isDropdownOpen ? 'rotate-180' : ''}`}
                             fill='none' 

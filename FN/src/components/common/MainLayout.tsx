@@ -13,7 +13,7 @@ const MainLayout: React.FC = () => {
                 <Header />
                 <div className="flex-1 flex min-h-0">
                     <Sidebar />
-                    <main className="flex-1 min-w-0 p-6">
+                    <main className="flex-1 min-w-0 px-4 py-3">
                         <div className="w-full h-full mx-auto bg-white rounded-xl shoadow-sm p-8">
                             <Outlet /> {/* 바뀌는 영역 */}
                         </div>

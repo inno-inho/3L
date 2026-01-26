@@ -43,9 +43,9 @@ const CustomerCenter = () => {
 
     return(
         <div>
-            <div className="text-left w-full max-w-lg mx-auto mt-4 mb-10">
+            <div className="text-left w-full max-w-xl mx-auto mt-4 mb-10">
                 <h1 className="text-3xl font-bold my-2">고객센터</h1>
-                <p>무엇을 도와드릴까요?</p>
+                <p className="text-2xl">무엇을 도와드릴까요?</p>
             </div>
             <div className="flex justify-between w-full max-w-2xl mx-auto border border-[#743F24] rounded-lg focus-within:ring-1 focus-within:ring-[#743F24]">
                 <input className="flex-grow p-2 m-2 rounded-lg bg-transparent outline-none" type="text" placeholder="궁금하신 점을 검색해보세요." />
@@ -54,28 +54,29 @@ const CustomerCenter = () => {
                 </button>
             </div>
             
-            <div className="w-full max-w-lg mx-auto mt-4 mb-10">
-                <h2 className="text-left text-2xl font-bold my-5">자주 묻는 질문</h2>
+            <div className="w-full max-w-xl mx-auto my-10">
+                <h2 className="text-left text-2xl font-bold">📌 자주 묻는 질문</h2>
                 {faqList.map((faq, index) => (
-                    <div key={index} className="mb-10" >
+                    <div key={index} className="py-4 px-2" >
                         <button 
                             onClick={() => handleClick(index)}
-                            className="w-full font-semibold text-left"
+                            className="w-full font-semibold text-xl text-left "
                         >
                             {faq.question}
                         </button>
                         {openIndexes.includes(index) && (
-                            <p className="m-2 whitespace-pre-line text-left">
+                            <p className="whitespace-pre-line text-lg text-left py-2">
                                 {faq.answer}
                             </p>
                         )}
                     </div>
                 ))}
+                 <div>
+                    <button type="button" className="w-28 mx-2 px-4 py-2 rounded-lg border border-[#743F24] text-[#743F24] hover:bg-gray-300 hover:text-white transition-all">더보기</button>
+                    <button type="button" className="w-38 mx-2 px-4 py-2 rounded-lg border border-[#743F24] text-[#743F24] hover:bg-[#743F24] hover:text-white transition-all">문의 남기기</button>
+                </div>
             </div>
-            <div>
-                <button type="button" className="w-28 mx-2 px-4 py-2 rounded-lg border border-[#743F24] text-[#743F24] hover:bg-gray-300 hover:text-white transition-all">더보기</button>
-                <button type="button" className="w-38 mx-2 px-4 py-2 rounded-lg border border-[#743F24] text-[#743F24] hover:bg-[#743F24] hover:text-white transition-all">문의 남기기</button>
-            </div>
+           
         </div>
     )
 }

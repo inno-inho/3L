@@ -1,32 +1,44 @@
 package com.example.demo.service;
 
+import com.example.demo.domain.Repository.NoticeFileRepository;
 import com.example.demo.domain.Repository.NoticeRepository;
 import com.example.demo.domain.dto.NoticeRequestDto;
 import com.example.demo.domain.dto.NoticeResponseDto;
 import com.example.demo.domain.entity.NoticeEntity;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.demo.domain.entity.NoticeFileEntity;
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
+import java.util.UUID;
 
 @Service
-
+@RequiredArgsConstructor // @Autowired 없이
 public class NoticeService {
 
-    @Autowired
-    private NoticeRepository noticeRepository;
-
-    public NoticeService(NoticeRepository noticeRepository){
-        this.noticeRepository = noticeRepository;
-    }
+    private final NoticeRepository noticeRepository;
+    private final NoticeFileService noticeFileService;
 
     // 공지 조회
     // List -> Pagenation 추가
-    public Page<NoticeResponseDto> getAllNotices(Pageable pageable) {
-        return noticeRepository.findAll(pageable)
+    // 검색 분기 처리 추가(Repository에서 Entity만 반환하므로 Service에서 DTO로 변환해줘야함)
+    public Page<NoticeResponseDto> getAllNotices(String keyword, Pageable pageable) {
+        // 검색어가 없는 경우
+        if (keyword == null || keyword.isBlank()){
+            return noticeRepository.findAll(pageable)
+                    .map(NoticeResponseDto::from);
+        }
+        // 검색어가 있는 경우
+        return noticeRepository.findByTitleContainingOrContentContaining(keyword, keyword, pageable)
                 .map(NoticeResponseDto::from);
     }
 
@@ -35,15 +47,24 @@ public class NoticeService {
     }
 
     // 공지 생성
-    public NoticeEntity createNotice(NoticeRequestDto noticeRequest){
+    @Transactional // 실패 시 롤백, DB 기준 정합성 유지되도록
+    public NoticeEntity createNotice(
+            NoticeRequestDto noticeRequest,
+            List<MultipartFile> files
+    ){
+        // 1. 공지 저장
         // 클라이언트 요청 dto를 받아서 entity로 변환후 db에 저장
-        NoticeEntity notice = new NoticeEntity(
-                noticeRequest.getTitle(),
-                noticeRequest.getContent(),
-                noticeRequest.getAuthorId()
+        NoticeEntity notice = noticeRepository.save(
+                new NoticeEntity(
+                        noticeRequest.getTitle(),
+                        noticeRequest.getContent(),
+                        noticeRequest.getAuthorId()
+                )
         );
+        // 2. 파일 저장은 NoticeFileService로
+        noticeFileService.saveFiles(notice, files);
 
-        return noticeRepository.save(notice);
+        return notice;
     }
 
     // 공지 수정

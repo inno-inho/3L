@@ -29,7 +29,7 @@ const NoticeDetail = () => {
         fetchNotice();
     }, [id]); // id가 바뀔때마다 실행
 
-    if (!notice) return <div> 로딩중 ... 😐 </div>
+    if (!notice) return <div className="text-gray-400 p-10"> 로딩중 ...  </div>
 
     return(
          <div className="flex bg-white">
@@ -37,11 +37,11 @@ const NoticeDetail = () => {
                 <div className="text-left">
                     <div className="flex items-center py-3">
                         <h2 className="flex-1 text-2xl font-bold">{notice.title}</h2>
-                        <p className="whitespace-nowrap">{formatDate(notice.createdAt)}</p>
+                        <p className="">{formatDate(notice.createdAt)}</p>
                     </div>
                     <hr />
                     <div className="py-4 min-h-[300px] max-h-[60vh] overflow-y-auto whitespace-pre-line">
-                        <p className="text-xl">컨텐츠 내용 {notice.content} </p>
+                        <p className="text-xl">{notice.content} </p>
                     </div>
                     <div className="py-4 flex">
                         <div className="flex items-center">

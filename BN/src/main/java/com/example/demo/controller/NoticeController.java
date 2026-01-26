@@ -1,9 +1,12 @@
 package com.example.demo.controller;
 
+import com.example.demo.domain.dto.NoticeFileResponseDto;
 import com.example.demo.domain.dto.NoticeRequestDto;
 import com.example.demo.domain.dto.NoticeResponseDto;
 import com.example.demo.domain.entity.NoticeEntity;
+import com.example.demo.service.NoticeFileService;
 import com.example.demo.service.NoticeService;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -18,25 +21,26 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 @RestController
+@AllArgsConstructor
 @RequestMapping("/api/notices")
 public class NoticeController {
 
     // 항상 service를 통해서만 처리(controller가 직접 DB 접근 x)
     private final NoticeService noticeService;
 
-    public NoticeController(NoticeService noticeService){
-        this.noticeService = noticeService;
-    }
+    private final NoticeFileService noticeFileService;
+
     // @RequestBody : Json body -> 객체로 변환 POST/PUT에서 사용
     // @PathVariable : URL 경로 값 추출 notices/{id}
 
     // 공지 생성
-//    @PostMapping(consumes= MediaType.MULTIPART_FORM_DATA_VALUE)
-//    , @RequestPart MultipartFile file
-    @PostMapping()
-    public ResponseEntity<NoticeResponseDto> createNotice(@RequestBody NoticeRequestDto noticeRequest){
+    @PostMapping(consumes= MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<NoticeResponseDto> createNotice(
+            @RequestBody NoticeRequestDto noticeRequest, // JSON 데이터(프론트에서 FormData로 "notice"라는 이름으로 보내야함
+            @RequestPart(value="files", required = false) List<MultipartFile> files
+    ){
         System.out.println("[Notice:CreateNotice] " + noticeRequest);
-        NoticeEntity notice = noticeService.createNotice(noticeRequest); // DTO -> Entity 변환 : DB 저장
+        NoticeEntity notice = noticeService.createNotice(noticeRequest,files); // DTO -> Entity 변환 : DB 저장
         return ResponseEntity.ok(NoticeResponseDto.from(notice)); // Entity -> ResponseDto 변환, HTTP 200 + Json 응답
     }
 
@@ -45,6 +49,7 @@ public class NoticeController {
     // 페이지하기 위해 ResponseEntity<Page<NoticeResponseDto>>
     @GetMapping("")
     public ResponseEntity<Page<NoticeResponseDto>> getAllNotices(
+            @RequestParam(required = false) String keyword, // 검색파라미터 추가
             @PageableDefault(
                     size = 5,
                     sort = "createdAt",
@@ -52,7 +57,7 @@ public class NoticeController {
             )
             Pageable pageable
     ) {
-        return ResponseEntity.ok(noticeService.getAllNotices(pageable));
+        return ResponseEntity.ok(noticeService.getAllNotices(keyword, pageable)); // Service에서 두개의 파라미터를 받고 있으므로
     }
 
     @GetMapping("/{id}")
@@ -77,4 +82,6 @@ public class NoticeController {
         noticeService.deleteNotice(id);
         return ResponseEntity.noContent().build();
     }
+
+
 }
