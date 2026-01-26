@@ -1,4 +1,6 @@
 import type { ChatRoomDto } from "../../types/chat";
+import { Plus } from 'lucide-react';    // 아이콘 라이브러리
+
 
 import search from "@/assets/image/search.png"
 
@@ -8,13 +10,14 @@ interface ListProps {
     rooms: ChatRoomDto[];
     selectedId: string | null;
     onSelect: (id: string) => void;
+    onCreateRomm: ()  => void;
 }
 
-const ChatRoomList = ({ rooms, selectedId, onSelect }: ListProps) => {
+const ChatRoomList = ({ rooms, selectedId, onSelect, onCreateRomm }: ListProps) => {
 
     return (
         <>
-            <div className="w-80 bg-white rounded-3xl shadow-sm flex flex-col overflow-hidden border border-[#E5E0D5]">
+            <div className="relative w-80 bg-white rounded-3xl shadow-sm flex flex-col overflow-hidden border border-[#E5E0D5]">
 
                 {/* 검색창 및 Chats */}
                 <div className="p-6 pb-2">
@@ -40,9 +43,9 @@ const ChatRoomList = ({ rooms, selectedId, onSelect }: ListProps) => {
                             </div>
                             <div className="flex-1 min-w-0">
                                 <div className="flex justify-between items-center">
-                                    <div className="flex items-center gap-1">
-                                        <span className="font-bold text-[#4A3F35]">{room.roomName}</span>
-                                        <span className="text-xs text-gray-400 font-medium">{room.userCount}</span>
+                                    <div className="flex items-center gap-1 min-w-0">
+                                        <span className="truncate font-bold text-[#4A3F35] max-w-full">{room.roomName}</span>
+                                        <span className="text-xs text-gray-400 font-medium shrink-0">{room.userCount}</span>
                                     </div>
                                     <span className="text-[10px] text-gray-400">{room.lastMessageTime}</span>
                                 </div>
@@ -51,11 +54,12 @@ const ChatRoomList = ({ rooms, selectedId, onSelect }: ListProps) => {
                         </div>
                     ))}
                 </div>
-
-
-                <div>
-
-                </div>
+                    <button
+                        onClick={onCreateRomm}
+                        className="absolute bottom-6 right-6 w-14 h-14 bg-[#B5A492] rounded-2xl shadow-lg flex items-center justify-center text-white hover:bg-[#8B4513] transition-transform active:scale-95"
+                    >
+                        <Plus  size={32} />
+                    </button>
             </div>
         </>
     );

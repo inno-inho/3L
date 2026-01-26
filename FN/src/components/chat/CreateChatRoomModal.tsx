@@ -1,0 +1,129 @@
+import React, { useState } from 'react';
+import { Modal, Button } from 'react-bootstrap';
+import { useModal } from '../../context/ModalContext';
+
+// 가짜 친구 데이터
+interface Friend {
+    email: string;
+    nickname: string;
+    profile_image_url: string;
+}
+
+// 가짜 친구 데이터 목록
+const dummyFriends: Friend[] = [
+    { email: 'member1@test.com', nickname: '이노', profile_image_url: 'https://via.placeholder.com/40' },
+    { email: 'member2@test.com', nickname: '헤렌', profile_image_url: 'https://via.placeholder.com/40' },
+    { email: 'member3@test.com', nickname: '사랑해', profile_image_url: 'https://via.placeholder.com/40' },
+    { email: 'member4@test.com', nickname: '마니마니', profile_image_url: 'https://via.placeholder.com/40' }
+];
+
+interface CreateChatModalProps {
+    show: boolean;
+    onHide: () => void;
+    onCreate: (roomName: string, selectedEmails: string[]) => void;
+}
+
+const CreateChatRoomModal = ({ show, onHide, onCreate }: CreateChatModalProps) => {
+    const [roomName, setRoomName] = useState("");
+    const [selectedEmails, setSelectedEmails] = useState<string[]>([]);
+    const { showAlert } = useModal();
+
+
+    // 친구 선택/해제 토글
+    const toggleFriend = (email: string) => {
+        setSelectedEmails(prev =>
+            prev.includes(email)
+                ? prev.filter(e => e !== email)
+                : [...prev, email]
+        );
+    };
+
+    const handleCreate = () => {
+        if (!roomName.trim()) {
+            showAlert("입력 오류", "채팅방 이름을 입력해 주세요.");
+            return
+        }
+        if (selectedEmails.length === 0) {
+            showAlert("입력 오류", "최소 한 명 이상의 친구를 초대해주세요.");
+            return;
+        }
+
+        // 부모 컴포넌트(ChatPage)로 데이터 전달
+        onCreate(roomName, selectedEmails)
+
+        // 초기화 및 닫기
+        setRoomName('');
+        setSelectedEmails([]);
+        onHide();
+    };
+
+    return (
+        <>
+            <Modal
+                show={show} onHide={onHide} centered
+                contentClassName='rounded-3xl border-0 shadow-lg'
+            >
+                <Modal.Header closeButton className='border-0 px-6 pt-6'>
+                    <Modal.Title className='font-bold text-[#4A3F35]'>새 채팅방 만들기</Modal.Title>
+                </Modal.Header>
+
+                <Modal.Body className='px-6 pb-6'>
+
+                    {/* 방 이름 입력 하는 곳 */}
+                    <div className='mb-4'>
+                        <label className='block text-sm font-bold text-gray-600 mb-2'>방 이름</label>
+                        <input
+                            type='text'
+                            className='w-full bg-gray-50 border border-gray-100 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-[#B5A492] transition-all'
+                            value={roomName}
+                            onChange={(e) => setRoomName(e.target.value)}
+                        />
+                    </div>
+
+                    {/* 친구 선택 하는 곳 */}
+                    <div>
+                        <label className='block text-sm font-bold text-gray-600 mb-2'>
+                            친구 초대 ({selectedEmails.length}명 선택됨)
+                        </label>
+                        <div className='max-h-64 overflow-auto space-y-2 pr-2 custom-scrollbar'>
+                            {dummyFriends.map(friend => (       // 친구목록의 가짜 데이터임. 유저관련 기능 만들어지면 수정해야함
+                                <div
+                                    key={friend.email}
+                                    onClick={() => toggleFriend(friend.email)}
+                                    className={`flex items-center p-3 rounded-2xl cursor-pointer border transition-all ${selectedEmails.includes(friend.email)
+                                            ? 'bg-[#FDF5E6] border-[#B5A492]'
+                                            : 'bg-white border-gray-100 hover:bg-gray-50'
+                                        }`}
+                                >
+                                    <img src={friend.profile_image_url} alt={friend.nickname} className='w-10 h-10 rounded-xl mr-3' />
+                                    <span className='flex-1 font-semibold text-[#4A3F35]'>{friend.nickname}</span>
+                                    <div className={`w-6 h-6 rounded-full border flex items-center justify-center ${selectedEmails.includes(friend.email) ? 'bg-[#B5A492] border-[#B5A492]' : 'border-gray-300'
+                                        }`}>
+                                        {selectedEmails.includes(friend.email) && <span className='text-white text-xs'>✓</span>}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </Modal.Body>
+
+                <Modal.Footer className='border-0 px-6 pb-6'>
+                    <Button
+                        onClick={onHide}
+                        className='bg-gray-100 border-0 text-gray-500 rounded-xl px-4 py-2 hover:bg-gray-200'
+                    >
+                        취소
+                    </Button>
+                    <Button
+                        onClick={handleCreate}
+                        className='bg-[#B5A492] border-0 text-white rounded-xl px-6 py-2 hover:bg-[#8B4513] transition-colors font-bold'
+                    >
+                        생성하기
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+        </>
+    );
+};
+
+export default CreateChatRoomModal;
