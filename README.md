@@ -5,6 +5,16 @@
 2) Pull requests 로 병합 요청 → 코드 확인 받은 다음 dev로 병합처리
 ```
 
+## BN 주의 사항
+```
+application-local.properties에서
+notice 파일 첨부 경로 - C:/upload/notices
+base-path : upload로 사용
+
+```
+
+
+
 ## FN 주의 사항
 
 ### 공통 유틸 함수(FN)
@@ -78,8 +88,8 @@ POST   api/notices/{id}/schedule        // 예약 공지 설정
 GET    api/notices/search               // 제목/내용 검색
 GET    api/notices/filter               // 기간/중요 공지 필터
 
-POST   api/notices/{id}/files           // 파일 첨부
-GET    api/notices/{id}/files/{fileId}  // 파일 다운로드
+GET  api/notices/{noticeId}/files        // 첨부파일 조회
+GET  api/notices/files/{fileId}/download // 첨부파일 다운로드
 
 POST   api/notices/{id}/comments
 ```
