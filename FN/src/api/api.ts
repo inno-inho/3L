@@ -17,7 +17,9 @@ const api: AxiosInstance = axios.create({
     baseURL: '/api', // 실제 요청 주소, Vite proxy 설정에 의해 http://localhost:8080/api/notices로 변환됨
     withCredentials: true, // 쿠키를 요청에 포함
     timeout: 10000, // 10초 이상 응답 없으면 에러
-    headers: { "Content-Type": "application/json" },
+
+    // notice에서 formdata로 받아야하기 때문에 주석처리
+    // headers: { "Content-Type": "application/json" }, // header 안 써도 자동으로 application/json, 
 })
 
 // 토큰 재발급 엔드포인트

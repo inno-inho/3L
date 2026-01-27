@@ -7,9 +7,7 @@ import com.example.demo.domain.entity.NoticeEntity;
 import com.example.demo.service.NoticeFileService;
 import com.example.demo.service.NoticeService;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -30,13 +28,14 @@ public class NoticeController {
 
     private final NoticeFileService noticeFileService;
 
-    // @RequestBody : Json body -> 객체로 변환 POST/PUT에서 사용
+    // @RequestBody : Json body -> 객체로 변환 POST/PUT에서 사용, application/json 전용
     // @PathVariable : URL 경로 값 추출 notices/{id}
+    // @RequestPart : JSON + 파일 같이 받을 때 무조건, multipart/form-data 전용
 
     // 공지 생성
     @PostMapping(consumes= MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<NoticeResponseDto> createNotice(
-            @RequestBody NoticeRequestDto noticeRequest, // JSON 데이터(프론트에서 FormData로 "notice"라는 이름으로 보내야함
+            @RequestPart("notice") NoticeRequestDto noticeRequest, // JSON 데이터(프론트에서 FormData로 "notice"라는 이름으로 보내야함
             @RequestPart(value="files", required = false) List<MultipartFile> files
     ){
         System.out.println("[Notice:CreateNotice] " + noticeRequest);
@@ -62,17 +61,21 @@ public class NoticeController {
 
     @GetMapping("/{id}")
     public ResponseEntity<NoticeResponseDto> getNoticesById(@PathVariable Long id){
-        NoticeEntity notice = noticeService.getNoticesById(id);
-        return ResponseEntity.ok(NoticeResponseDto.from(notice));
+        return ResponseEntity.ok(noticeService.getNoticesById(id));
     }
 
     // 공지 수정
+    // Service에서 Dto를 반환, Controller에서도 Dto를 반환 (반환형 일치)
     @PutMapping("/{id}")
-    public ResponseEntity<NoticeResponseDto> updateNotice(@PathVariable Long id, @RequestBody NoticeRequestDto noticeRequest){
+    public ResponseEntity<NoticeResponseDto> updateNotice(
+            @PathVariable Long id,
+            @RequestPart NoticeRequestDto noticeRequest,
+            @RequestPart(required = false) List<MultipartFile> files
+    ){
         System.out.println("[Notice:updateNotice] " + noticeRequest);
 
-        NoticeEntity notice = noticeService.updateNotice(id, noticeRequest); // 존재 여부 확인, 필드 수정, 저장
-        return ResponseEntity.ok(NoticeResponseDto.from(notice));
+        NoticeResponseDto response = noticeService.updateNotice(id, noticeRequest); // 존재 여부 확인, 필드 수정, 저장
+        return ResponseEntity.ok(response);
     }
 
     // 공지 삭제

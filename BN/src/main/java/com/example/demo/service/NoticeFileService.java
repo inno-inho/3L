@@ -27,13 +27,18 @@ public class NoticeFileService {
 
     private final NoticeFileRepository noticeFileRepository;
 
-    @Value("${file.upload.path}")
-    private String uploadPath;
+    @Value("${file.upload.base-path}")
+    private String basePath;
+
+    @Value("${file.upload.notice-dir}")
+    private String noticeDir;
+
+    String fullPath = basePath + "/" + noticeDir;
 
     // 공지에 첨부된 파일들을 서버에 저장하고 DB에 기록
     public void saveFiles(NoticeEntity notice, List<MultipartFile> files){
         // 파일 없을 때 저장 로직 건너 뜀(종료)
-        if (files == null && files.isEmpty()) return;
+        if (files == null || files.isEmpty()) return;
 
         // 파일 하나씩 처리
         for (MultipartFile file : files){
@@ -43,7 +48,7 @@ public class NoticeFileService {
                 String savedName = UUID.randomUUID() + "_" + originalName; // UUID를 이용해 서버에 저장할 파일명 생성(중복 방지)
 
                 // 2. 저장 경로 생성
-                Path savePath = Paths.get(uploadPath, savedName); // 실제 파일이 저장될 경로
+                Path savePath = Paths.get(fullPath, savedName); // 실제 파일이 저장될 경로
                 Files.createDirectories(savePath.getParent()); // 디렉토리가 없으면 생성
 
                 // 3. 파일을 서버에 저장
@@ -64,6 +69,8 @@ public class NoticeFileService {
                 throw new RuntimeException("파일 저장 실패", e);
             }
         }
+
+
     }
 
     // 파일 다운로드

@@ -7,6 +7,7 @@ export interface Notice {
     viewCount: number;
     createdAt: string | null;
     updatedAt: string | null;
+
 }
 
 // RequestDto
@@ -33,7 +34,15 @@ export interface NoticeDetail{
     viewCount: number;
     createdAt: string | null;
     updatedAt: string | null;
+    files?: NoticeFile[];
     // comment: Comment[];
+}
+
+// 파일첨부 공지
+export interface NoticeFile{
+    id: number;
+    originalName: string;
+    fileSize: number;
 }
 
 // 댓글기능 추가할때

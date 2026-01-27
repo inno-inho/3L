@@ -1,5 +1,5 @@
 import api from "./api";
-import type { Notice, NoticePageResponse } from "@/types/notice";
+import type { Notice, NoticeCreateRequest, NoticePageResponse } from "@/types/notice";
 
 
 // 공지 목록 조회 
@@ -31,11 +31,47 @@ export const getNotice = async (id:number): Promise<Notice> => {
     return response.data;
 };
 
-export const createNotice = async (data: {
-    title: string;
-    content: string;
-    authorId: string;
-}) => {
-    const response = await api.post("/notices", data);
+// 🔥 수정 (이거 꼭 필요)
+// export const updateNotice = async (
+//   id: number,
+//   data: NoticeUpdateRequest
+// ) => {
+//   return api.put(`/notices/${id}`, data);
+// };
+// 파일 없는 공지일 때
+// export const createNotice = async (data: {
+//     title: string;
+//     content: string;
+//     authorId:string;
+// }) => {
+//     const response = await api.post("/notices", data);
+//     return response.data;
+// };
+
+// 파일 있는 공지
+export const createNotice = async (
+    data: NoticeCreateRequest,
+    files: File[]
+) => {
+    const formData = new FormData();
+
+    // Json 데이터 formData.append("백엔드의 @RequsetParam의 "notice'와 일치", noticeData)로 하지 말고 반드시 Blob 사용
+    formData.append(
+        "notice",
+        new Blob([JSON.stringify(data)], {
+            type:"application/json",
+        })
+    );
+
+    // 파일들
+    if (files && files.length > 0){
+        files.forEach(file => formData.append("files", file));
+    }
+    
+    const response = await api.post("/notices", formData);
     return response.data;
+};
+
+export const downloadNoticeFile = (fileId: number) => {
+    return api.get(`/notices/files/${fileId}/download`, {responseType: 'blob'} );
 };

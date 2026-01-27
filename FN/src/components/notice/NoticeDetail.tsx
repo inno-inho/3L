@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
-import { Link, useParams } from "react-router-dom";
-import { getNotice } from "@/api/noticeApi";
+import { Link, useParams, useNavigate } from "react-router-dom";
+import { getNotice, downloadNoticeFile } from "@/api/noticeApi";
 import type { NoticeDetail } from "@/types/notice";
 import { formatDate } from "@/utils/date";
 import thumb_up from '@/assets/image/thumb_up.svg';
 import text from '@/assets/image/comment.svg';
 import visibility from '@/assets/image/visibility.svg';
+import AlertModal from '@/components/common/AlertModal';
 
 // 단건 조회
 const NoticeDetail = () => {
@@ -13,6 +14,10 @@ const NoticeDetail = () => {
     const { id } = useParams();
     // 상세페이지는 무조건 API를 다시 호출
     const [ notice, setNotice ] = useState<NoticeDetail | null>(null);
+
+    const navigate = useNavigate(); // 모달 닫고 목록 페이지로 이동할 때 필요
+    const [modalShow, setModalShow] = useState(false);
+    const [modalMessage, setModalMessage] = useState("");
 
     useEffect(() => {
         if (!id) return;
@@ -29,6 +34,27 @@ const NoticeDetail = () => {
         fetchNotice();
     }, [id]); // id가 바뀔때마다 실행
 
+    const handleDownload = async(fileId: number, originalName:string) => {
+        try{
+            const response = await downloadNoticeFile(fileId);
+            const blob = new Blob([response.data]);
+            const url = window.URL.createObjectURL(blob);
+
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = originalName;
+
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            window.URL.revokeObjectURL(url);
+        } catch(e) {
+            setModalMessage("파일 다운로드에 실패했습니다.");
+        }
+
+    };
+
     if (!notice) return <div className="text-gray-400 p-10"> 로딩중 ...  </div>
 
     return(
@@ -40,6 +66,37 @@ const NoticeDetail = () => {
                         <p className="">{formatDate(notice.createdAt)}</p>
                     </div>
                     <hr />
+                    {notice.files && notice.files.length > 0 && (
+                        <div className="flex items-center p-2">
+                            <h3 className="font-semibold mr-4">첨부파일</h3>
+                            <ul className="space-y-1">
+                                {notice.files.map(file => (
+                                    <li key={file.id} className="flex items-center justify-between">
+                                        <span className="truncate max-w-[70%] mx-4">{file.originalName}</span>
+                                        <button 
+                                            onClick={() => handleDownload(file.id, file.originalName)}
+                                            className="shrink-0 hover:underline text-blue-600 border rounded-md bg-gray-300 p-1"
+                                        >
+                                            다운로드
+                                        </button>
+                                        <AlertModal
+                                            show={modalShow}
+                                            onHide={() => {
+                                                setModalShow(false);
+                                                navigate("/notices/{id}");
+                                            }}
+                                            title="알림"
+                                            message={modalMessage}
+                                        />
+                                        
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    )}
+                    
+                    <hr />
+
                     <div className="py-4 min-h-[300px] max-h-[60vh] overflow-y-auto whitespace-pre-line">
                         <p className="text-xl">{notice.content} </p>
                     </div>

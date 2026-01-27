@@ -8,6 +8,8 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @NoArgsConstructor
@@ -43,6 +45,9 @@ public class NoticeEntity {
 
     @LastModifiedDate // 수정 날짜
     private LocalDateTime updatedAt; // 수정된 날짜
+
+    @OneToMany(mappedBy="notice", cascade = CascadeType.ALL, orphanRemoval = true, fetch=FetchType.LAZY)
+    private List<NoticeFileEntity> files = new ArrayList<>();
 
     // 생성용 생성자
     public NoticeEntity(String title, String content, String authorId){
