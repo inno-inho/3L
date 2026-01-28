@@ -28,7 +28,7 @@ public class ChatRoomService {
     // 채팅방 생성
     // #########################################
     @Transactional
-    public ChatRoomDto createRoom(String roomName, List<String> memberEmails) {
+    public ChatRoomDto createRoom(String roomName, List<String> memberEmails, String creatorEmail) {
         String roomId = UUID.randomUUID().toString();
 
         LocalDateTime now = LocalDateTime.now();
@@ -54,7 +54,7 @@ public class ChatRoomService {
         // 인원 수 계산 후 번환 메서드
         int userCount = memberEmails.size();
 
-        return chatCommonService.convertToRoomDto(chatRoomEntity, userCount);
+        return chatCommonService.convertToRoomDto(chatRoomEntity, creatorEmail, userCount);
     }
 
     // #############################################
@@ -78,8 +78,15 @@ public class ChatRoomService {
                     System.out.println("조회된 방 개수: " + chatRoomMemberEntities.size());
 
                     // DTO로 변환
-                    return chatCommonService.convertToRoomDto(chatRoomEntity, userCount);
+                    return chatCommonService.convertToRoomDto(chatRoomEntity, userEmail, userCount);
                 })
+                // 반환된 Dto 리스트를 lastMessageTime 기준으로 내림차순 정렬
+                .sorted((r1, r2) -> {   // 리스트를 스트림으로 바꾼 다음 sorted로 r1, r2를 비기ㅛ
+                    if (r1.getLastMessageTime() == null) return 1;      // null 은 항상 최하단, 마지막 메시지가 없는 채팅방은 뒤로 보냄
+                    if (r2.getLastMessageTime() == null) return -1;     //
+                    // 마지막 메시지 시간이 최신인 것이 위로 오도록 역순 설정
+                    return r2.getLastMessageTime().compareTo(r1.getLastMessageTime());  // a.compareTo(b) -> a가 나중 -> 양수
+                })                                                                      //                -> a가 이전 -> 음수
                 .toList();
 
     }

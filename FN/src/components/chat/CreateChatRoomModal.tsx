@@ -28,6 +28,13 @@ const CreateChatRoomModal = ({ show, onHide, onCreate }: CreateChatModalProps) =
     const [selectedEmails, setSelectedEmails] = useState<string[]>([]);
     const { showAlert } = useModal();
 
+    // 선택된 사람이 나 제외 2명 이상이면 'GROUP'으로 판단
+    const isGroup = selectedEmails.length >= 2;
+
+    // 선택된 친구들의 닉네임 목록 추출
+    const selectedFriendNames = dummyFriends.filter(f => selectedEmails.includes(f.email))
+                                            .map(f => f.nickname)
+                                            .join(", ");
 
     // 친구 선택/해제 토글
     const toggleFriend = (email: string) => {
@@ -39,7 +46,7 @@ const CreateChatRoomModal = ({ show, onHide, onCreate }: CreateChatModalProps) =
     };
 
     const handleCreate = () => {
-        if (!roomName.trim()) {
+        if (isGroup && !roomName.trim()) {
             showAlert("입력 오류", "채팅방 이름을 입력해 주세요.");
             return
         }
@@ -48,8 +55,12 @@ const CreateChatRoomModal = ({ show, onHide, onCreate }: CreateChatModalProps) =
             return;
         }
 
+        // 1:1인데 이름이 없으면 1:1 채팅방 혹은 빈 값 전달(백엔드에서 어차피 가공해놓음)
+        const finalName = isGroup ? roomName : (roomName || "1:1 채팅");
+
+
         // 부모 컴포넌트(ChatPage)로 데이터 전달
-        onCreate(roomName, selectedEmails)
+        onCreate(finalName, selectedEmails)
 
         // 초기화 및 닫기
         setRoomName('');
@@ -68,23 +79,33 @@ const CreateChatRoomModal = ({ show, onHide, onCreate }: CreateChatModalProps) =
                 </Modal.Header>
 
                 <Modal.Body className='px-6 pb-6'>
-
                     {/* 방 이름 입력 하는 곳 */}
-                    <div className='mb-4'>
-                        <label className='block text-sm font-bold text-gray-600 mb-2'>방 이름</label>
-                        <input
+                    
+                    {/* 2명 이상 선택되었을 때만 방 이름 입력란 노출 */}
+                    <div className={`mb-4 transition-all ${isGroup ? 'opacity-100' : 'opacity-50'}`}>
+                        <label className='block text-sm font-bold text-gray-600 mb-2'>
+                            채팅방 이름 {isGroup ? "(필수)" : ""}
+                        </label>
+                        <input 
                             type='text'
-                            className='w-full bg-gray-50 border border-gray-100 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-[#B5A492] transition-all'
-                            value={roomName}
+                            className={`w-full bg-gray-50 border border-gray-100 rounded-xl px-4 py-3 outline-none transition-all ${isGroup ? 'focus:ring-2 focus:ring-[#B5A492]' : 'cursor-not-allowed'}`}
+                            placeholder={isGroup ? "그룹 이름을 입력하세요" : "상대방 이름으로 자동 설정됩니다."}
+                            value={isGroup ? roomName : ""}
                             onChange={(e) => setRoomName(e.target.value)}
+                            disabled={!isGroup}
                         />
                     </div>
+
 
                     {/* 친구 선택 하는 곳 */}
                     <div>
                         <label className='block text-sm font-bold text-gray-600 mb-2'>
                             친구 초대 ({selectedEmails.length}명 선택됨)
                         </label>
+                        {/* 선택된 멤버 닉네임 보여주는 곳 */}
+                        <div className='text-xs text-[#B5A492] font-semibold mb-3 min-h-[1rem]'>
+                            {selectedFriendNames ? `초대 멤버: ${selectedFriendNames}` : '초대할 친구를 선택해 주세요.'}
+                        </div>
                         <div className='max-h-64 overflow-auto space-y-2 pr-2 custom-scrollbar'>
                             {dummyFriends.map(friend => (       // 친구목록의 가짜 데이터임. 유저관련 기능 만들어지면 수정해야함
                                 <div

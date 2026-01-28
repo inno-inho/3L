@@ -81,19 +81,23 @@ const ChatPage = () => {
 
             // 서버에 저장 요청
             const response = await api.post('/chatrooms', payload);   
+            
             // 백엔드에서 생성된 ChatRoomDto를 통째로 넘기기
             const newRoomId: ChatRoomDto = response.data;
 
-            showAlert("생성 완료", `'${roomName}'방이 만들어졌습니다.`);
-
+            // 서버에서 최신 목록 가져오기(만든 순서 정렬 반영)
+            await fetchRooms();
+            
             // 모달 닫기
             setIsCreateModalOpen(false);
+            showAlert("생성 완료", `'${roomName}'방이 만들어졌습니다.`);
+
 
             // 목록을 다시 불러오지 않고 상태만 업데이트해서 성능 최적화
-            setRooms(prev => [newRoomId, ...prev]);
+            // setRooms(prev => [newRoomId, ...prev]);
 
             // 만든 새 방을 선택 상태로 만들기
-            if (newRoomId) setSelectedRoomId(newRoomId.roomId);
+            if (newRoomId && newRoomId.roomId) setSelectedRoomId(newRoomId.roomId);
             
     } catch (error) {
         console.log("방 생성 실패: ", error);

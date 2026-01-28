@@ -26,7 +26,7 @@ import java.util.List;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class ChatService {
+public class ChatMessageService {
 
     private final ChatMessageRepository chatMessageRepository;
     private final FileService fileService;

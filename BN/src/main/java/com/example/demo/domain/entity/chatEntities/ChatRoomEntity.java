@@ -1,14 +1,12 @@
 package com.example.demo.domain.entity.chatEntities;
 
 import com.example.demo.domain.dto.chatDto.ChatMessageDto;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.cglib.core.Local;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Setter
@@ -29,5 +27,9 @@ public class ChatRoomEntity {
 
     private String lastMessage;
     private LocalDateTime lastMessageTime;
+
+    @ElementCollection // 이게 없으면 List<String>을 DB에 저장하지 못함
+    @CollectionTable(name = "chat_room_images", joinColumns = @JoinColumn(name = "room_id"))
+    private List<String> roomImageUrls;
 
 }

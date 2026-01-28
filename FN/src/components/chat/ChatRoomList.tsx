@@ -1,6 +1,6 @@
 import type { ChatRoomDto } from "../../types/chat";
 import { Plus } from 'lucide-react';    // 아이콘 라이브러리
-
+import coconuttalk from "@/assets/image/coconuttalk.png";
 
 import search from "@/assets/image/search.png"
 
@@ -10,12 +10,11 @@ interface ListProps {
     rooms: ChatRoomDto[];
     selectedId: string | null;
     onSelect: (id: string) => void;
-    onCreateRomm: ()  => void;
+    onCreateRomm: () => void;
 }
 
-const ChatRoomList = ({ rooms, selectedId, onSelect, onCreateRomm, currentUserEmail }: ListProps & { currentUserEmail: string }) => {
+const ChatRoomList = ({ rooms, selectedId, onSelect, onCreateRomm }: ListProps) => {
 
-    
 
     return (
         <>
@@ -37,11 +36,25 @@ const ChatRoomList = ({ rooms, selectedId, onSelect, onCreateRomm, currentUserEm
                             onClick={() => onSelect(room.roomId)}
                             className={`flex items-center p-4 mx-2 rounded-2xl cursor-pointer transition-all ${selectedId === room.roomId ? 'bg-[#FDF5E6]' : 'hover:bg-gray-50'}`}
                         >
-                            {/* 바둑판 프로필 이미지 */}
-                            <div className="w-12 h-12 rounded-2xl overflow-hidden grid grid-cols-2 gap-0.5 bg-gray-200 mr-3">
-                                {room.roomImageUrls.slice(0, 4).map((url, i) => (
-                                    <img key={i} src={url} className="w-full h-full object-cover" />
-                                ))}
+                            {/* 프로필 이미지 영역*/}
+                            <div className="w-12 h-12 rounded-2xl overflow-hidden bg-gray-200 mr-3 shrink-0">
+                                {room.roomImageUrls && room.roomImageUrls.length <= 1 ? (
+                                    // 1:1채팅방이거나 프로필 이미지가 하나 이하인 경우
+                                    <img 
+                                        src={room.roomImageUrls[0] || coconuttalk}
+                                        className="w-full h-full object-cover"
+                                        alt="profile"
+                                    />
+                                ) : (
+                                    // 그룹 채팅방
+                                    <div className="grid grid-cols-2 gap-0.5 w-full h-full">
+                                        {room.roomImageUrls.slice(0, 4).map((url, i) => (
+                                            <img key={i} src={url} className="w-full h-full object-cover" alt="group"/>
+                                        ))}        
+                                    </div>
+                                )}
+                                
+                                
                             </div>
                             <div className="flex-1 min-w-0">
                                 <div className="flex justify-between items-center">
@@ -55,14 +68,14 @@ const ChatRoomList = ({ rooms, selectedId, onSelect, onCreateRomm, currentUserEm
                             </div>
                         </div>
                     ))}
-                </div>
-                    <button
-                        onClick={onCreateRomm}
-                        className="absolute bottom-6 right-6 w-14 h-14 bg-[#B5A492] rounded-2xl shadow-lg flex items-center justify-center text-white hover:bg-[#8B4513] transition-transform active:scale-95"
-                    >
-                        <Plus  size={32} />
-                    </button>
             </div>
+            <button
+                onClick={onCreateRomm}
+                className="absolute bottom-6 right-6 w-14 h-14 bg-[#B5A492] rounded-2xl shadow-lg flex items-center justify-center text-white hover:bg-[#8B4513] transition-transform active:scale-95"
+            >
+                <Plus size={32} />
+            </button>
+        </div >
         </>
     );
 };

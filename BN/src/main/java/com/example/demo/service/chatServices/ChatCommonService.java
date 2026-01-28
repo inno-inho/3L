@@ -1,9 +1,11 @@
 package com.example.demo.service.chatServices;
 
+import com.example.demo.domain.Repository.chatRepository.ChatRoomMemberRepository;
 import com.example.demo.domain.dto.chatDto.ChatMessageDto;
 import com.example.demo.domain.dto.chatDto.ChatRoomDto;
 import com.example.demo.domain.entity.chatEntities.ChatMessageEntity;
 import com.example.demo.domain.entity.chatEntities.ChatRoomEntity;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -16,7 +18,10 @@ import java.util.Locale;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class ChatCommonService {
+
+    private final ChatRoomMemberRepository chatRoomMemberRepository;
 
     // 정규식 패턴 (URL 추출용)
     private static final String URL_REGEX = "https?://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]";
@@ -70,16 +75,35 @@ public class ChatCommonService {
     // #############################################
     // Room관련 entity Dto로 변환
     // #############################################
-    public ChatRoomDto convertToRoomDto(ChatRoomEntity chatRoomEntity, int userCount) {
+    public ChatRoomDto convertToRoomDto(ChatRoomEntity chatRoomEntity, String userEmail ,int userCount) {
+        String displayRoomName = chatRoomEntity.getRoomName();
+        List<String> displayUrlImages = new ArrayList<>();
+
+        // 1:1 채팅방(Type: FRIEND)인 경우 로직
+        if (chatRoomEntity.getChatRoomType() == ChatMessageDto.ChatType.FRIEND) {
+            // Optional을 변수로 꺼내서 ifPresent 대신에 직접 제어
+            var opponentOptional = chatRoomMemberRepository.findOpponent(chatRoomEntity.getRoomId(), userEmail);
+
+            if(opponentOptional.isPresent()) {
+                var opponent = opponentOptional.get();
+                displayRoomName = resolveSenderName(opponent.getUserEmail());   // 상대방 이름으로
+                displayUrlImages.add("http://via.placeholder.com/150");         // 상대방 프로필로, user기능 만들면 실제 url 참조
+            }
+        } else {
+            // 그룹방일 경우 기존 이미지 리스트 사용
+            if (chatRoomEntity.getRoomImageUrls() != null) {
+                displayUrlImages.addAll(chatRoomEntity.getRoomImageUrls());
+            }
+        }
 
         return ChatRoomDto.builder()
                 .roomId(chatRoomEntity.getRoomId())
-                .roomName(chatRoomEntity.getRoomName())
+                .roomName(displayRoomName)
                 .chatRoomType(chatRoomEntity.getChatRoomType())
                 .lastMessage(chatRoomEntity.getLastMessage())
                 .lastMessageTime(formatTime(chatRoomEntity.getLastMessageTime()))
                 .userCount(userCount)
-                .roomImageUrls(new ArrayList<>()) // 필요시 멤버 프로필 사진 로직 추가
+                .roomImageUrls(displayUrlImages) // 필요시 멤버 프로필 사진 로직 추가
                 .build();
     }
 

@@ -8,10 +8,14 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.*;
+import org.springframework.cglib.core.Local;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-
+@EnableJpaAuditing
 @Entity
 @Getter
 @Setter
@@ -35,6 +39,9 @@ public class ChatRoomMemberEntity {
 
     // 안 읽은 메시지 개수를 구하기 위한 마지막으로 읽은 시간
     private LocalDateTime lastReadAt;
+
+    @CreatedDate
+    private LocalDate createdAt;
 
     public void activate() {
         this.active = true;

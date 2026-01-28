@@ -2,7 +2,9 @@ package com.example.demo.domain.Repository.chatRepository;
 
 
 import com.example.demo.domain.entity.chatEntities.ChatRoomMemberEntity;
+import io.lettuce.core.dynamic.annotation.Param;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 import java.util.Optional;
@@ -22,4 +24,10 @@ public interface ChatRoomMemberRepository extends JpaRepository<ChatRoomMemberEn
     // 초대할 때 이미 있는 멤버인지 확인하는거
     boolean existsByRoomIdAndUserEmail(String roomId, String userEmail);
 
+    // 1:1 채팅 시상대방 정보 가져오기
+    @Query("SELECT m FROM ChatRoomMemberEntity m WHERE m.roomId = :roomId AND m.userEmail != :userEmail")
+    Optional<ChatRoomMemberEntity> findOpponent(
+            @Param("roomId") String roomId,
+            @Param("userEmail") String userEmail
+            );
 }

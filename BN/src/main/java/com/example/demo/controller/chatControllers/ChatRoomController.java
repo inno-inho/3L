@@ -21,7 +21,17 @@ public class ChatRoomController {
     // #######################################
     @PostMapping
     public ResponseEntity<ChatRoomDto> createRoom(@RequestBody ChatRoomCreateRequest chatRoomCreateRequest) {
-        ChatRoomDto chatRoomDto = chatRoomService.createRoom(chatRoomCreateRequest.getRoomName(), chatRoomCreateRequest.getMemberEmails());
+        // 프론트엔드 ChatPage에서 [...selectedEmails, user?.email] 형태로 보냈으므로
+        // 리스트의 마지막 요소가 방장의 이메일
+
+        List<String> emails = chatRoomCreateRequest.getMemberEmails();
+        String creatorEmail = emails.get(emails.size() - 1);
+
+        ChatRoomDto chatRoomDto = chatRoomService.createRoom(
+                chatRoomCreateRequest.getRoomName(),
+                emails,
+                creatorEmail
+        );
 
         return ResponseEntity.ok(chatRoomDto);
     }
