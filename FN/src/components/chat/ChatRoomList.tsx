@@ -13,7 +13,9 @@ interface ListProps {
     onCreateRomm: ()  => void;
 }
 
-const ChatRoomList = ({ rooms, selectedId, onSelect, onCreateRomm }: ListProps) => {
+const ChatRoomList = ({ rooms, selectedId, onSelect, onCreateRomm, currentUserEmail }: ListProps & { currentUserEmail: string }) => {
+
+    
 
     return (
         <>

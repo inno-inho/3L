@@ -1,11 +1,13 @@
 package com.example.demo.service.chatServices;
 
-import com.example.demo.domain.Repository.ChatMessageRepository;
+import com.example.demo.domain.Repository.chatRepository.ChatMessageRepository;
 import com.example.demo.domain.Repository.Local_S3_FileService.FileService;
-import com.example.demo.domain.dto.ChatMessageDto;
-import com.example.demo.domain.dto.ChatMessageRequestDto;
-import com.example.demo.domain.entity.ChatEntities.ChatMessageEntity;
-import com.example.demo.domain.entity.ChatEntities.ChatMessageFileEntity;
+import com.example.demo.domain.Repository.chatRepository.ChatRoomRepository;
+import com.example.demo.domain.dto.chatDto.ChatMessageDto;
+import com.example.demo.domain.dto.chatDto.ChatMessageRequestDto;
+import com.example.demo.domain.entity.chatEntities.ChatMessageEntity;
+import com.example.demo.domain.entity.chatEntities.ChatMessageFileEntity;
+import com.example.demo.domain.entity.chatEntities.ChatRoomEntity;
 import com.example.demo.eventListener.ChatMessageEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,7 +33,7 @@ public class ChatService {
     private final ChatCommonService chatCommonService;
     private final RedisTemplate<String, Object> redisTemplate;
     private final ApplicationEventPublisher applicationEventPublisher;      // 방송국 역할
-
+    private final ChatRoomRepository chatRoomRepository;
 
 
     // ####################################
@@ -64,6 +66,7 @@ public class ChatService {
         ChatMessageEntity chatMessageEntity = ChatMessageEntity.builder()
                 .roomId(chatMessageRequestDto.getRoomId())
                 .sender(chatMessageRequestDto.getSender())
+                .senderName(chatCommonService.resolveSenderName(chatMessageRequestDto.getSender()))
                 .message(chatMessageRequestDto.getMessage())
                 .messageType(determinedType)
                 .metadata(chatMetadata) // 추출된 메타데이터 객체를 그대로 넣으면 컨버터가 알아서 JSON으로 변환함
@@ -98,6 +101,26 @@ public class ChatService {
 
         // DB 저장(Cascade 설정 덕분에 파일들도 함께 저장됨)
         chatMessageRepository.save(chatMessageEntity);
+
+        // 채팅방의 마지막 메시지 정보 업데이트
+        ChatRoomEntity chatRoomEntity = chatRoomRepository.findById(chatMessageRequestDto.getRoomId())
+                .orElseThrow(() -> new RuntimeException("방을 찾을 수 없습니다."));
+
+        // 마지막 메시지 텍스트 결정 (누군가가 보낸 마지막 메시지)
+        String lastMessage = chatMessageEntity.getMessage();
+        if (chatMessageEntity.getMessageType() == ChatMessageDto.MessageType.IMAGE) {
+            lastMessage = "사진을 보냈습니다.";
+        } else if (chatMessageEntity.getMessageType() == ChatMessageDto.MessageType.FILE) {
+            lastMessage = "파일을 보냈습니다." ;
+        }
+
+        chatRoomEntity.setLastMessage(lastMessage);
+        chatRoomEntity.setLastMessageTime(chatMessageEntity.getCreatedAt());
+        // JPA의 dirty Checking으로 인해 따로 save하지 않아도 트랜잭션 종료 시 업데이트됨
+        // Dirty Checking? JPA는 트랜잭션 안에서 엔티티를 조회하면 그 엔티티를 영속 상태로 관리.
+        // 처음 조회했을 때 스냅샷 저장 하고 이후 값아 바뀌었는지 계속해서 추적하기 때문에
+        // chatRoomRepository.save(chatRoomEntity); 를 써서 다시 저장 할 필요는 없음
+
 
         // Entity를 Dto로 변환
         ChatMessageDto savedDto = chatCommonService.convertToDto(chatMessageEntity);

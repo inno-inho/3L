@@ -1,13 +1,18 @@
 package com.example.demo.service.chatServices;
 
-import com.example.demo.domain.dto.ChatMessageDto;
-import com.example.demo.domain.entity.ChatEntities.ChatMessageEntity;
+import com.example.demo.domain.dto.chatDto.ChatMessageDto;
+import com.example.demo.domain.dto.chatDto.ChatRoomDto;
+import com.example.demo.domain.entity.chatEntities.ChatMessageEntity;
+import com.example.demo.domain.entity.chatEntities.ChatRoomEntity;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 @Slf4j
 @Service
@@ -15,6 +20,16 @@ public class ChatCommonService {
 
     // 정규식 패턴 (URL 추출용)
     private static final String URL_REGEX = "https?://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]";
+
+    // 공통 시간 포맷터
+    private final DateTimeFormatter dateTimeFormatter =
+            DateTimeFormatter.ofPattern("a h:mm", Locale.KOREAN);
+
+    // LocalDateTime을 "오후 4:30" 형태의 문자열로 변환
+    public String formatTime(LocalDateTime localDateTime) {
+        if (localDateTime == null) return null;
+        return localDateTime.format(dateTimeFormatter);
+    }
 
 
     // ###############################
@@ -50,6 +65,22 @@ public class ChatCommonService {
         // 작성한 시간 포맷팅 메서드 호출
         chatMessageDto.setSentTimeFromCreatedAt();
         return chatMessageDto;
+    }
+
+    // #############################################
+    // Room관련 entity Dto로 변환
+    // #############################################
+    public ChatRoomDto convertToRoomDto(ChatRoomEntity chatRoomEntity, int userCount) {
+
+        return ChatRoomDto.builder()
+                .roomId(chatRoomEntity.getRoomId())
+                .roomName(chatRoomEntity.getRoomName())
+                .chatRoomType(chatRoomEntity.getChatRoomType())
+                .lastMessage(chatRoomEntity.getLastMessage())
+                .lastMessageTime(formatTime(chatRoomEntity.getLastMessageTime()))
+                .userCount(userCount)
+                .roomImageUrls(new ArrayList<>()) // 필요시 멤버 프로필 사진 로직 추가
+                .build();
     }
 
     // ##############################################
@@ -135,6 +166,20 @@ public class ChatCommonService {
             log.error("메타데이터 추출 실패: {}", e.getMessage());
             return null;
         }
+    }
+
+    public String resolveSenderName(String userEmail) {
+        // 유저 서비스/레포지토리가 생긴다면 여기서 닉네임 조회
+        // String nickname = userRepository.findByEmail(userEmail).map(User::getNickname).orElse(null);
+        String nickname = null;
+
+        // 결정 로직: 닉네임이 있으면 닉네임, 없으면 닉네임
+        if (nickname != null && !nickname.isEmpty()) {
+            return nickname;
+        }
+
+        // 이메일도 없다면 "알 수 업음", 있다면 이메일 반환
+        return (userEmail != null) ? userEmail : "알 수 없는 사용자";
     }
 
 

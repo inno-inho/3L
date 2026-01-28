@@ -1,10 +1,9 @@
-package com.example.demo.domain.dto;
+package com.example.demo.domain.dto.chatDto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
-import org.springframework.messaging.Message;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;

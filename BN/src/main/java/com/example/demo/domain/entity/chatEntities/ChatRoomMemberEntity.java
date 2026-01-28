@@ -2,7 +2,7 @@
 // 참여자와 방의 관계를 관리하는 엔티티
 // #################################################
 
-package com.example.demo.domain.entity.ChatEntities;
+package com.example.demo.domain.entity.chatEntities;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -32,6 +32,9 @@ public class ChatRoomMemberEntity {
 
     // 현재 방에 참여 중인지 여부 (나가기 버튼 누르면 false)
     private boolean active;
+
+    // 안 읽은 메시지 개수를 구하기 위한 마지막으로 읽은 시간
+    private LocalDateTime lastReadAt;
 
     public void activate() {
         this.active = true;

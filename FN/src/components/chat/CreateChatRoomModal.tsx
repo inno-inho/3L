@@ -91,8 +91,8 @@ const CreateChatRoomModal = ({ show, onHide, onCreate }: CreateChatModalProps) =
                                     key={friend.email}
                                     onClick={() => toggleFriend(friend.email)}
                                     className={`flex items-center p-3 rounded-2xl cursor-pointer border transition-all ${selectedEmails.includes(friend.email)
-                                            ? 'bg-[#FDF5E6] border-[#B5A492]'
-                                            : 'bg-white border-gray-100 hover:bg-gray-50'
+                                        ? 'bg-[#FDF5E6] border-[#B5A492]'
+                                        : 'bg-white border-gray-100 hover:bg-gray-50'
                                         }`}
                                 >
                                     <img src={friend.profile_image_url} alt={friend.nickname} className='w-10 h-10 rounded-xl mr-3' />
@@ -110,15 +110,36 @@ const CreateChatRoomModal = ({ show, onHide, onCreate }: CreateChatModalProps) =
                 <Modal.Footer className='border-0 px-6 pb-6'>
                     <Button
                         onClick={onHide}
-                        className='bg-gray-100 border-0 text-gray-500 rounded-xl px-4 py-2 hover:bg-gray-200'
+
+                        style={{
+                            backgroundColor: '#fff9ed', // bg-gray-100
+                            border: '1px',             // border-0
+                            color: 'gray',            // text-gray-500
+                            borderRadius: '0.75rem',     // rounded-xl
+                            paddingLeft: '1rem',         // px-4
+                            paddingRight: '1rem',
+                            paddingTop: '0.5rem',        // py-2
+                            paddingBottom: '0.5rem',
+                        }}
                     >
                         취소
                     </Button>
                     <Button
                         onClick={handleCreate}
-                        className='bg-[#B5A492] border-0 text-white rounded-xl px-6 py-2 hover:bg-[#8B4513] transition-colors font-bold'
+                        style={{
+                            backgroundColor: '#743F24',
+                            border: 'none',
+                            color: 'white',
+                            borderRadius: '0.75rem',   // rounded-xl
+                            paddingLeft: '1.5rem',     // px-6
+                            paddingRight: '1.5rem',
+                            paddingTop: '0.5rem',      // py-2
+                            paddingBottom: '0.5rem',
+                            fontWeight: '700',         // font-bold
+                        }}
+
                     >
-                        생성하기
+                        방 만들기
                     </Button>
                 </Modal.Footer>
             </Modal>

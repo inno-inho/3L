@@ -1,4 +1,4 @@
-package com.example.demo.domain.dto;
+package com.example.demo.domain.dto.chatDto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
@@ -18,6 +18,9 @@ public class ChatRoomDto {
 
     @Schema(description = "채팅방 이름", example = "코코넛톡 공지방")
     private String roomName;
+
+    @Schema(description = "채팅방 타입", example = "GROUP")
+    private ChatMessageDto.ChatType chatRoomType;
 
     @Schema(description = "마지막으로 수신된 메시지 내용", example = "두바이 쫀득 쿠키")
     private String lastMessage;
