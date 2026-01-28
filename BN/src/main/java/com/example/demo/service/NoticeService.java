@@ -48,7 +48,8 @@ public class NoticeService {
     // 프론트에 내려주는 용도
     @Transactional(readOnly = true)
     public NoticeResponseDto getNoticesById(Long id){
-        NoticeEntity entity = getNoticeEntity(id);
+        NoticeEntity entity = noticeRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("공지 없음"));
         return NoticeResponseDto.from(entity);
     }
 
@@ -61,11 +62,25 @@ public class NoticeService {
 
     // 공지 수정
     @Transactional
-    public NoticeResponseDto updateNotice(Long id, NoticeRequestDto noticeRequest){
+    public NoticeResponseDto updateNotice(
+            Long id,
+            NoticeRequestDto noticeRequest,
+            List<MultipartFile> files,
+            List<Long> deleteFileIds
+    ){
         NoticeEntity existNotice = getNoticeEntity(id); // 존재하는지 확인(getNoticeById에서는 DTO를 반환)
         existNotice.setTitle(noticeRequest.getTitle());
         existNotice.setContent(noticeRequest.getContent());
-        existNotice.setAuthorId(noticeRequest.getAuthorId());
+//        existNotice.setAuthorId(noticeRequest.getAuthorId()); // 공지 작성자는 보통 불변이므로 제거하는게 좋음(생성시에만 설정)
+
+        // 기존 파일 삭제
+        if (deleteFileIds != null && !deleteFileIds.isEmpty()){
+            noticeFileService.deleteFiles(deleteFileIds);
+        }
+        // 새 파일 추가
+        if (files != null && !files.isEmpty()){
+            noticeFileService.saveFiles(existNotice, files);
+        }
         return NoticeResponseDto.from(existNotice);
 
     }

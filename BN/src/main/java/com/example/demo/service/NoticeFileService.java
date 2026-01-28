@@ -11,6 +11,7 @@ import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -70,7 +71,6 @@ public class NoticeFileService {
             }
         }
 
-
     }
 
     // 파일 다운로드
@@ -100,4 +100,49 @@ public class NoticeFileService {
                 .map(NoticeFileResponseDto::from)
                 .toList();
     }
+
+    // 단일 파일 삭제
+    @Transactional
+    public void deleteFile(Long fileId){
+        NoticeFileEntity file = noticeFileRepository.findById(fileId)
+                .orElseThrow(() -> new RuntimeException("파일 없음"));
+
+        try{
+            // 1. 서버에 저장된 실제 파일 삭제
+            Path path = Paths.get(file.getFilePath());
+            Files.deleteIfExists(path);
+        } catch (IOException e){
+            throw new RuntimeException("파일 삭제 실패", e);
+        }
+
+        // 2. DB에서 파일 정보 삭제
+        noticeFileRepository.delete(file);
+
+    }
+
+    // 수정 시 여러 파일 삭제
+    @Transactional
+    public void deleteFiles(List<Long> fileIds){
+        if (fileIds == null || fileIds.isEmpty()) return;
+
+        for (Long fileId : fileIds) {
+            deleteFile(fileId); // 재사용
+        }
+
+//        List<NoticeFileEntity> files = noticeFileRepository.findAllById(fileIds);
+//
+//        for(NoticeFileEntity file : files) {
+//            try {
+//                // 1. 서버에 저장된 실제 파일 삭제
+//                Path path = Paths.get(file.getFilePath());
+//                Files.deleteIfExists(path);
+//            } catch (IOException e){
+//                throw new RuntimeException("파일 삭제 실패", e);
+//            }
+//        }
+
+//        // 2. DB에서 파일 정보 삭제
+//        noticeFileRepository.deleteAll(files);
+    }
+
 }

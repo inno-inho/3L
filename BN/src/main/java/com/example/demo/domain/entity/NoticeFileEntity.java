@@ -2,12 +2,14 @@ package com.example.demo.domain.entity;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Getter // Entity를 다른 곳에서 사용하기 위해
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 @Table(name="notice_files")
 public class NoticeFileEntity {
 

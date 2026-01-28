@@ -111,12 +111,12 @@ const NoticeDetail = () => {
                         </div>
                     </div>
                     <hr />
-                    <div className="py-4">
+                    <div className="w-full py-4 mx-auto max-w-64">
                         <Link to="/notices">
-                            <button className="px-6 py-2 rounded-lg border border-[#743F24] text-[#743F24] hover:bg-[#743F24] hover:text-white transition-all shadow-sm">목록</button>
+                            <button className="mx-4 px-6 py-2 rounded-lg border border-[#743F24] text-[#743F24] hover:bg-[#743F24] hover:text-white transition-all shadow-sm">목록</button>
                         </Link>
-                        <Link to="#">
-                            <button className="px-6 py-2 rounded-lg border border-[#743F24] text-[#743F24] hover:bg-[#e04e05] hover:text-white transition-all shadow-sm">수정</button>
+                        <Link to={`/notices/${notice.id}/edit`}>
+                            <button className="mx-4 px-6 py-2 rounded-lg border border-[#743F24] text-[#743F24] hover:bg-[#e04e05] hover:text-white transition-all shadow-sm">수정</button>
                         </Link>
                     </div>
                     <div>

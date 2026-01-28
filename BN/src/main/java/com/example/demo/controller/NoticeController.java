@@ -66,15 +66,16 @@ public class NoticeController {
 
     // 공지 수정
     // Service에서 Dto를 반환, Controller에서도 Dto를 반환 (반환형 일치)
-    @PutMapping("/{id}")
+    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<NoticeResponseDto> updateNotice(
             @PathVariable Long id,
-            @RequestPart NoticeRequestDto noticeRequest,
-            @RequestPart(required = false) List<MultipartFile> files
+            @RequestPart("notice") NoticeRequestDto noticeRequest,
+            @RequestPart(value="files", required = false) List<MultipartFile> files,
+            @RequestPart(value="deleteFileIds", required = false) List<Long> deleteFileIds
     ){
         System.out.println("[Notice:updateNotice] " + noticeRequest);
-
-        NoticeResponseDto response = noticeService.updateNotice(id, noticeRequest); // 존재 여부 확인, 필드 수정, 저장
+        System.out.println("[Notice:updateNotice] files = " + files);
+        NoticeResponseDto response = noticeService.updateNotice(id, noticeRequest, files, deleteFileIds); // 존재 여부 확인, 필드 수정, 저장
         return ResponseEntity.ok(response);
     }
 

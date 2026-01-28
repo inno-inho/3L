@@ -34,7 +34,7 @@ export interface NoticeDetail{
     viewCount: number;
     createdAt: string | null;
     updatedAt: string | null;
-    files?: NoticeFile[];
+    files?: NoticeFile[]; // 기존 파일 포함
     // comment: Comment[];
 }
 

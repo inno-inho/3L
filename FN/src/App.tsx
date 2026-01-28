@@ -33,7 +33,7 @@ const App: React.FC = () => {
               <Route element={<MainLayout />} >
                 <Route path="/notices" element={<NoticeList />} />
                 <Route path="/notices/write" element={<NoticeForm />} />
-                <Route path="/notices/:id" element={<NoticeForm />} />
+                <Route path="/notices/:id/edit" element={<NoticeForm />} />
                 <Route path="/notices/:id" element={<NoticeDetail />} />
 
                 <Route path="/settings" element={<SettingsLayout />} >

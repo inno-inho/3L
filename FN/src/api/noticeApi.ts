@@ -1,5 +1,5 @@
 import api from "./api";
-import type { Notice, NoticeCreateRequest, NoticePageResponse } from "@/types/notice";
+import type { NoticeDetail, NoticeCreateRequest, NoticePageResponse } from "@/types/notice";
 
 
 // 공지 목록 조회 
@@ -26,18 +26,11 @@ export const getNotices = async (page: number, keyword?: string) => {     // pag
     // }
 }
 
-export const getNotice = async (id:number): Promise<Notice> => {
+export const getNotice = async (id:number): Promise<NoticeDetail> => {
     const response = await api.get(`/notices/${id}`);
     return response.data;
 };
 
-// 🔥 수정 (이거 꼭 필요)
-// export const updateNotice = async (
-//   id: number,
-//   data: NoticeUpdateRequest
-// ) => {
-//   return api.put(`/notices/${id}`, data);
-// };
 // 파일 없는 공지일 때
 // export const createNotice = async (data: {
 //     title: string;
@@ -74,4 +67,47 @@ export const createNotice = async (
 
 export const downloadNoticeFile = (fileId: number) => {
     return api.get(`/notices/files/${fileId}/download`, {responseType: 'blob'} );
+};
+
+// 공지 수정 
+export const updateNotice = async (
+    id: number,
+    data: NoticeCreateRequest,
+    files: File[],
+    deleteFileIds:number[]
+) => {
+    const formData = new FormData();
+
+    // 공지 데이터
+    formData.append(
+        "notice",
+        new Blob([JSON.stringify(data)], {type:"application/json",})
+    );
+
+    // 새 파일들
+    files.forEach(file => formData.append("files", file));
+    
+    // 삭제할 파일 id들
+    deleteFileIds.forEach(fileId => {
+        formData.append("deleteFileIds", String(fileId));
+    });
+
+    const response = await api.put(`/notices/${id}`, formData, {
+        headers: { "Content-Type" : "multipart/form-data"},
+    });
+
+    return response.data;
+};
+
+// 공지 수정에서 파일 삭제 
+export const deleteNoticeFile = async (fileId: number) => {
+    console.log("DELETE API 호출", fileId); 
+    await api.delete(`/notices/files/${fileId}`);
+};
+
+// 공지 수정에서 여러 파일 삭제
+export const deleteNoticeFiles = async (fileIds: number[]) => {
+    await api.delete("/notices/files", {
+        data: fileIds
+    });
 };

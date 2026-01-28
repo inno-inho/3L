@@ -2,10 +2,14 @@ package com.example.demo.domain.dto;
 
 import com.example.demo.domain.entity.NoticeFileEntity;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
+@Builder
 @AllArgsConstructor
+@NoArgsConstructor
 public class NoticeFileResponseDto {
     private Long id;
     private String originalName;
@@ -13,11 +17,11 @@ public class NoticeFileResponseDto {
     private Long fileSize;
 
     public static NoticeFileResponseDto from(NoticeFileEntity entity){
-        return new NoticeFileResponseDto(
-                entity.getId(),
-                entity.getOriginalName(),
-                entity.getFilePath(),
-                entity.getFileSize()
-        );
+        return NoticeFileResponseDto.builder()
+                .id(entity.getId())
+                .originalName(entity.getOriginalName())
+                .fileSize(entity.getFileSize())
+                .build();
+
     }
 }
