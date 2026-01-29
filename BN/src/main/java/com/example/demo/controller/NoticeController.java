@@ -75,6 +75,7 @@ public class NoticeController {
     ){
         System.out.println("[Notice:updateNotice] " + noticeRequest);
         System.out.println("[Notice:updateNotice] files = " + files);
+        System.out.println("deleteFileIds = " + deleteFileIds);
         NoticeResponseDto response = noticeService.updateNotice(id, noticeRequest, files, deleteFileIds); // 존재 여부 확인, 필드 수정, 저장
         return ResponseEntity.ok(response);
     }

@@ -26,12 +26,13 @@ export const getNotices = async (page: number, keyword?: string) => {     // pag
     // }
 }
 
+// 단건 공지 조회
 export const getNotice = async (id:number): Promise<NoticeDetail> => {
     const response = await api.get(`/notices/${id}`);
     return response.data;
 };
 
-// 파일 없는 공지일 때
+// 파일 없는 공지 등록
 // export const createNotice = async (data: {
 //     title: string;
 //     content: string;
@@ -41,68 +42,25 @@ export const getNotice = async (id:number): Promise<NoticeDetail> => {
 //     return response.data;
 // };
 
-// 파일 있는 공지
-export const createNotice = async (
-    data: NoticeCreateRequest,
-    files: File[]
-) => {
-    const formData = new FormData();
-
-    // Json 데이터 formData.append("백엔드의 @RequsetParam의 "notice'와 일치", noticeData)로 하지 말고 반드시 Blob 사용
-    formData.append(
-        "notice",
-        new Blob([JSON.stringify(data)], {
-            type:"application/json",
-        })
-    );
-
-    // 파일들
-    if (files && files.length > 0){
-        files.forEach(file => formData.append("files", file));
-    }
-    
+// 파일 있는 공지 등록
+export const createNotice = async(formData: FormData) => {
     const response = await api.post("/notices", formData);
     return response.data;
-};
+}
 
 export const downloadNoticeFile = (fileId: number) => {
     return api.get(`/notices/files/${fileId}/download`, {responseType: 'blob'} );
 };
 
-// 공지 수정 
-export const updateNotice = async (
-    id: number,
-    data: NoticeCreateRequest,
-    files: File[],
-    deleteFileIds:number[]
-) => {
-    const formData = new FormData();
-
-    // 공지 데이터
-    formData.append(
-        "notice",
-        new Blob([JSON.stringify(data)], {type:"application/json",})
-    );
-
-    // 새 파일들
-    files.forEach(file => formData.append("files", file));
-    
-    // 삭제할 파일 id들
-    deleteFileIds.forEach(fileId => {
-        formData.append("deleteFileIds", String(fileId));
-    });
-
-    const response = await api.put(`/notices/${id}`, formData, {
-        headers: { "Content-Type" : "multipart/form-data"},
-    });
-
+// 공지 수정
+export const updateNotice = async(id:number, formData: FormData) => {
+    const response = await api.put(`/notices/${id}`, formData); // 여기서 multipart/form-data를 지정하면 boundary가 빠져서 415에러 발생
     return response.data;
-};
+}
 
 // 공지 수정에서 파일 삭제 
-export const deleteNoticeFile = async (fileId: number) => {
-    console.log("DELETE API 호출", fileId); 
-    await api.delete(`/notices/files/${fileId}`);
+export const deleteNoticeFile = (fileId: number) => {
+    return api.get(`/notices/files/${fileId}/download`, {responseType:"blob",});
 };
 
 // 공지 수정에서 여러 파일 삭제

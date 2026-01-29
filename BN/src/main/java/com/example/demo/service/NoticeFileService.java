@@ -107,6 +107,12 @@ public class NoticeFileService {
         NoticeFileEntity file = noticeFileRepository.findById(fileId)
                 .orElseThrow(() -> new RuntimeException("파일 없음"));
 
+        // 부모와 연관관계 제거
+        NoticeEntity notice = file.getNotice();
+        if (notice != null){
+            notice.getFiles().remove(file);
+        }
+
         try{
             // 1. 서버에 저장된 실제 파일 삭제
             Path path = Paths.get(file.getFilePath());

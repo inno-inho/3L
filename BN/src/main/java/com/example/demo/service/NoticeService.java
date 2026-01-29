@@ -75,7 +75,10 @@ public class NoticeService {
 
         // 기존 파일 삭제
         if (deleteFileIds != null && !deleteFileIds.isEmpty()){
-            noticeFileService.deleteFiles(deleteFileIds);
+            for(Long fileId : deleteFileIds){
+                noticeFileService.deleteFile(fileId);
+            }
+
         }
         // 새 파일 추가
         if (files != null && !files.isEmpty()){
