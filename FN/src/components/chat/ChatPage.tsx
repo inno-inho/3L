@@ -1,7 +1,11 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 
+<<<<<<< HEAD
 import Sidebar from '@/components/common/Sidebar';
+=======
+import Sidebar from '../common/Sidebar';
+>>>>>>> origin/dev
 import ChatRoomList from './ChatRoomList';
 import ChatEmptyState from './ChatEmptyState';
 import ChatWindow from './ChatWindow';
@@ -115,7 +119,7 @@ const ChatPage = () => {
                     onSelect={setSelectedRoomId}
                     onCreateRomm={() => setIsCreateModalOpen(true)}    // 모달 열기
                 />
-    
+
                 {/* 선택된 방이 있을 때만 ChatWindow를 띄움 */}
                 {selectedRoomId && selectedRoom ? (
                     <ChatWindow

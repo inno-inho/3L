@@ -26,7 +26,6 @@ const App: React.FC = () => {
       <div className="App">
         <Router>
           <AuthProvider>
-            {/* Modal 있어야함 */}
             <ModalProvider>
               <Routes>
                 <Route path='/' element={<LoginPage />} />

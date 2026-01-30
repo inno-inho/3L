@@ -2,6 +2,7 @@ import React from 'react';
 import type {ReactNode} from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import Sidebar from './Sidebar';
+
 import Header from './Header';
 import { useAuth } from '../../context/AuthContext';
 
@@ -17,8 +18,9 @@ const MainLayout: React.FC<MainLayoutProps> = () => {
     const isChatPage = location.pathname.startsWith('/chatPage');
 
     return(
-        <div className='w-full min-h-screen bg-[#fff9ed] flex justify-center'>
-            <div className="w-full max-w-screen-xl mx-auto flex flex-col">
+        <>
+            {/* 베이지색 배경색 지정 */}
+            <div className='w-full min-h-screen bg-[#fff9ed] flex flex-col m-0 p-0'>
                 <Header />
                 <div className="flex-1 flex min-h-0">
                     <Sidebar currentUser={user} />
@@ -35,9 +37,8 @@ const MainLayout: React.FC<MainLayoutProps> = () => {
                     </main>
                 </div>
             </div>
-        </div>
+        </>
     );
 };
 
 export default MainLayout;
-

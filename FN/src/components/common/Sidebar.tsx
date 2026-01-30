@@ -14,7 +14,7 @@ interface SidebarProps {
     currentUser: User | null;
 }
 
-const Sidebar = ({ currentUser }: SidebarProps) => {
+const Sidebar = ({ currentUser }: SidebarProps ) => {
     const navigate = useNavigate();
     const location = useLocation();
     const { user } = useAuth();
