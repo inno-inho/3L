@@ -80,12 +80,13 @@ const ChatWindow = ({ roomInfo, currentUser }: ChatWindowProps) => {
         const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
         // // 현재 브라우저 주소창의 호스트(localhost:5173_리액트 vite 주소)를 자동으로 가져옴
         const host = window.location.host
-        
+
         // 웹 소켓 클라이언트 설정
         client.current = new Client({
 
             // /ws는 EndPoint, /websocket은 순수 소켓 연결을 위한 STOMP 표준 주소
             brokerURL: `${protocol}//${host}/ws`,
+
             connectHeaders: {
                 // Authorization: token ? `Bearer ${token}` : ""        // 유저 기능이랑 토큰관련 백엔드 로직 끝나면 추가해야함
             },
@@ -97,7 +98,7 @@ const ChatWindow = ({ roomInfo, currentUser }: ChatWindowProps) => {
                 // 해당 방을 구독(누가 메시지를 보내면 나한테 알려달라고 구독 신청), `/topic/chat/${roomInfo.roomId}는 ChatController에서 잡아논 주소
                 client.current?.subscribe(`/sub/chat/${roomInfo.roomId}`, (message) => {
                     console.log("메시지 원본: ", message.body);
-                    
+
                     const newMessages = JSON.parse(message.body);
 
                     console.log("수신 데이터: ", newMessages);
@@ -108,7 +109,7 @@ const ChatWindow = ({ roomInfo, currentUser }: ChatWindowProps) => {
 
                         if (isExisting) {
                             // 이미 있다면 해당 Id의 메시지만 새 데이터(newMessage)로 교체
-                            return prev.map(m => m.messageId === newMessages.messageId ? newMessages : m);   
+                            return prev.map(m => m.messageId === newMessages.messageId ? newMessages : m);
                         }
 
                         // 완전히 새로운 메시지라면? 기존 배열 끝에 추가
@@ -135,7 +136,7 @@ const ChatWindow = ({ roomInfo, currentUser }: ChatWindowProps) => {
     // 새 메시지가 올 때마다 자동 스크롤
     useEffect(() => {
         // 사용자가 바닥에 있었을 때만 자동으로 스크롤 내림
-        if (isAtBottomRef.current)  {
+        if (isAtBottomRef.current) {
             scrollToBottom();
         }
     }, [messages]);
@@ -329,7 +330,7 @@ const ChatWindow = ({ roomInfo, currentUser }: ChatWindowProps) => {
 
     // 삭제 버튼 클릭 시 실행된 핸들러
     const onDeleteClick = (messageId: string) => {
-            showConfirm("메시지 삭제", "정말 이 메시지를 삭제하시겠습니까?", () => {
+        showConfirm("메시지 삭제", "정말 이 메시지를 삭제하시겠습니까?", () => {
             executeDelete(messageId);
         })
     }
@@ -367,7 +368,7 @@ const ChatWindow = ({ roomInfo, currentUser }: ChatWindowProps) => {
                 />
 
                 {/* 메시지 리스트 영역 */}
-                <ChatMessageList 
+                <ChatMessageList
                     messages={messages}
                     currentUser={currentUser}
                     scrollRef={scrollRef}

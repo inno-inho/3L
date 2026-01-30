@@ -1,0 +1,36 @@
+모든 api 통로가 내 IP를 향하도록 하는 게 중요
+
+1. api.ts
+baseURL: '/api', 
+// 실제 요청 주소, Vite proxy 설정에 의해 http://localhost:8080/api/notices로 변환됨
+⇩ 
+baseURL: 'http://172.30.1.53:8080/api', 
+// 친구가 내 백엔드로 직접 찌르게 설정
+
+
+２．ChatWindow.tsx
+brokerURL: `${protocol}//${host}/ws`,
+// 자기 자신의 컴퓨터(http://localhost:8080/......)
+⇩
+brokerURL: "ws://172.30.1.53:8080/ws",
+ // 내 컴퓨터 웹소켓 서버 주소
+
+
+3. docker-compose.local.yml
+VITE_API_URL: http://localhost:8080 
+⇩
+VITE_API_URL: http://172.30.1.53:8080  # 내 IP로 수정
+
+
+4. 백엔드 CORS 설정_WebConfig
+- 허용할 주소에 내 IP 주소를 추가
+
+public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**")
+                .allowedOrigins("http://localhost:5173", "http://172.30.1.53:5173") 
+        ......
+}
+
+5. package.json
+"scripts" 안의 "dev": "vite --host 0.0.0.0", 로 설정
+vite --host 0.0.0.0는 내부(localhost)뿐만 아니라 외부에서 오는 요청도 다 받아줘라고 설정하는 것
