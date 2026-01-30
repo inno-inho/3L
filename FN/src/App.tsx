@@ -18,29 +18,35 @@ const App: React.FC = () => {
   return(
     <>
       <div className="App">
-        <ModalProvider>
+        
           <Router>
             <AuthProvider>
-              <Routes>
-                {/* 홈페이지 입장하면 제일 먼저 보일 기본페이지, 로그인 페이지 */}
-                <Route path='/' element={<LoginPage />} />
-                
-                {/* test용 */}
-                <Route 
-                  path='/test' 
-                  element={
-                  <MainLayout>
-                    <ConnectionTest />
-                  </MainLayout>
-                  }
-                />
+              <ModalProvider>
+                <Routes>
+                  {/* 홈페이지 입장하면 제일 먼저 보일 기본페이지, 로그인 페이지 */}
+                  <Route path='/' element={<LoginPage />} />
+                  
+                  {/* test용 */}
+                  <Route 
+                    path='/test' 
+                    element={
+                    <MainLayout>
+                      <ConnectionTest />
+                    </MainLayout>
+                    }
+                  />
+                  
+                  <Route element={<MainLayout />}>
+                    <Route path="/chatPage" element={<ChatPage />} />
+                  </Route>
 
-                {/* ChatPage */}
-                  <Route path='/chatPage' element={<MainLayout><ChatPage /></MainLayout>}/>
-              </Routes>
+                  {/* ChatPage */}
+                    {/* <Route path='/chatPage' element={<MainLayout><ChatPage /></MainLayout>}/> */}
+                </Routes>
+              </ModalProvider>
             </AuthProvider>
           </Router>
-        </ModalProvider>
+        
       </div>  
     </>
   )
