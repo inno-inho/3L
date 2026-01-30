@@ -1,11 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
-
-<<<<<<< HEAD
 import Sidebar from '@/components/common/Sidebar';
-=======
-import Sidebar from '../common/Sidebar';
->>>>>>> origin/dev
+
 import ChatRoomList from './ChatRoomList';
 import ChatEmptyState from './ChatEmptyState';
 import ChatWindow from './ChatWindow';
