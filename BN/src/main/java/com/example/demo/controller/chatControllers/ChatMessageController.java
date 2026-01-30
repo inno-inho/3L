@@ -1,8 +1,8 @@
-package com.example.demo.controller;
+package com.example.demo.controller.chatControllers;
 
-import com.example.demo.domain.dto.ChatMessageDto;
-import com.example.demo.domain.dto.ChatMessageRequestDto;
-import com.example.demo.service.chatServices.ChatService;
+import com.example.demo.domain.dto.chatDto.ChatMessageDto;
+import com.example.demo.domain.dto.chatDto.ChatMessageRequestDto;
+import com.example.demo.service.chatServices.ChatMessageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -15,23 +15,21 @@ import java.util.List;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/chatrooms")
-public class ChatController {
+public class ChatMessageController {
 
     private final SimpMessagingTemplate simpMessagingTemplate;
-    private final ChatService chatService;
+    private final ChatMessageService chatMessageService;
 
+    // ######################################
     //  메시지 전송 및 저장
+    // ######################################
     @PostMapping("/{roomId}/send")
     public ResponseEntity<ChatMessageDto> sendMessage(
             @PathVariable String roomId,
             @ModelAttribute ChatMessageRequestDto chatMessageRequestDto) {
 
-
-
-
-
         // 서비스에서 DB 저장 및 DTO 변환 (파일 업로드 포함)
-        ChatMessageDto savedMessage = chatService.saveMessage(chatMessageRequestDto);
+        ChatMessageDto savedMessage = chatMessageService.saveMessage(chatMessageRequestDto);
 
 //         여기서 직접 전송하지 않고 Service 내부에서 발생시킨 이벤트를 기다린다
 
@@ -48,14 +46,30 @@ public class ChatController {
 //        simpMessagingTemplate.convertAndSend("/sub/chat/" + chatMessageEvent.roomId(), chatMessageEvent.chatMessageDto());        // 구독 주소 잡기
 //    }
 
+    // ########################################
     // 채팅 내역 불러오기
+    // ########################################
     @GetMapping("/{roomId}/messages")
     public ResponseEntity<List<ChatMessageDto>> getChatHistory(
             @PathVariable String roomId,
             @RequestParam(required = false) Long lastMessageId,
             @RequestParam(defaultValue = "50") int size) {
-        List<ChatMessageDto> history = chatService.getChatHistory(roomId, lastMessageId, size);
+        List<ChatMessageDto> history = chatMessageService.getChatHistory(roomId, lastMessageId, size);
 
         return ResponseEntity.ok(history);
     }
+
+    // ########################################
+    // 채팅 삭제하기
+    // ########################################
+    @DeleteMapping("/messages/{messageId}")
+    public ResponseEntity<Void> deleteMessage (
+            @PathVariable Long messageId,
+            @RequestParam String email) {
+
+        chatMessageService.deleteMessage(messageId, email);
+
+        return ResponseEntity.ok().build();
+    }
+
 }

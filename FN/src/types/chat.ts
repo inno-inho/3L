@@ -10,7 +10,7 @@ export interface ChatMetadata {
 export interface ChatMessageDto{
     messageId: string;
     messageType: 'ENTER' | 'QUIT' | 'SYSTEM' | 'TEXT' | 'IMAGE' | 'VIDEO' | 'FILE' | 'URL_LINK' | 'DELETE' | 'TYPING';
-    chatType: 'GROUP' | 'FRIEND';
+    chatRoomType: 'GROUP' | 'FRIEND' | null;
     roomId: string;
     sender: string;
     senderName: string;
@@ -22,11 +22,15 @@ export interface ChatMessageDto{
         originalFileName: string;
     }[];
     thumbnailUrl?: string;
-    metadata?: ChatMetadata;
-    isDeleted: boolean;
+    metadata?: ChatMetadata | null;
+    deleted: boolean;
     sentTime?: string;
     createdAt: string;
-    unreadCount: number;
+    unreadCount?: number | null;
+    parentMessageId?: string;   // 답장기능 필드
+    parentMessageSenderName?: string;   // 답장기능 필드
+    parentMessageContent?: string;    // 답장기능 필드
+    // parentMessage?: any;
 }
 
 // 채팅방 목록에 표시할 것들을 받는 인터페이스

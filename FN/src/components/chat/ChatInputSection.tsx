@@ -2,6 +2,7 @@ import text from "@/assets/image/text.svg";
 import addPhoto from "@/assets/image/addPhoto.svg";
 import addReaction from "@/assets/image/addReaction.svg";
 import { useEffect, useReducer, useRef } from "react";
+import type { ChatMessageDto } from "../../types/chat";
 
 
 interface Props {
@@ -11,9 +12,11 @@ interface Props {
     onFileUpload: (file: File, type: "IMAGE" | "VIDEO" | "FILE") => void;
     pendingFiles: any[];   // 대기 중인 파일 정보
     onCancelFile: (id: string) => void;   // 파일 취소 함수, 특정 파일만 취소 가능하도록 ID 전달
+    replyTarget: ChatMessageDto | null;
+    onCancelReply: () => void;
 }
 
-const ChatInputSection = ({ inputText, setInputText, handleSend, onFileUpload, pendingFiles, onCancelFile }: Props) => {
+const ChatInputSection = ({ inputText, setInputText, handleSend, onFileUpload, pendingFiles, onCancelFile, replyTarget, onCancelReply }: Props) => {
 
     // 미디어, 파일의 Input을 위한 Ref
     const mediaInputRef = useRef<HTMLInputElement>(null);
@@ -79,6 +82,7 @@ const ChatInputSection = ({ inputText, setInputText, handleSend, onFileUpload, p
             />
 
             <div className="border border-[#743F24] rounded-2xl p-3 bg-white">
+                {/* 첨부파일의 종류에 따른 렌더링 */}
                 {pendingFiles.length > 0 && (
                     <div className="flex gap-3 mb-3 overflow-x-auto pb-2 scrollbar-hide">
                         {pendingFiles.map((p) => (
@@ -98,6 +102,23 @@ const ChatInputSection = ({ inputText, setInputText, handleSend, onFileUpload, p
                                 </button>
                             </div>
                         ))}
+                    </div>
+                )}
+
+                {/* 답장할 경우의 UI */}
+                {replyTarget && (
+                    <div className="flex items-center justify-between px-4 py-2 bg-gray-50 border-t border-gray-100 animate-slide-up">
+                        <div className="flex flex-col border-l-4 border-[#B5A492] pl-3">
+                            <span className="text-[10px] font-bold text-[#743F24]">
+                                {replyTarget.senderName}에게 답장
+                            </span>
+                            <span className="text-xs text-gray-500 truncate max-w-[400px]">
+                                {replyTarget.message}
+                            </span>
+                        </div>
+                        <button onClick={onCancelReply} className="p-1 hover:bg-gray-200 rounded-full">
+                            <p className="text-lg">X</p>
+                        </button>
                     </div>
                 )}
 

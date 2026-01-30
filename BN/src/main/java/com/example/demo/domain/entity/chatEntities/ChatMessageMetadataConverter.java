@@ -1,6 +1,6 @@
-package com.example.demo.domain.entity.ChatEntities;
+package com.example.demo.domain.entity.chatEntities;
 
-import com.example.demo.domain.dto.ChatMessageDto;
+import com.example.demo.domain.dto.chatDto.ChatMessageDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.AttributeConverter;

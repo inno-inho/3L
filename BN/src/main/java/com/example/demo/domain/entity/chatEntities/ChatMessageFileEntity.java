@@ -1,4 +1,4 @@
-package com.example.demo.domain.entity.ChatEntities;
+package com.example.demo.domain.entity.chatEntities;
 
 
 import jakarta.persistence.*;

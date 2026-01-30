@@ -1,6 +1,6 @@
-package com.example.demo.domain.entity.ChatEntities;
+package com.example.demo.domain.entity.chatEntities;
 
-import com.example.demo.domain.dto.ChatMessageDto;
+import com.example.demo.domain.dto.chatDto.ChatMessageDto;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -23,7 +23,9 @@ public class ChatMessageEntity {
     private Long messageId;
 
     private String roomId;
-    private String sender;
+
+    private String sender;  // 이메일
+    private String senderName;  // 이름(닉네임)
 
     @Column(columnDefinition = "TEXT")
     private String message;
@@ -39,6 +41,15 @@ public class ChatMessageEntity {
 
     @CreatedDate
     private LocalDateTime createdAt;
+
+    @Column
+    private Long parentMessageId;
+
+    @Column
+    private String parentMessageSenderName;
+
+    @Column(columnDefinition = "TEXT")
+    private String parentMessageContent;
 
     @OneToMany(mappedBy = "chatMessage", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default        // builder 사용 시 리스트 초기화 보장하는 옵션 Default

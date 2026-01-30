@@ -12,6 +12,8 @@ import NoticeDetail from './components/notice/NoticeDetail';
 import LoginPage from './components/user/LoginPage';
 import MainLayout from './components/common/MainLayout';
 import ChatPage from './components/chat/ChatPage';
+import { ModalProvider } from './context/ModalContext';
+
 
 import SettingsLayout from './components/settings/SettingsLayout';
 import Profile from './components/settings/Profile';
@@ -28,14 +30,16 @@ const App: React.FC = () => {
         <Router>
           <AuthProvider>
             <Routes>
-              {/* 홈페이지 입장하면 제일 먼저 보일 기본페이지, 로그인 페이지 */}
               <Route path='/' element={<LoginPage />} />
               <Route element={<MainLayout />} >
+                {/* CHAT */}
+                <Route path='/chatPage' element={<ChatPage />} />
+                {/* NOTICE */}
                 <Route path="/notices" element={<NoticeList />} />
                 <Route path="/notices/write" element={<NoticeForm />} />
                 <Route path="/notices/:id/edit" element={<NoticeForm />} />
                 <Route path="/notices/:id" element={<NoticeDetail />} />
-
+                {/* 설정 */}
                 <Route path="/settings" element={<SettingsLayout />} >
                   <Route index element={<Navigate to="profile" replace />} /> {/* settings로 들어왔을 때 자동으로 settings/profile로 들어옴 */}
                   <Route path="profile" element={<Profile />} />
@@ -44,15 +48,10 @@ const App: React.FC = () => {
                 </Route>
                 {/* test용 */}
                 <Route path='/test' element={<ConnectionTest />} />
-
-                <Route path='/chatPage' element={<ChatPage />} />
-                
               </Route>
               {/* 없는 주소 접근 시 */}
               <Route path="*" element={<Navigate to="/" />} />
             </Routes>
-            
-              
           </AuthProvider>
         </Router>
       </div>

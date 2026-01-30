@@ -16,6 +16,7 @@ export default defineConfig({
       },
       // 이미지 요청을 위한 프록시 추가
       '/uploads': {
+        // target: 'http://backend:8080',         // 배포 시 혹은 도커로 전부 돌릴거면
         target: 'http://host.docker.internal:8080',
         changeOrigin: true,
       },
