@@ -24,6 +24,9 @@ services:
   backend:
     build: ./BN
     container_name: coconutTalk-backend-dev
+    # volumes:
+    #   - ./BN:/app              # 내 컴퓨터의 BN 폴더를 컨테이너의 /app에 연결
+    #   - /app/target            # 빌드 결과물(클래스 파일 등)은 컨테이너 안에서 관리 (충돌 방지)
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/${DB_NAME}
       SPRING_DATASOURCE_USERNAME: root

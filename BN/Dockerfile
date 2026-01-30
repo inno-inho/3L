@@ -16,5 +16,5 @@ RUN apk add --no-cache curl
 # 빌드 단계에서 생성된 jar 파일만 복사
 COPY --from=build /app/build/libs/*-SNAPSHOT.jar app.jar
 
-# 컨테이너 실해 시점의 환경 변수 처리
+# 컨테이너 실행 시점의 환경 변수 처리
 ENTRYPOINT ["java", "-jar", "app.jar"]

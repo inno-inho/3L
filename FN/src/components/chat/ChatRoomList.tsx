@@ -2,7 +2,7 @@ import type { ChatRoomDto } from "../../types/chat";
 import { Plus } from 'lucide-react';    // 아이콘 라이브러리
 import coconuttalk from "@/assets/image/coconuttalk.png";
 
-import search from "@/assets/image/search.png"
+import search from "@/assets/image/search.svg"
 
 
 
