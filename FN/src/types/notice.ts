@@ -26,7 +26,7 @@ export interface NoticePageResponse {
     size: number;
 }
 
-export interface NoticeDetail{
+export interface NoticeDetailDto{
     id: number;
     title: string;
     content: string;
