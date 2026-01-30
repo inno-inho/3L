@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 
-import ChatSidebar from '../common/ChatSidebar';
+import Sidebar from '../common/Sidebar';
 import ChatRoomList from './ChatRoomList';
 import ChatEmptyState from './ChatEmptyState';
 import ChatWindow from './ChatWindow';
@@ -110,7 +110,7 @@ const ChatPage = () => {
         <>
             <div className='flex h-[calc(100vh-100px)] w-full overflow-hidden p-4 gap-4'>
                 {/* ChatSidebar 내 프로필 이미지를 보여주기위해 user 전달 */}
-                <ChatSidebar currentUser={user} />
+                <Sidebar currentUser={user} />
 
                 <ChatRoomList
                     rooms={rooms}

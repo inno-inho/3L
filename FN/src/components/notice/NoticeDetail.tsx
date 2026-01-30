@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import { getNotice, downloadNoticeFile } from "@/api/noticeApi";
-import type { NoticeDetail } from "@/types/notice";
+import type { NoticeDetail as NoticeDetailType} from "@/types/notice";
 import { formatDate } from "@/utils/date";
 import thumb_up from '@/assets/image/thumb_up.svg';
 import text from '@/assets/image/comment.svg';
@@ -13,7 +13,7 @@ const NoticeDetail = () => {
 
     const { id } = useParams();
     // 상세페이지는 무조건 API를 다시 호출
-    const [ notice, setNotice ] = useState<NoticeDetail | null>(null);
+    const [ notice, setNotice ] = useState<NoticeDetailType | null>(null);
 
     const navigate = useNavigate(); // 모달 닫고 목록 페이지로 이동할 때 필요
     const [modalShow, setModalShow] = useState(false);

@@ -7,8 +7,8 @@ import ChatPage from '../chat/ChatPage';
 import ProfileImage from './ProfileImage';
 import chats from '@/assets/image/chats.svg';
 import users from '@/assets/image/users.svg';
-import megaphone from '@/assets/image/megaphone.png';
-import setting from '@/assets/image/setting.png';
+import megaphone from '@/assets/image/megaphone.svg';
+import setting from '@/assets/image/settings.svg';
 import exit from '@/assets/image/exit.png';
 
 interface ChatSidebarProps {

@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
-import { useAuth, User } from '../../context/AuthContext'
+import { useAuth } from '../../context/AuthContext'
+import type { User } from '../../context/AuthContext';
 
 import ProfileImage from './ProfileImage';
 import chats from '@/assets/image/chats.svg';
@@ -9,8 +10,12 @@ import megaphone from '@/assets/image/megaphone.svg';
 import setting from '@/assets/image/settings.svg';
 import exit from '@/assets/image/logout.svg';
 
+interface SidebarProps {
+    currentUser: User | null;
+}
 
-const Sidebar = () => {
+
+const Sidebar = ({ currentUser }: SidebarProps ) => {
     const navigate = useNavigate();
     const location = useLocation();
     const { user } = useAuth();
