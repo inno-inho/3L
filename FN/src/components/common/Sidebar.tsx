@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext'
+import { useAuth } from '../../context/AuthContext';
 import type { User } from '../../context/AuthContext';
 
 import ProfileImage from './ProfileImage';
@@ -13,7 +13,6 @@ import exit from '@/assets/image/logout.svg';
 interface SidebarProps {
     currentUser: User | null;
 }
-
 
 const Sidebar = ({ currentUser }: SidebarProps ) => {
     const navigate = useNavigate();
