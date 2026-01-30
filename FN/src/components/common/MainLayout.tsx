@@ -11,7 +11,7 @@ interface MainLayoutProps{
 
 const MainLayout: React.FC<MainLayoutProps> = () => {
     const { user } = useAuth(); 
-    const location = useLocation();
+    const location = useLocation(); // 사용자가 어떤 페이지(URL)에 있는지 알 수 있음 location 객체 안에 {pathname:, search:}
 
     //
     const isChatPage = location.pathname.startsWith('/chatPage');
