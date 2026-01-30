@@ -1,6 +1,6 @@
 import React from 'react';
 import type {ReactNode} from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import Header from './Header';
 import { useAuth } from '../../context/AuthContext';
@@ -11,6 +11,10 @@ interface MainLayoutProps{
 
 const MainLayout: React.FC<MainLayoutProps> = () => {
     const { user } = useAuth(); 
+    const location = useLocation();
+
+    //
+    const isChatPage = location.pathname.startsWith('/chatPage');
 
     return(
         <div className='w-full min-h-screen bg-[#fff9ed] flex justify-center'>
@@ -19,9 +23,15 @@ const MainLayout: React.FC<MainLayoutProps> = () => {
                 <div className="flex-1 flex min-h-0">
                     <Sidebar currentUser={user} />
                     <main className="flex-1 min-w-0 px-4 py-3">
-                        <div className="w-full h-full mx-auto bg-white rounded-xl shoadow-sm p-8">
-                            <Outlet /> {/* 바뀌는 영역 */}
-                        </div>
+                        {isChatPage ? (
+                            <Outlet />
+                        ) : (
+                            <div className="w-full h-full mx-auto bg-white rounded-xl shoadow-sm p-8">
+                                <Outlet /> {/* 바뀌는 영역 */}
+                            </div>
+                        )
+                        }
+                        
                     </main>
                 </div>
             </div>

@@ -14,44 +14,44 @@ import MainLayout from './components/common/MainLayout';
 import ChatPage from './components/chat/ChatPage';
 import { ModalProvider } from './context/ModalContext';
 
-
 import SettingsLayout from './components/settings/SettingsLayout';
 import Profile from './components/settings/Profile';
 import Security from './components/settings/Security';
 import CustomerCenter from './components/settings/CustomerCenter';
 
-
 const App: React.FC = () => {
-
 
   return(
     <>
       <div className="App">
         <Router>
           <AuthProvider>
-            <Routes>
-              <Route path='/' element={<LoginPage />} />
-              <Route element={<MainLayout />} >
-                {/* CHAT */}
-                <Route path='/chatPage' element={<ChatPage />} />
-                {/* NOTICE */}
-                <Route path="/notices" element={<NoticeList />} />
-                <Route path="/notices/write" element={<NoticeForm />} />
-                <Route path="/notices/:id/edit" element={<NoticeForm />} />
-                <Route path="/notices/:id" element={<NoticeDetail />} />
-                {/* 설정 */}
-                <Route path="/settings" element={<SettingsLayout />} >
-                  <Route index element={<Navigate to="profile" replace />} /> {/* settings로 들어왔을 때 자동으로 settings/profile로 들어옴 */}
-                  <Route path="profile" element={<Profile />} />
-                  <Route path="security" element={<Security />} />
-                  <Route path="support" element={<CustomerCenter />} />
+            {/* Modal 있어야함 */}
+            <ModalProvider>
+              <Routes>
+                <Route path='/' element={<LoginPage />} />
+                <Route element={<MainLayout />} >
+                  {/* CHAT */}
+                  <Route path='/chatPage' element={<ChatPage />} />
+                  {/* NOTICE */}
+                  <Route path="/notices" element={<NoticeList />} />
+                  <Route path="/notices/write" element={<NoticeForm />} />
+                  <Route path="/notices/:id/edit" element={<NoticeForm />} />
+                  <Route path="/notices/:id" element={<NoticeDetail />} />
+                  {/* 설정 */}
+                  <Route path="/settings" element={<SettingsLayout />} >
+                    <Route index element={<Navigate to="profile" replace />} /> {/* settings로 들어왔을 때 자동으로 settings/profile로 들어옴 */}
+                    <Route path="profile" element={<Profile />} />
+                    <Route path="security" element={<Security />} />
+                    <Route path="support" element={<CustomerCenter />} />
+                  </Route>
+                  {/* test용 */}
+                  <Route path='/test' element={<ConnectionTest />} />
                 </Route>
-                {/* test용 */}
-                <Route path='/test' element={<ConnectionTest />} />
-              </Route>
-              {/* 없는 주소 접근 시 */}
-              <Route path="*" element={<Navigate to="/" />} />
-            </Routes>
+                {/* 없는 주소 접근 시 */}
+                <Route path="*" element={<Navigate to="/" />} />
+              </Routes>
+            </ModalProvider>
           </AuthProvider>
         </Router>
       </div>
