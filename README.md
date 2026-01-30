@@ -1,8 +1,14 @@
-### 병합시 주의 사항
+## 병합시 주의 사항
+- PR 올리기전에 항상 dev pull 해서 충돌은 올리는 사람이 해결  
+- 첫 PR은 dev가 안바뀌어서 그냥 올리면 됩니다!(feature/chat 해당)  
+- feature/notice, feature/auth는 각자 dev pull 해서 충돌 해결 후 올리기!  
+
 ```
-1) 각자 feature 브랜치로 develop 브랜치의 최신 코드를 먼저 pull 혹은 merge 받아
-  그 후 로컬 환경에서 충돌 난 부분을 수정하고 테스트를 마친 뒤, 다시 push하여 PR을 업데이트
-2) Pull requests 로 병합 요청 → 코드 확인 받은 다음 dev로 병합처리
+1) 각자 feature 브랜치로 작업
+2) 첫번째 주자(첫 병합) : dev 초기 상태로 dev pull 해도 변화 없는 상태
+3) 두번째 주자 : dev에서 merge된 상태로 dev 브랜치의 최신 코드를 먼저 pull 혹은 merge 받아
+  그 후 로컬 환경에서 충돌 난 부분을 수정하고 테스트를 마친 뒤, 다시 commit하여 PR을 업데이트
+4) 세번째 주자도 3)과 마찬가지로 기능 두개가 합쳐진 상태의 dev를 받아 merge하고 충돌난 부분 해결 후 commit → PR
 ```
 
 ## BN 주의 사항
@@ -13,8 +19,6 @@ base-path : upload로 사용
 
 ```
 
-
-
 ## FN 주의 사항
 
 ### 공통 유틸 함수(FN)
@@ -22,6 +26,11 @@ base-path : upload로 사용
 src/utils/date.ts : 날짜 포맷 2026.01.01 형태
 
 ```
+
+### SocialLoginButton 사용
+```
+```
+
 
 ### 페이지 너비, 높이 고정 XX
 ```
@@ -40,7 +49,7 @@ build 다시 해줘야함(삭제 안해도 ok, 빌드만 해서 compose up 하�
 
 
 ### Outlet 기반 방식  
-React Router + Outelt 레이아웃 패턴  
+React Router + Outlet 레이아웃 패턴  
 - MainLayout 에 Header, SideBar 지정해둔 상태로 common 폴더 그대로 사용
 - App.tsx  
   ```
