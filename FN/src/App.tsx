@@ -14,15 +14,12 @@ import MainLayout from './components/common/MainLayout';
 import ChatPage from './components/chat/ChatPage';
 import { ModalProvider } from './context/ModalContext';
 
-
 import SettingsLayout from './components/settings/SettingsLayout';
 import Profile from './components/settings/Profile';
 import Security from './components/settings/Security';
 import CustomerCenter from './components/settings/CustomerCenter';
 
-
 const App: React.FC = () => {
-
 
   return(
     <>
