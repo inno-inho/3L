@@ -26,9 +26,9 @@ const LoginPage: React.FC = () => {
                     </div>
                     <div className="flex flex-col mb-3 mx-3">
                         {/* <SocialLoginButtons /> */}
-                        <button className="border rounded-md p-2 my-2 bg-[#03A94D] text-white">네이버로 로그인</button>
-                        <button className="border rounded-md p-2 my-2 bg-[#FEE500] ">카카오로 로그인</button>
-                        <button className="border rounded-md p-2 my-2 bg-white">구글로 로그인</button>
+                        <button className="border rounded-md p-2 my-2 bg-[#03A94D] text-white">Naver로 시작하기</button>
+                        <button className="border rounded-md p-2 my-2 bg-[#FEE500] ">Kakao로 시작하기</button>
+                        <button className="border rounded-md p-2 my-2 bg-white">Google로 시작하기</button>
                     </div>
                     <div className="flex justify-center items-center mx-auto text-sm">
                         <Link to="#" className="px-2 hover:text-gray-600 hover:underline">코코넛톡 계정 찾기</Link>
@@ -37,7 +37,7 @@ const LoginPage: React.FC = () => {
                     </div>
                 </div>
                 <div className="w-full mt-4 px-3 pt-4 border-t border-gray-300">
-                    아직 회원이 아니신가요?
+                    계정이 없으신가요?
                     <Link to="/auth/signup" className="ml-1 font-bold text-[#6F4E37] hover:underline"> 회원가입</Link>
                 </div>
             </div>
