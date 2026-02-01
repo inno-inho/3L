@@ -3,7 +3,8 @@ import { useSignup } from "../../context/SignupContext";
 import logo from "../../assets/image/coconuttalk.png";
 
 const SignupEmail = () => {
-    const { setStep } = useSignup();
+    const { setStep, setEmail: setContextEmail } = useSignup(); // Context에서 setEmail 가져오기
+
 
     // 입력 상태 관리
     const [email, setEmail] = useState("");
@@ -37,14 +38,72 @@ const SignupEmail = () => {
     };
 
     // [Step 2] 인증번호 확인
+    // ‼️‼️백엔드 로직 완성 후 수정해야함(axios나 fectch사용)(현재는 FE단계별 확인을 위해 하드코딩해놓은 상태)
     const handleConfirmCode = () => {
         if (authCode === "123456") {
             alert("인증에 성공했습니다.");
+            setContextEmail(email); //사용자가 입력한 이메일을 Context에 전역 저장
             setStep("PROFILE");
         } else {
             alert("인증번호가 일치하지 않습니다.");
         }
     };
+
+//     // [Step 1] 인증요청 - BE 연결 버전
+// const handleRequestAuth = async () => { // 비동기 통신을 위해 async를 붙입니다.
+//     if (!isEmailValid) return;
+//     setIsLoading(true);
+
+//     try {
+//         /* [미래의 BE 로직] 
+//            1. fetch나 axios를 이용해 서버의 '인증번호 발송 API' 주소로 데이터 전송
+//            2. 서버는 이메일이 중복인지, 유효한지 검사 후 실제 메일을 발송
+//         */
+//         const response = await fetch("https://api.coconuttalk.com/auth/email-request", {
+//             method: "POST",
+//             headers: { "Content-Type": "application/json" },
+//             body: JSON.stringify({ email: email }), // 서버에 이메일 주소를 담아 전송
+//         });
+
+//         if (response.ok) {
+//             // 성공 시: 서버에서 메일 발송을 완료했다는 응답을 주면 다음 단계로 이동
+//             alert(`${email}로 인증번호가 발송되었습니다.`);
+//             setViewStep("VERIFY");
+//         } else {
+//             // 실패 시: 이미 가입된 이메일이거나 서버 에러인 경우
+//             const errorData = await response.json();
+//             alert(errorData.message || "메일 발송에 실패했습니다.");
+//         }
+//     } catch (error) {
+//         // 네트워크 연결 끊김 등 예상치 못한 에러 처리
+//         alert("서버와 통신 중 오류가 발생했습니다.");
+//     } finally {
+//         setIsLoading(false); // 성공하든 실패하든 로딩 상태는 해제
+//     }
+// };
+
+// // [Step 2] 인증번호 확인 - BE 연결 버전
+// const handleConfirmCode = async () => {
+//     try {
+//         /* [미래의 BE 로직] 
+//            서버에 "이 사용자가 입력한 이 번호(authCode)가 맞나요?"라고 물어봄
+//         */
+//         const response = await fetch("https://api.coconuttalk.com/auth/email-verify", {
+//             method: "POST",
+//             headers: { "Content-Type": "application/json" },
+//             body: JSON.stringify({ email: email, code: authCode }),
+//         });
+
+//         if (response.ok) {
+//             alert("인증에 성공했습니다.");
+//             setStep("PROFILE"); // 인증 성공 시 다음 페이지로 이동
+//         } else {
+//             alert("인증번호가 틀렸습니다. 다시 확인해 주세요.");
+//         }
+//     } catch (error) {
+//         alert("인증 확인 중 오류가 발생했습니다.");
+//     }
+// };
 
     return (
         <div className="min-h-screen flex flex-col justify-center items-center p-4 bg-white relative">

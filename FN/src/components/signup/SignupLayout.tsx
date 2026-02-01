@@ -10,7 +10,7 @@ import { useSignup } from "../../context/SignupContext";
 import SignupStart from "./SignupStart";
 import SignupTerms from "./SignupTerms";
 import SignupEmail from "./SignupEmail";
-// import SignupProfile from "./SignupProfile";
+import SignupProfile from "./SignupProfile";
 
 const SignupLayout = () => {
   const { step } = useSignup();
@@ -24,8 +24,8 @@ const SignupLayout = () => {
       return <SignupTerms />;
     case "EMAIL":
       return <SignupEmail />;
-    // case "PROFILE":
-    //   return <SignupProfile />;
+    case "PROFILE":
+      return <SignupProfile />;
     default:
         // if 정의되지 않은 값이 들어온다면 아무것도 보여주지 않는 안전장치
       return null;

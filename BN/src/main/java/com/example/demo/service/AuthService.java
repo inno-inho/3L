@@ -6,6 +6,9 @@ package com.example.demo.service;
     비즈니스 규칙을 적용하고
     Entity를 생성하여 Repository를 통해 DB에 저장**/
 
+import com.example.demo.config.auth.jwt.JwtTokenProvider;
+import com.example.demo.domain.dto.LoginRequest;
+import com.example.demo.domain.dto.LoginResponse;
 import com.example.demo.domain.dto.SignupRequest;
 import com.example.demo.domain.entity.Role;
 import com.example.demo.domain.entity.User;
@@ -69,6 +72,8 @@ public class AuthService {
     * 4. DB 저장
     * */
 
+    private final JwtTokenProvider jwtTokenProvider; //토큰 생성기 주입
+
     public void signup(SignupRequest request){//request : 이 메서드에 들어온 요청데이터
 
         //1.이메일 중복 검사
@@ -119,6 +124,9 @@ public class AuthService {
                 .phone(request.getPhone())
                 .role(Role.USER)        //기본 권한은 USER
                 .isVerified(true)       //이메일 인증 완료된 사용자만 가입
+                .birth(request.getBirth())
+                .gender(request.getGender())
+                .agreement(request.getAgreement())
                 .build();
 
 
@@ -129,5 +137,45 @@ public class AuthService {
         * - @Transactional에 의해 여기까지 성공해야 커밋됨
         * */
         userRepository.save(user);
+    }
+
+    //-------------------------------------------------------
+    /* 로그인 비즈니스 로직
+       @param request 로그인 요청 DTO (email, password)
+       @return 로그인 성공 응답 DTO (token, email, nickname)
+    */
+    public LoginResponse login(LoginRequest request) {
+
+        // 1. 이메일 존재 여부 확인
+        /* - 가입된 이메일이 있는지 UserRepository를 통해 확인
+           - 존재하지 않는다면 "가입되지 않은 이메일"이라는 예외를 던져서 중단시킴
+        */
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new IllegalArgumentException("가입되지 않은 이메일입니다."));
+
+        // 2. 비밀번호 일치 여부 검증
+        /* - 중요한 점: DB에는 암호화된 비번이 있고, 사용자는 생(raw) 비번을 보낸 상태
+           - passwordEncoder.matches(사용자가 입력한 비번, DB에 저장된 암호화 비번)
+           - 이 함수가 내부적으로 복잡한 알고리즘을 써서 두 비번이 같은지 비교해줌
+        */
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+        }
+
+        // 3. 통행증(JWT 토큰) 발급
+        /* - 위 검증이 다 끝났다면 이 사람은 '진짜'
+           - 이 사용자의 이메일을 담은 JWT 토큰(입장권)을 생성해서 보내줌
+        */
+        String token = jwtTokenProvider.createToken(user.getEmail());
+
+        // 4. 프론트엔드에 필요한 정보(LoginResponse) 조립해서 반환
+        /* - 여기서 토큰(token)은 다음 API 호출을 위한 '통행증'이고,
+           - 닉네임(nickname)은 프론트엔드 조원이 화면에 "코코넛님 환영합니다"를 띄우기 위해 쓰임
+        */
+        return LoginResponse.builder()
+                .token(token)
+                .email(user.getEmail())
+                .nickname(user.getNickname())
+                .build();
     }
 }

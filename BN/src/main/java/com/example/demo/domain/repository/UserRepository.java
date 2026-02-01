@@ -3,6 +3,8 @@ package com.example.demo.domain.repository;
 import com.example.demo.domain.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.Optional;
+
 /*
 * User Entity 전용 Repository
 *
@@ -22,4 +24,6 @@ public interface UserRepository extends JpaRepository<User,Long> { //<Entity타�
     * */
     boolean existsByEmail(String email);
             //이메일 중복 여부 확인메서드
+
+    Optional<User> findByEmail(String email);
 }

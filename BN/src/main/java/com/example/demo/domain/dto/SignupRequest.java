@@ -46,4 +46,12 @@ public class SignupRequest {
     @NotBlank
     private String phone;
 
+    // FE에서 보내는 추가 필드들 (필요시 @NotBlank 추가)
+
+    private String birth;    // "2010-01-01" 형식
+
+    private String gender;   // "male" 또는 "female"
+
+    private String agreement; // "yes" 또는 "no"
+
 }

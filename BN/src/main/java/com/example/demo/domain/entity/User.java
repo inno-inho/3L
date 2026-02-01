@@ -115,6 +115,11 @@ public class User {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
+    // FE관련 추가 정보 컬럼
+    private String birth;
+    private String gender;
+    private String agreement;
+
     /**
      * 회원가입 시 사용하는 생성자
      * → 기본값을 여기서 명확하게 설정
@@ -127,7 +132,10 @@ public class User {
             String username,
             String phone,
             Role role,
-            boolean isVerified
+            boolean isVerified,
+            String birth,
+            String gender,
+            String agreement
     ) {
         this.email = email;
         this.password = password;
@@ -136,6 +144,9 @@ public class User {
         this.phone = phone;
         this.role = role;
         this.isVerified = isVerified;
+        this.birth = birth;
+        this.gender = gender;
+        this.agreement = agreement;
         this.isOnline = false;
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();

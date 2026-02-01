@@ -1,5 +1,7 @@
 package com.example.demo.controller;
 /* controller = 통로*/
+import com.example.demo.domain.dto.LoginRequest;
+import com.example.demo.domain.dto.LoginResponse;
 import com.example.demo.domain.dto.SignupRequest;
 import com.example.demo.service.AuthService;
 import jakarta.validation.Valid;
@@ -35,19 +37,19 @@ public class AuthController {
 
     private final AuthService authService;
     /*
-    * - 실제 로직은 Service에 위임하고 Controller는 요청/응답만 처리(역할 분리)
-    * */
+     * - 실제 로직은 Service에 위임하고 Controller는 요청/응답만 처리(역할 분리)
+     * */
 
 
     /*
-    * 회원가입 API
-    * HTTP POST /auth/signup
-    * */
+     * 회원가입 API
+     * HTTP POST /auth/signup
+     * */
     @PostMapping("/signup")
     /*
-    * - HTTP POST 요청만 처리
-    * - 회원가입처럼 데이터를 생성하는 경우 POST 사용
-    * */
+     * - HTTP POST 요청만 처리
+     * - 회원가입처럼 데이터를 생성하는 경우 POST 사용
+     * */
     public ResponseEntity<Void> signup(
             @RequestBody @Valid SignupRequest request
             /*
@@ -62,10 +64,35 @@ public class AuthController {
              * - 검증 실패 시 Controller 메서드는 실행되지 않고
              *   MethodArgumentNotValidException 발생
              */
-    ){
+    ) {
 
         authService.signup(request); //실제 회원가입 로직은 Service에게 위임하겠다
 
         return ResponseEntity.ok().build(); //회원가입 처리는 끝났고 클라이언트에게 성공했다(200)라는 신호만 보내겠다!
+    }
+
+    /*
+     * 로그인 API
+     * HTTP POST /auth/login
+     * */
+    @PostMapping("/login")
+    /*
+     * - 사용자가 입력한 ID/PW를 JSON으로 받음
+     * - 결과로 토큰과 사용자 정보를 포함한 LoginResponse를 반환
+     * */
+    public ResponseEntity<LoginResponse> login(
+            @RequestBody LoginRequest request
+    ) {
+        // 1. 서비스에게 로그인 업무 위임
+        /* - AuthService의 login 메서드를 호출하여 검증 및 토큰 생성 진행
+           - 성공 시 결과 데이터(LoginResponse)를 받아옴
+           - => 서비스 로직 실행 후 결과값 반환
+        */
+        LoginResponse response = authService.login(request);
+
+        // 2. 성공 응답 반환
+        /* - HTTP 200 OK 상태 코드와 함께 생성된 토큰 정보를 JSON으로 클라이언트에게 전달
+         */
+        return ResponseEntity.ok(response);
     }
 }
