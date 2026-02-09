@@ -1,0 +1,66 @@
+모든 api 통로가 내 IP를 향하도록 하는 게 중요
+
+1. api.ts
+baseURL: '/api', 
+// 실제 요청 주소, Vite proxy 설정에 의해 http://localhost:8080/api/notices로 변환됨
+⇩ 
+baseURL: 'http://172.30.1.53:8080/api', 
+// 친구가 내 백엔드로 직접 찌르게 설정
+
+
+２．ChatWindow.tsx
+brokerURL: `${protocol}//${host}/ws`,
+// 자기 자신의 컴퓨터(http://localhost:8080/......)
+⇩
+brokerURL: "ws://172.30.1.53:8080/ws",
+ // 내 컴퓨터 웹소켓 서버 주소
+
+
+3. docker-compose.local.yml
+VITE_API_URL: http://localhost:8080 
+⇩
+VITE_API_URL: http://172.30.1.53:8080  # 내 IP로 수정
+
+
+4. 백엔드 CORS 설정_WebConfig
+- 허용할 주소에 내 IP 주소를 추가
+
+public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**")
+                .allowedOrigins("http://localhost:5173", "http://172.30.1.53:5173") 
+        ......
+}
+
+5. package.json
+"scripts" 안의 "dev": "vite --host 0.0.0.0", 로 설정
+vite --host 0.0.0.0는 내부(localhost)뿐만 아니라 외부에서 오는 요청도 다 받아줘라고 설정하는 것
+
+
+
+
+
+멀리 있는 친구와 테스트하려면 가장 추천하는 방법은 ngrok입니다.
+
+ngrok 사용 (가장 추천 / 5분 컷)
+내 로컬 서버를 임시로 외부 인터넷에 공개해주는 가장 유명한 도구입니다.
+
+ngrok 홈페이지에서 다운로드 후 설치합니다.
+
+터미널(또는 CMD) 두 개를 열고 각각 다음을 입력합니다:
+
+백엔드용: ngrok http 8080
+
+프론트엔드용: ngrok http 5173
+
+그러면 https://abcd-123-456.ngrok-free.app 같은 임시 주소가 두 개 생깁니다.
+
+이 주소들을 api.ts와 ChatWindow.tsx의 하드코딩된 IP 자리에 대신 넣으면 끝!
+
+
+**백엔드(8080)**를 ngrok으로 띄우면 나오는 https://... 주소를 복사합니다.
+
+api.ts의 baseURL을 그 주소로 바꿉니다.
+
+ChatWindow.tsx의 웹소켓 주소도 wss://... (ngrok은 https를 지원하므로 ws 대신 wss)로 바꿉니다.
+
+**프론트엔드(5173)**도 ngrok으로 띄운 뒤 그 주소를 친구에게 보냅니다.

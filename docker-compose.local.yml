@@ -53,7 +53,7 @@ services:
     # depends_on:     // 백엔드도 도커로 할거면 의존관계 풀어야함
     #   - backend
     environment:
-      VITE_API_URL: http://localhost:8080
+      VITE_API_URL: http://localhost:8080 
       CHOKIDAR_USEPOLLING: "true" # 파일 변경 감지 성능 향상 (Windows 환경 필수), Hot reload
     ports:
       - "${VITE_PORT:-5173}:5173"

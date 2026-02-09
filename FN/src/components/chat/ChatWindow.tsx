@@ -7,13 +7,12 @@ import type { User } from "../../context/AuthContext";
 import api from "../../api/api";
 
 import ChatSearchHeader from "./ChatSearchHeader";
-import AlertModal from "../common/AlertModal";
-
 import ChatInputSection from "./ChatInputSection";
-
 import ChatMessageList from "./ChatMessageList";
 
+
 import stat_minus from "@/assets/image/stat_minus.png";
+import { useModal } from "../../context/ModalContext";
 
 
 interface ChatWindowProps {
@@ -23,8 +22,8 @@ interface ChatWindowProps {
 
 const ChatWindow = ({ roomInfo, currentUser }: ChatWindowProps) => {
 
-    const [modalShow, setModalShow] = useState(false);
-    const [modalMessage, setModalMessage] = useState("");
+    // 모달 함수를 useModal(ModalContext)에서 들고온다
+    const { showAlert, showConfirm } = useModal();
 
     // 입력창의 텍스트를 관리하는 상태
     const [inputText, setInputText] = useState("");
@@ -53,6 +52,12 @@ const ChatWindow = ({ roomInfo, currentUser }: ChatWindowProps) => {
     const [isChatDropdownOpen, setChatIsDropdownOpen] = useState(false);
     const chatDropdownRef = useRef<HTMLDivElement>(null);
 
+    // 답장 데이터 타입 정의(메시지 ID와 내용 일부)
+    const [replyTarget, setReplyTarget] = useState<ChatMessageDto | null>(null);
+
+    // 사용자가 바닥인지 추적하는 Ref
+    const isAtBottomRef = useRef(true); // 기본값은 true(처음 접속 시 바닥)
+
     // 미리보기 파일들 상태 관리
     const [pendingFiles, setPendingFiles] = useState<{
         id: string,
@@ -60,6 +65,7 @@ const ChatWindow = ({ roomInfo, currentUser }: ChatWindowProps) => {
         type: "IMAGE" | "VIDEO" | "FILE",
         previewUrl: string
     }[]>([]);
+
 
     // 웹 소켓 클라이언트
     const client = useRef<Client | null>(null);
@@ -70,9 +76,9 @@ const ChatWindow = ({ roomInfo, currentUser }: ChatWindowProps) => {
         // localStorage에서 직접 토큰을 꺼내온다
         const token = localStorage.getItem("accessToken");
 
-        // 현재 브라우저가 접속한 프로토콜(http/https)에 맞춰 ws/wss 결정
+        // 현재 브라우저가 접속한 프로토콜에 맞춰 ws/wss 결정
         const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-        // 현재 브라우저 주소창의 호스트(localhost:5173_리액트 vite 주소)를 자동으로 가져옴
+        // // 현재 브라우저 주소창의 호스트(localhost:5173_리액트 vite 주소)를 자동으로 가져옴
         const host = window.location.host
 
         // 웹 소켓 클라이언트 설정
@@ -80,6 +86,7 @@ const ChatWindow = ({ roomInfo, currentUser }: ChatWindowProps) => {
 
             // /ws는 EndPoint, /websocket은 순수 소켓 연결을 위한 STOMP 표준 주소
             brokerURL: `${protocol}//${host}/ws`,
+
             connectHeaders: {
                 // Authorization: token ? `Bearer ${token}` : ""        // 유저 기능이랑 토큰관련 백엔드 로직 끝나면 추가해야함
             },
@@ -91,14 +98,21 @@ const ChatWindow = ({ roomInfo, currentUser }: ChatWindowProps) => {
                 // 해당 방을 구독(누가 메시지를 보내면 나한테 알려달라고 구독 신청), `/topic/chat/${roomInfo.roomId}는 ChatController에서 잡아논 주소
                 client.current?.subscribe(`/sub/chat/${roomInfo.roomId}`, (message) => {
                     console.log("메시지 원본: ", message.body);
-                    
+
                     const newMessages = JSON.parse(message.body);
 
                     console.log("수신 데이터: ", newMessages);
                     // 메시지 리스트를 업데이트하면 실시간으로 메시지가 화면에 뜸
                     setMessages((prev) => {
-                        // 이미 리스트에 있는 ID라면 추가하지 않음
-                        if(prev.some(m => m.messageId === newMessages.messageId)) return prev;
+                        // 이미 리스트에 해당 ID가 있는지 확인 (삭제 등으로 인한 업데이트 메시지인지 확인)
+                        const isExisting = prev.some(m => m.messageId === newMessages.messageId);
+
+                        if (isExisting) {
+                            // 이미 있다면 해당 Id의 메시지만 새 데이터(newMessage)로 교체
+                            return prev.map(m => m.messageId === newMessages.messageId ? newMessages : m);
+                        }
+
+                        // 완전히 새로운 메시지라면? 기존 배열 끝에 추가
                         return [...prev, newMessages];
                     });
                 });
@@ -121,14 +135,22 @@ const ChatWindow = ({ roomInfo, currentUser }: ChatWindowProps) => {
 
     // 새 메시지가 올 때마다 자동 스크롤
     useEffect(() => {
-        scrollToBottom();
+        // 사용자가 바닥에 있었을 때만 자동으로 스크롤 내림
+        if (isAtBottomRef.current) {
+            scrollToBottom();
+        }
     }, [messages]);
+
 
 
 
     // 스크롤 위치를 감지하여 버튼 표시 여부 결정
     const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
         const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
+
+        // 바닥 감지 로직: 하단에서 약 50px 이내에 있으면 바닥에 있다고 간주
+        const isBottom = scrollHeight - scrollTop - clientHeight < 50;
+        isAtBottomRef.current = isBottom;
 
         // 바닥에서 200px 이상 위로 올라가면 버튼 표시
         if (scrollHeight - scrollTop - clientHeight > 200) {
@@ -163,6 +185,9 @@ const ChatWindow = ({ roomInfo, currentUser }: ChatWindowProps) => {
                 // 프론트엔드 화면에 마자게 과거 -> 최신순으로 뒤집는다
                 const sortedMessages = [...response.data].reverse();
                 setMessages(sortedMessages);
+
+                // 데이터 로딩 직후에는 강제로 바닥으로 이동
+                setTimeout(() => scrollToBottom(), 100);
             } catch (error) {
                 console.error("채팅 내역 로딩 실패: ", error);
             }
@@ -173,6 +198,17 @@ const ChatWindow = ({ roomInfo, currentUser }: ChatWindowProps) => {
         }
 
     }, [roomInfo.roomId])
+
+    // 답장 취소 함수
+    const handleCancelReply = () => setReplyTarget(null);
+
+    const onReplyClick = (msg: ChatMessageDto) => {
+        setReplyTarget(msg);
+    };
+
+    const onCancelReply = () => {
+        setReplyTarget(null);
+    };
 
     // ##################################################
     // 전송 버튼 함수
@@ -189,6 +225,13 @@ const ChatWindow = ({ roomInfo, currentUser }: ChatWindowProps) => {
             formData.append("sender", currentUser?.email ?? "");
             formData.append("messageType", "TEXT");
 
+            // 답장 대상이 있다면 부모 메시지 ID 전달
+            if (replyTarget) {
+                formData.append("parentMessageId", replyTarget.messageId);
+                formData.append("parentMessageSenderName", replyTarget.senderName);
+                formData.append("parentMessageContent", replyTarget.message);
+            }
+
             pendingFiles.forEach((p) => {
                 formData.append("files", p.file);   // 서버의 RequsePart랑 이름 맞춰야함
             });
@@ -201,10 +244,14 @@ const ChatWindow = ({ roomInfo, currentUser }: ChatWindowProps) => {
             // 성공 시 입력창 비우기
             setInputText("");
             setPendingFiles([]);
+            setReplyTarget(null);
+
+            // 내가 메시지를 보냈을 시에는 사용자가 위를 보고 있더라도 강제로 바닥으로 이동
+            isAtBottomRef.current = true;
+            scrollToBottom();
         } catch (error) {
             console.error("전송 에러: ", error);
-            setModalMessage("메시지 전송에 실패했습니다.");
-            setModalShow(true);
+            showAlert("전송 실패", "메시지 전송에 실패했습니다.");
         }
     };
 
@@ -268,7 +315,7 @@ const ChatWindow = ({ roomInfo, currentUser }: ChatWindowProps) => {
         }
     };
 
-    // 검색 종료(취소) 함수
+    // 검색창 종료(취소) 함수
     const handleCloseSearch = () => {
         setIsSearchMode(false);
         setSearchQuery("");
@@ -276,9 +323,29 @@ const ChatWindow = ({ roomInfo, currentUser }: ChatWindowProps) => {
         setCurrentSearchIndex(-1);
     }
 
+    // input창에서 파일 보낼 때 미리보기단걔에서 취소하는 로직
     const handleCancelFile = (id: string) => {
         setPendingFiles(prev => prev.filter(f => f.id !== id));
     }
+
+    // 삭제 버튼 클릭 시 실행된 핸들러
+    const onDeleteClick = (messageId: string) => {
+        showConfirm("메시지 삭제", "정말 이 메시지를 삭제하시겠습니까?", () => {
+            executeDelete(messageId);
+        })
+    }
+
+    // 실제 삭제 API 호출 로직(ConfrimModal 안에서의 확인 버튼을 누를)
+    const executeDelete = async (messageId: string) => {
+        try {
+            await api.delete(`/chatrooms/messages/${messageId}?email=${currentUser?.email}`);
+        } catch (error) {
+            console.error("삭제 실패: ", error);
+            showAlert("삭제 실패", "메시지 삭제 중 오류가 발생했습니다.");
+        }
+    };
+
+
 
     return (
         <>
@@ -301,13 +368,15 @@ const ChatWindow = ({ roomInfo, currentUser }: ChatWindowProps) => {
                 />
 
                 {/* 메시지 리스트 영역 */}
-                <ChatMessageList 
+                <ChatMessageList
                     messages={messages}
                     currentUser={currentUser}
                     scrollRef={scrollRef}
                     messagesEndRef={messagesEndRef}
                     messageRefs={messageRefs}
                     handleScroll={handleScroll}
+                    onDeleteClick={onDeleteClick}
+                    onReplyClick={onReplyClick}
                 />
 
 
@@ -335,16 +404,10 @@ const ChatWindow = ({ roomInfo, currentUser }: ChatWindowProps) => {
                     onFileUpload={handleFileUpload}
                     pendingFiles={pendingFiles}
                     onCancelFile={handleCancelFile}
+                    replyTarget={replyTarget}
+                    onCancelReply={onCancelReply}
                 />
             </div>
-
-            {/* 모달 컴포넌트 */}
-            <AlertModal
-                show={modalShow}
-                onHide={() => setModalShow(false)}
-                title="알림"
-                message={modalMessage}
-            />
         </>
     );
 };

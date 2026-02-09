@@ -23,7 +23,7 @@ import java.util.Date;
 public class JwtTokenProvider {
 
     // 1. [비밀번호] 우리 서버만의 비밀 열쇠 (이게 털리면 해커가 토큰을 마음대로 찍어냄)
-    private String secretKey = "coconuttalk_secret_key_example_random_string_for_security";
+    private String secretKey = "";
     private Key key; // 실제로 암호화에 사용할 Key 객체
 
     // 2. [유효기간] 이 토큰이 언제까지 쓸 수 있는지 정함 (현재 1시간)

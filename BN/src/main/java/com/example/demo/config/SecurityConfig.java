@@ -42,7 +42,7 @@ public class SecurityConfig {
                 .formLogin(f -> f.disable())   // 기본 로그인 폼 비활성화
                 .httpBasic(h -> h.disable())   // HTTP Basic 인증 비활성화
 
-                // 1. 세션 정책 설정: 세션을 만들지도 사용하지도 않음 (JWT 방식의 핵심)
+                // 1. 세션 정책 설정: 세션을 만들지도 사용하지도 않음 (JWT 방식의 핵심, JWT 사용 시 필수)
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
@@ -51,6 +51,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/**").permitAll() // 로그인, 회원가입은 인증 없이 접근 가능
                         .anyRequest().authenticated()           // 그 외 모든 요청은 토큰이 있어야 함
+                        // .anyRequest().permitAll()
                 )
 
                 // 3. 필터 추가: ID/PW 검사 필터(UsernamePasswordAuthenticationFilter) 전에
