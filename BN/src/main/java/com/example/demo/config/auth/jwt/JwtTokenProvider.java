@@ -4,10 +4,12 @@ import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
+import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.ArrayList;
 import java.util.Base64;
@@ -23,7 +25,10 @@ import java.util.Date;
 public class JwtTokenProvider {
 
     // 1. [비밀번호] 우리 서버만의 비밀 열쇠 (이게 털리면 해커가 토큰을 마음대로 찍어냄)
-    private String secretKey = "";
+    // [수정] properties에서 키를 읽어옴
+    @Value("${jwt.secret}")
+    private String secretKey;
+    
     private Key key; // 실제로 암호화에 사용할 Key 객체
 
     // 2. [유효기간] 이 토큰이 언제까지 쓸 수 있는지 정함 (현재 1시간)
@@ -35,10 +40,11 @@ public class JwtTokenProvider {
      */
     @PostConstruct
     protected void init() {
-        // 내 비밀번호를 Base64라는 방식으로 한 번 더 안전하게 감싸서 저장
-        secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
-        // 암호화 알고리즘(HMAC-SHA)에 사용할 수 있는 Key 객체로 변환
-        key = Keys.hmacShaKeyFor(secretKey.getBytes());
+        // [수정] 작성한 문자열을 UTF-8 바이트로 변환하여 HMAC-SHA 키로 생성
+        // 이 과정에서 키 길이가 짧으면 에러가 나지만 현재 키는 충분히 길어서 안전함
+        byte[] keyBytes = secretKey.getBytes(StandardCharsets.UTF_8);
+        this.key = Keys.hmacShaKeyFor(keyBytes);
+
     }
 
     /**
