@@ -85,7 +85,8 @@ const ChatWindow = ({ roomInfo, currentUser }: ChatWindowProps) => {
         client.current = new Client({
 
             // /ws는 EndPoint, /websocket은 순수 소켓 연결을 위한 STOMP 표준 주소
-            brokerURL: `${protocol}//${host}/ws`,
+            // `${protocol}//${host}/ws`
+            brokerURL: `ws://172.30.1.53:8080/ws`, // inho ip
             connectHeaders: {
                 // Authorization: token ? `Bearer ${token}` : ""        // 유저 기능이랑 토큰관련 백엔드 로직 끝나면 추가해야함
             },
