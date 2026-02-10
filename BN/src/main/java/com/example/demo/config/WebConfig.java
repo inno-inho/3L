@@ -12,7 +12,7 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry corsRegistry){
         corsRegistry.addMapping("/**")      // 모든 경로에 대해
-                .allowedOrigins("http://localhost:5173")   // 프론트엔드 주소 허용
+                .allowedOrigins("http://localhost:5173", "http://172.30.1.53:5173")   // 프론트엔드 주소 허용
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowedHeaders("*")
                 .allowCredentials(true);

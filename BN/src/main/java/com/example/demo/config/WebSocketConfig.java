@@ -18,7 +18,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        // 클라이언트가 소켓에 연결할 지점 (SockJS 사용)
+        // 클라이언트가 소켓에 연결할 지점
         registry.addEndpoint("/ws")
                 .setAllowedOriginPatterns("*");  // CORS 허용
     }
@@ -34,6 +34,6 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     // 인터셉터 등록
     @Override
     public void configureClientInboundChannel(ChannelRegistration channelRegistration) {
-        channelRegistration.interceptors(stompHandler);
+//        channelRegistration.interceptors(stompHandler);
     }
 }
