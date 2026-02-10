@@ -110,7 +110,7 @@ const SignupEmail = () => {
             {/* 상단 로고 */}
             <div className="flex items-center justify-center gap-1 mb-3">
                 <img src={logo} alt="logo" className="w-10 h-10 object-contain" />
-                <h1 className="text-[42px] font-[1000] text-[#6F4E37] tracking-[-0.06em] leading-none">
+                <h1 className="text-[42px] font-normal font-nerko text-[#6F4E37] tracking-[-0.06em] leading-none">
                     CoconutTalk
                 </h1>
             </div>

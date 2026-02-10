@@ -123,7 +123,7 @@ const SignupProfile = () => {
             {/* 1. 상단 로고 & 타이틀 (사진 비율에 맞게 조절) */}
             <div className="flex items-center justify-center gap-2 mb-3">
                 <img src={logo} alt="logo" className="w-12 h-12 object-contain" />
-                <h1 className="text-[48px] font-[1000] text-[#6F4E37] tracking-tight">
+                <h1 className="text-[48px] font-normal font-nerko text-[#6F4E37] tracking-tight">
                     CoconutTalk
                 </h1>
             </div>

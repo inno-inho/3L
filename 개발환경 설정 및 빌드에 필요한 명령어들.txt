@@ -50,7 +50,6 @@ docker-compose -f docker-compose.local.yml --env-file .env.local up -d --build
 - 로컬에서 백엔드 실행하고 있을 시 도커 다운 명령어
 docker-compose -f docker-compose.local.yml --env-file .env.local down
 
-
 ########################################## 
 react-swc관련 코드 오류 있으면 기존 플러그인 삭제 후 재 설치해야함
 ##########################################
@@ -59,8 +58,6 @@ react-swc관련 코드 오류 있으면 기존 플러그인 삭제 후 재 설�
 npm uninstall @vitejs/plugin-react
 # 설치
 npm install @vitejs/plugin-react-swc
-
-
 
 
 - 원격이랑 로컬 어느 게 최신인지 비교하는 명령어
