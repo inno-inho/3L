@@ -100,7 +100,7 @@ public class User {
      * 사용자 권한
      */
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = false, length=20)
     private Role role;
 
     /**
