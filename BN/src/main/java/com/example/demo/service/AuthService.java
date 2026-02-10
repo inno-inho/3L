@@ -166,7 +166,9 @@ public class AuthService {
         /* - 위 검증이 다 끝났다면 이 사람은 '진짜'
            - 이 사용자의 이메일을 담은 JWT 토큰(입장권)을 생성해서 보내줌
         */
-        String token = jwtTokenProvider.createToken(user.getEmail());
+        String token = jwtTokenProvider.createToken(user.getEmail(), user.getRole().name());
+        /* user.getRole().name() 추가
+        *  -> 로그인 메서드에서 createToken 호출 시 사용자 Role을 인자로 넘겨주어야 함 */
 
         // 4. 프론트엔드에 필요한 정보(LoginResponse) 조립해서 반환
         /* - 여기서 토큰(token)은 다음 API 호출을 위한 '통행증'이고,

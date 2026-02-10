@@ -5,6 +5,7 @@ import com.example.demo.config.auth.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -38,6 +39,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
+                .cors(Customizer.withDefaults()) // WebConfig에서 설정한 CORS를 Security에 적용
                 .csrf(csrf -> csrf.disable()) // REST API이므로 CSRF 비활성화
                 .formLogin(f -> f.disable())   // 기본 로그인 폼 비활성화
                 .httpBasic(h -> h.disable())   // HTTP Basic 인증 비활성화
@@ -49,8 +51,22 @@ public class SecurityConfig {
 
                 // 2. 접근 권한 설정
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**").permitAll() // 로그인, 회원가입은 인증 없이 접근 가능
-                        .anyRequest().authenticated()           // 그 외 모든 요청은 토큰이 있어야 함
+                                .requestMatchers("/auth/**").permitAll()
+
+                                // [공지사항] 권한 설정
+                                // 조회(Read)는 인증된 모든 사용자 가능
+                                .requestMatchers(HttpMethod.GET, "/api/notices/**").authenticated()
+                                // 등록/수정/삭제(CUD)는 관리자(ADMIN)만 가능
+                                .requestMatchers(HttpMethod.POST, "/api/notices/**").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.PUT, "/api/notices/**").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.DELETE, "/api/notices/**").hasRole("ADMIN")
+
+                                // [채팅방] 권한 설정
+                                // 조회 및 CRUD 전체를 인증된 모든 사용자에게 허용
+                                .requestMatchers("/api/chatrooms/**").authenticated()
+
+                                // 나머지 모든 요청은 인증 필요
+                                .anyRequest().authenticated()
                         // .anyRequest().permitAll()
                 )
 

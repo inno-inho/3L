@@ -1,5 +1,6 @@
 package com.example.demo.domain.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -7,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
 public class LoginRequest {
     private String email;    // 사용자가 입력한 이메일
     private String password; // 사용자가 입력한 비밀번호

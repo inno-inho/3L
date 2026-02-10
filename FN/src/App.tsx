@@ -43,6 +43,10 @@ const App: React.FC = () => {
                   </SignupProvider>
                 }
               />
+
+              {/* Login */}
+              <Route path="/auth/login" element={<LoginPage />} />
+              
               <Route element={<MainLayout />} >
                 {/* CHAT */}
                 <Route path='/chatPage' element={<ChatPage />} />
