@@ -36,7 +36,11 @@ api.interceptors.request.use(
         }
 
         // 여기서 보통 Authorization 헤더 추가, accessToken 붙이기 같은 작업 
-
+        const token = localStorage.getItem('accessToken');
+        if (token) {
+            config.headers.Authorization = `Bearer ${token}`;
+        }
+        
         return config;
     },
     (error: Axios) => {

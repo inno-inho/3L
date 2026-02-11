@@ -7,13 +7,13 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.Date;
+import java.util.*;
 
 /**
  * [ JwtTokenProvider의 역할 ]
@@ -52,9 +52,10 @@ public class JwtTokenProvider {
      * @param email 유저를 식별할 수 있는 값 (이메일)
      * @return 암호화된 JWT 토큰 문자열
      */
-    public String createToken(String email) {
+    public String createToken(String email, String role) {
         // Claims: 토큰의 '내용물' (누구꺼냐, 언제 만들었냐 등)
         Claims claims = Jwts.claims().setSubject(email); // 유저 식별값(Subject)으로 이메일 저장
+        claims.put("auth","ROLE_" + role); // // 'ADMIN' -> 'ROLE_ADMIN' 자동 변환 저장
         Date now = new Date();
         Date validity = new Date(now.getTime() + tokenValidityInMilliseconds); // 지금부터 1시간 뒤가 만료일
 
@@ -70,15 +71,23 @@ public class JwtTokenProvider {
      * 4. [인증 도장 찍기] 토큰이 유효하면 '로그인 성공 상태'로 만들어주는 객체 생성
      */
     public Authentication getAuthentication(String token) {
-        // 토큰을 열어서 그 안에 들어있는 유저 이메일을 꺼냄
-        String email = Jwts.parserBuilder()
-                .setSigningKey(key).build() // 내 비밀도장(key)을 대조해보고
-                .parseClaimsJws(token)      // 토큰 껍데기를 까서
-                .getBody().getSubject();    // 안에 적힌 이메일 추출
+        // 1. 토큰을 열어서 내부 데이터(Claims)를 통째로 가져옴
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
 
-        // 스프링 시큐리티에게 "이 유저 인증됐어!"라고 알려주는 전용 객체 반환
-        // (두 번째 인자는 비밀번호인데, 이미 토큰으로 인증됐으니 빈칸으로 둠)
-        return new UsernamePasswordAuthenticationToken(email, "", new ArrayList<>());
+        // 2. 토큰 내용물에서 이메일(Subject)과 권한(auth) 정보를 추출
+        String email = claims.getSubject();
+        String role = claims.get("auth", String.class); // 우리가 담았던 "ROLE_ADMIN" 등을 꺼냄
+
+        // 3. 추출한 권한 문자열을 시큐리티가 이해할 수 있는 객체(GrantedAuthority)로 변환
+        Collection<? extends GrantedAuthority> authorities =
+                Collections.singletonList(new SimpleGrantedAuthority(role));
+
+        // 4. 이메일과 함께 '실제 권한 리스트'를 담아서 인증 객체 반환
+        return new UsernamePasswordAuthenticationToken(email, "", authorities);
     }
 
     /**
