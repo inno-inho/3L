@@ -35,32 +35,18 @@ public void addCorsMappings(CorsRegistry registry) {
 "scripts" 안의 "dev": "vite --host 0.0.0.0", 로 설정
 vite --host 0.0.0.0는 내부(localhost)뿐만 아니라 외부에서 오는 요청도 다 받아줘라고 설정하는 것
 
+##################################################
+같은 와이파이 아닐 시 ngrok 사용
+##################################################
 
-
-
-
-멀리 있는 친구와 테스트하려면 가장 추천하는 방법은 ngrok입니다.
-
-ngrok 사용 (가장 추천 / 5분 컷)
-내 로컬 서버를 임시로 외부 인터넷에 공개해주는 가장 유명한 도구입니다.
-
-ngrok 홈페이지에서 다운로드 후 설치합니다.
-
-터미널(또는 CMD) 두 개를 열고 각각 다음을 입력합니다:
-
-백엔드용: ngrok http 8080
-
-프론트엔드용: ngrok http 5173
-
-그러면 https://abcd-123-456.ngrok-free.app 같은 임시 주소가 두 개 생깁니다.
-
-이 주소들을 api.ts와 ChatWindow.tsx의 하드코딩된 IP 자리에 대신 넣으면 끝!
-
-
-**백엔드(8080)**를 ngrok으로 띄우면 나오는 https://... 주소를 복사합니다.
-
-api.ts의 baseURL을 그 주소로 바꿉니다.
-
-ChatWindow.tsx의 웹소켓 주소도 wss://... (ngrok은 https를 지원하므로 ws 대신 wss)로 바꿉니다.
-
-**프론트엔드(5173)**도 ngrok으로 띄운 뒤 그 주소를 친구에게 보냅니다.
+1. https://dashboard.ngrok.com/ 로 접속
+2. Getting Started" > "Your Authtoken 클릭
+3. ngrok이 설치된 곳에서 터미널열고 'ngrok config add-authtoken 내_토큰_값'
+4. 백엔드 통로 열기 -> ngrok http 8080
+5. Forwarding 옆에 주소 복사 ex: 'https://mastoparietal-trina-nourishable.ngrok-free.dev'
+6. api.ts나 ２．ChatWindow에서 아까 복사한 백엔드용 ngrok 주소 넣으면 됌
+7. docker-cocmpose 파일 수정 
+-  친구 브라우저가 참조할 API 주소를 내 ngrok 주소로 바꾸기
+   VITE_API_URL: https://mastoparietal-trina-nourishable.ngrok-free.dev
+7. 백엔드에서 CORS 허용하기
+>>>>>>> feature/chat

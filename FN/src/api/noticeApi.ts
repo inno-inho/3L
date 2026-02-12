@@ -1,5 +1,5 @@
 import api from "./api";
-import type { NoticeDetail, NoticeCreateRequest, NoticePageResponse } from "@/types/notice";
+import type { NoticeDetailDto, NoticeCreateRequest, NoticePageResponse } from "@/types/notice";
 
 
 // 공지 목록 조회 
@@ -27,7 +27,7 @@ export const getNotices = async (page: number, keyword?: string) => {     // pag
 }
 
 // 단건 공지 조회
-export const getNotice = async (id:number): Promise<NoticeDetail> => {
+export const getNotice = async (id:number): Promise<NoticeDetailDto> => {
     const response = await api.get(`/notices/${id}`);
     return response.data;
 };
