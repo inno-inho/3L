@@ -7,6 +7,7 @@ import com.example.demo.domain.dto.chatDto.ChatRoomDto;
 import com.example.demo.domain.entity.chatEntities.ChatRoomEntity;
 import com.example.demo.domain.entity.chatEntities.ChatRoomMemberEntity;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,6 +15,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
+
+// 채팅방 생성, 내가 참여중인 채팅방 목록 불러오기, 나가기 등등
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ChatRoomService {
@@ -66,29 +70,26 @@ public class ChatRoomService {
         List<ChatRoomMemberEntity> chatRoomMemberEntities = chatRoomMemberRepository.findByUserEmailAndActiveTrue(userEmail);
 
         return chatRoomMemberEntities.stream()
-                .map(member -> {
-                    // 방 정보 가져오기
-                    ChatRoomEntity chatRoomEntity = chatRoomRepository.findById(member.getRoomId())
-                            .orElseThrow(() -> new RuntimeException("방을 찾을 수 없습니다."));
+                // 방 정보 가져오기
+                .map(member -> chatRoomRepository.findById(member.getRoomId())
+                        .orElseThrow(() -> new RuntimeException("방을 찾을 수 없습니다.")))
 
-
-                    // 현재 방의 총 인원 수 계산
-                    int userCount = chatRoomMemberRepository.countByRoomIdAndActiveTrue(chatRoomEntity.getRoomId());
-
-                    System.out.println("조회된 방 개수: " + chatRoomMemberEntities.size());
-
-                    // DTO로 변환
-                    return chatCommonService.convertToRoomDto(chatRoomEntity, userEmail, userCount);
+                // 3. LocalDateTime(Entity) 기준으로 정렬
+                .sorted((e1, e2) -> {
+                    if (e1.getLastMessageTime() == null) return 1;
+                    if (e2.getLastMessageTime() == null) return -1;
+                    return e2.getLastMessageTime().compareTo(e1.getLastMessageTime());
                 })
-                // 반환된 Dto 리스트를 lastMessageTime 기준으로 내림차순 정렬
-                .sorted((r1, r2) -> {   // 리스트를 스트림으로 바꾼 다음 sorted로 r1, r2를 비기ㅛ
-                    if (r1.getLastMessageTime() == null) return 1;      // null 은 항상 최하단, 마지막 메시지가 없는 채팅방은 뒤로 보냄
-                    if (r2.getLastMessageTime() == null) return -1;     //
-                    // 마지막 메시지 시간이 최신인 것이 위로 오도록 역순 설정
-                    return r2.getLastMessageTime().compareTo(r1.getLastMessageTime());  // a.compareTo(b) -> a가 나중 -> 양수
-                })                                                                      //                -> a가 이전 -> 음수
+
+                // 정렬된 순서대로 인원수 계산 및 DTO 변환
+                .map(entity -> {
+                    // 채팅방의 인원수 계산 로직
+                    int userCount = chatRoomMemberRepository.countByRoomIdAndActiveTrue(entity.getRoomId());
+
+                    log.info("방 이름: {}, 마지막 시간: {}", entity.getRoomName(), entity.getLastMessageTime());
+
+                    return chatCommonService.convertToRoomDto(entity, userEmail, userCount);
+                })
                 .toList();
-
     }
-
 }
