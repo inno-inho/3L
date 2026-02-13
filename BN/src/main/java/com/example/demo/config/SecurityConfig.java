@@ -53,7 +53,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                                 .requestMatchers("/api/auth/user").authenticated()
                                 .requestMatchers("/api/auth/login", "/api/auth/signup").permitAll()
-                                .requestMatchers("/api/auth/**").permitAll() // 혹시 모를 다른 auth 경로 허용
+//                                .requestMatchers("/api/auth/**").permitAll() // 혹시 모를 다른 auth 경로 허용
                                 .requestMatchers("/ws/**").permitAll()
                                 .requestMatchers("/uploads/**").permitAll()
 

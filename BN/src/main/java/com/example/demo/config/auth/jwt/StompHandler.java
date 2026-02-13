@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.Message;   // WebSocket으로 오가는 메시지
 import org.springframework.messaging.MessageChannel;    // 메시지가 지나가는 통로
+import org.springframework.messaging.MessageDeliveryException;
 import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;    // STOMP 헤더 쉽게 다루는 도구
 import org.springframework.messaging.support.ChannelInterceptor;    // 메시지 가로채는 인터셉텉
@@ -45,8 +46,7 @@ public class StompHandler implements ChannelInterceptor {       // ChannelInterc
                     log.info("[StompHandler] 인증 성공, 접속자의 이름은?: {}", authentication.getName());
                 } else {
                     log.warn("[StompHandler] 유효하지 않은 토큰입니다.");
-                    // 필요하면 여기서 예외를 던져서 연결을 끊는 것도 가능
-
+                    throw new MessageDeliveryException("인증되지 않은 사용자의 접근입니다.");
                 }
             } catch (Exception e) {
                 log.warn("[StompHandler] 토큰 검증 오류: {}", e.getMessage());
