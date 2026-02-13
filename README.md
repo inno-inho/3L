@@ -131,7 +131,7 @@ POST   api/auth/email/verify             //  이메일 인증 완료
 
 ### 5.2 회원 / 프로필
 ```
-GET    api/user                         // 회원정보 조회
+GET    api/auth/user                         // 회원정보 조회
 GET    api/user/{email}
 PUT    api/user/{email}
 DELETE api/user/{email}
