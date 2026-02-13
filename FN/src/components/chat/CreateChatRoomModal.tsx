@@ -89,7 +89,7 @@ const CreateChatRoomModal = ({ show, onHide, onCreate }: CreateChatModalProps) =
                         <input 
                             type='text'
                             className={`w-full bg-gray-50 border border-gray-100 rounded-xl px-4 py-3 outline-none transition-all ${isGroup ? 'focus:ring-2 focus:ring-[#B5A492]' : 'cursor-not-allowed'}`}
-                            placeholder={isGroup ? "그룹 이름을 입력하세요" : "상대방 이름으로 자동 설정됩니다."}
+                            placeholder={isGroup ? "그룹 이름을 입력하세요" : "참여 멤버가 2명 이하일 시 상대방 이름으로 자동 설정됩니다."}
                             value={isGroup ? roomName : ""}
                             onChange={(e) => setRoomName(e.target.value)}
                             disabled={!isGroup}
