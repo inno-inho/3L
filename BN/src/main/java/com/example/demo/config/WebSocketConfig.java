@@ -34,6 +34,6 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     // 인터셉터 등록
     @Override
     public void configureClientInboundChannel(ChannelRegistration channelRegistration) {
-//        channelRegistration.interceptors(stompHandler);
+        channelRegistration.interceptors(stompHandler);
     }
 }

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useSignup } from "../../context/SignupContext";
 import { useNavigate } from "react-router-dom"; // 1. useNavigate 임포트
 import logo from "../../assets/image/coconuttalk.png";
+import api from "@/api/api";
 
 const SignupProfile = () => {
     const { email } = useSignup(); // Context에서 이전 단계 이메일 가져오기
@@ -91,33 +92,28 @@ const SignupProfile = () => {
         }
 
         try {
-            const response = await fetch("http://localhost:8080/auth/signup", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    email: formData.email,
-                    password: formData.password,
-                    nickname: formData.nickname,
-                    username: formData.username,
-                    phone: formData.phone,
-                    birth: `${formData.birthYear}-${formData.birthMonth}-${formData.birthDay}`,
-                    gender: formData.gender,
-                    agreement: formData.agreement
-                }),
+            const response = await api.post("/auth/signup", {
+                email: formData.email,
+                password: formData.password,
+                nickname: formData.nickname,
+                username: formData.username,
+                phone: formData.phone,
+                birth: `${formData.birthYear}-${formData.birthMonth}-${formData.birthDay}`,
+                gender: formData.gender,
+                agreement: formData.agreement
             });
 
-            if (response.ok) {
-                alert("회원가입이 완료되었습니다!");
-                navigate("/");
-            } else {
-                const errorMsg = await response.text();
-                alert(errorMsg || "회원가입에 실패했습니다.");
-            }
-        } catch (err) {
+            // 성공 처리
+            alert("회원가입이 완료되었습니다.");
+            navigate("/");
+        } catch (err : any) {
             console.error("Signup Error:", err);
-            alert("서버와 통신 중 오류가 발생했습니다.");
+
+            const serverMessage = err.response?.data?.message || err.response?.data;
+            alert(serverMessage || "회원가입에 실패했습니다.");
         }
     };
+    
     return (
         <div className="min-h-screen flex flex-col justify-center items-center p-4 bg-[#FFF9F3]">
             {/* 1. 상단 로고 & 타이틀 (사진 비율에 맞게 조절) */}

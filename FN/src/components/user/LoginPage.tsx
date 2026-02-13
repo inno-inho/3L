@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '@/api/api';
+import { useAuth } from '@/context/AuthContext';
 import logo from '@/assets/image/coconuttalk.png';
 
 const LoginPage: React.FC = () => {
@@ -9,13 +10,15 @@ const LoginPage: React.FC = () => {
     const [password, setPassword] = useState('');
     const navigate = useNavigate();
 
+    const { login } = useAuth();    // context에서 login 함수 가져오기
+
     // 2. 로그인 버튼 클릭 시 실행될 함수
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault(); // 페이지 새로고침 방지
 
         try {
             // 3. 백엔드 로그인 API 호출
-            const response = await axios.post('http://localhost:8080/auth/login', {
+            const response = await api.post('/auth/login', {
                 email: email,
                 password: password
             });
@@ -27,7 +30,10 @@ const LoginPage: React.FC = () => {
             localStorage.setItem('accessToken', token);
             localStorage.setItem('nickname', nickname);
 
+            await login();
+
             alert(`${nickname}님, 환영합니다!`);
+            
             navigate('/chatPage'); 
 
         } catch (error: any) {

@@ -14,7 +14,7 @@ interface CustomInternalAxiosRequestConfig extends InternalAxiosRequestConfig{
 }
 
 const api: AxiosInstance = axios.create({
-    baseURL: '/api', // 실제 요청 주소, Vite proxy 설정에 의해 http://localhost:8080/api/notices로 변환됨
+    baseURL: '/api', // 실제 요청 주소, Vite proxy 설정에 맞춰서 변환됌
     withCredentials: true, // 쿠키를 요청에 포함
     timeout: 10000, // 10초 이상 응답 없으면 에러
 
@@ -30,21 +30,19 @@ const REFRESH_URL = '/reissue';
 // -----------------------------------
 api.interceptors.request.use(
     (config: InternalAxiosRequestConfig) => {
-        const publicPaths = ['/login', '/join']; // 인증이 필요 없는 경로
-        if (publicPaths.some(path => config.url?.includes(path))){ // 요청 URL이 로그인/회원가입이면 그대로 통과
-            return config;
+        // 토큰이 필요한 요청인지 체크 (로그인, 회원가입이 아닐때만 토큰 첨부)
+        const isAuthRequest = config.url?.includes('/auth/login') || config.url?.includes('/auth/signup');
+
+        if (!isAuthRequest) {
+            const token = localStorage.getItem('accessToken');
+            if (token) {
+                config.headers.Authorization = `Bearer ${token}`;
+            }
         }
 
-        // 여기서 보통 Authorization 헤더 추가, accessToken 붙이기 같은 작업 
-        const token = localStorage.getItem('accessToken');
-        if (token) {
-            config.headers.Authorization = `Bearer ${token}`;
-        }
-        
         return config;
     },
-    (error: Axios) => {
-        console.error("[오류-요청 인터셉터]", error);
+    (error) => {
         return Promise.reject(error);
     }
 );

@@ -11,30 +11,6 @@ import api from '../../api/api';
 import type { ChatRoomDto } from '../../types/chat';
 import { useModal } from '../../context/ModalContext';
 
-// 채팅방 가짜 데이터
-// const dummyRooms: ChatRoomDto[] = [
-//     {
-//         roomId: '1',
-//         roomName: '코코넛톡 테스트방1코코넛코코넛코코넛',
-//         chatRoomType: 'GROUP',
-//         lastMessage: '자 이제 시작이야!',
-//         lastMessageTime: '오후 4:32',
-//         unreadCount: 3,
-//         userCount: 4,
-//         roomImageUrls: ['https://via.placeholder.com/20', 'https://via.placeholder.com/20']
-//     },
-//     {
-//         roomId: '2',
-//         roomName: '테스트톡 코코넛방2',
-//         chatRoomType: 'FRIEND',
-//         lastMessage: '내 꿈을 위한 여행',
-//         lastMessageTime: '오전 4:32',
-//         unreadCount: 10,
-//         userCount: 2,
-//         roomImageUrls: ['https://via.placeholder.com/20']
-//     }
-// ];
-
 const ChatPage = () => {
     const { user } = useAuth();     // 로그인한 유저 정보 가져오기
     // 공용 모달 상태 관리

@@ -10,6 +10,7 @@ import com.example.demo.config.auth.jwt.JwtTokenProvider;
 import com.example.demo.domain.dto.LoginRequest;
 import com.example.demo.domain.dto.LoginResponse;
 import com.example.demo.domain.dto.SignupRequest;
+import com.example.demo.domain.dto.UserResponseDto;
 import com.example.demo.domain.entity.Role;
 import com.example.demo.domain.entity.User;
 import com.example.demo.domain.repository.UserRepository;
@@ -178,6 +179,31 @@ public class AuthService {
                 .token(token)
                 .email(user.getEmail())
                 .nickname(user.getNickname())
+                .build();
+    }
+
+
+    // #######################################
+    // 유저 정보 불러오기
+    // #######################################
+    @Transactional // 읽기 전용으로 성능 최적화
+    public UserResponseDto getUserInfo(String email){
+
+        // DB에서 해당 이메일을 가진 유저 조회
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다"));
+
+        // 찾아온 User 엔티티를 UserResponseDto로 변환
+        return UserResponseDto.builder()
+                .email(user.getEmail())
+                .nickname(user.getNickname())
+                .username(user.getUsername())
+                .phone(user.getPhone())
+                .profileImageUrl(user.getProfileImageUrl())
+                .statusMessage(user.getStatusMessage())
+                .role(user.getRole().name())
+                .gender(user.getGender())
+                .birth(user.getBirth())
                 .build();
     }
 }
