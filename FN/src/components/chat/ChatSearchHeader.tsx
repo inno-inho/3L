@@ -24,6 +24,9 @@ const ChatSearchHeader = ({
     currentSearchIndex, handleSearch, moveSearchIndex, handleCloseSearch,
     isChatDropdownOpen, setChatIsDropdownOpen, chatDropdownRef
 }: Props) => {
+
+    console.log("현재 방 정보(roomInfo): ", roomInfo);
+
     return (
         <div className="h-16 border-b border-gray-100 flex items-center justify-between px-6 bg-white">
             {!isSearchMode ? (
@@ -50,9 +53,15 @@ const ChatSearchHeader = ({
                                 {roomInfo.roomName}
                             </span>
                             {roomInfo.userCount > 2 && (
-                                <span className="text-xs text-gray-400 pl-3">
+                                <span className="text-xs text-gray-900 p-3">
                                     {roomInfo.userCount}명
                                 </span>
+                            )}
+                            {roomInfo.userCount > 2 && roomInfo.memberNames && (
+                                <div className="text-[11px] text-gray-400 mt-0.5 truncate max-w-[250px]">
+                                    {roomInfo.memberNames.slice(0, 5).join(", ")}
+                                    {roomInfo.memberNames.length > 5 && "..."}
+                                </div>
                             )}
                             <button
                                 className="h-8 w-8 pl-3"

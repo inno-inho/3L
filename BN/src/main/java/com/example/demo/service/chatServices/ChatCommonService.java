@@ -119,6 +119,12 @@ public class ChatCommonService {
             }
         }
 
+        // 해당 방에 참여 중인 모든 멤버의 닉네임 리스트 가져오기
+        List<String> memberNames = chatRoomMemberRepository.findByRoomIdAndActiveTrue(chatRoomEntity.getRoomId())
+                .stream()
+                .map(m -> resolveSenderName(m.getUserEmail()))
+                .toList();
+
         return ChatRoomDto.builder()
                 .roomId(chatRoomEntity.getRoomId())
                 .roomName(displayRoomName)
@@ -127,6 +133,7 @@ public class ChatCommonService {
                 .lastMessageTime(formatTime(chatRoomEntity.getLastMessageTime()))
                 .userCount(userCount)
                 .roomImageUrls(displayUrlImages) // 필요시 멤버 프로필 사진 로직 추가
+                .memberNames(memberNames)
                 .build();
     }
 

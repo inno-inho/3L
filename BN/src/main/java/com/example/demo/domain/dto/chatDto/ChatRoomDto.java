@@ -37,4 +37,6 @@ public class ChatRoomDto {
     @Schema(description = "채팅방 대표 이미지 URL", example = "[\"url1\", \"url2\"]")
     private List<String> roomImageUrls;
 
+    @Schema(description = "채팅방에 참여중인 멤버들 닉네임", example = "이노, 헤렌, 사랑해, 마니마니, 평생......")
+    private List<String> memberNames;
 }
