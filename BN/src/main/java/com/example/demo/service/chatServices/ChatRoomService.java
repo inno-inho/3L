@@ -37,6 +37,13 @@ public class ChatRoomService {
 
         LocalDateTime now = LocalDateTime.now();
 
+        // 그룹 채팅이 아닐 경우(2명 이하), 전달받은 roomName이 이메일이라면
+        // DB에는 Null로 저장하여 동적 생성을 유도
+        String finalRoomName = roomName;
+        if (memberEmails.size() <= 2 && (roomName == null || roomName.contains("@") || roomName.equals("1:1 채팅"))) {
+            finalRoomName = null;
+        }
+
         ChatRoomEntity chatRoomEntity = ChatRoomEntity.builder()
                 .roomId(roomId)
                 .roomName(roomName)
@@ -51,9 +58,6 @@ public class ChatRoomService {
         for (String email : memberEmails) {
             chatRoomMemberService.inviteUser(roomId, email);
         }
-
-        // 입장 일림 메시지 생성
-
 
         // 인원 수 계산 후 번환 메서드
         int userCount = memberEmails.size();
