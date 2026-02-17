@@ -13,6 +13,7 @@ import LoginPage from './components/user/LoginPage';
 import MainLayout from './components/common/MainLayout';
 import ChatPage from './components/chat/ChatPage';
 import { ModalProvider } from './context/ModalContext';
+import FriendsPage from './components/friends/FriendsPage';
 
 import SettingsLayout from './components/settings/SettingsLayout';
 import Profile from './components/settings/Profile';
@@ -50,6 +51,8 @@ const App: React.FC = () => {
               <Route element={<MainLayout />} >
                 {/* CHAT */}
                 <Route path='/chatPage' element={<ChatPage />} />
+                {/* FRIENDS */}
+                <Route path='/friends' element={<FriendsPage />} />
                 {/* NOTICE */}
                 <Route path="/notices" element={<NoticeList />} />
                 <Route path="/notices/write" element={<NoticeForm />} />

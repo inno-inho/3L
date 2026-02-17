@@ -26,10 +26,10 @@ const SignupStart = () => {
   return (
     <div className="min-h-screen flex flex-col justify-center items-center p-4">
       {/* 1. 메인 카드 박스*/}
-      <div className="w-[500px] min-h-[600px] bg-[#FDF8F3] border-[3px] border-[#743F24] pt-16 pb-0 px-0 flex flex-col items-center justify-between shadow-sm rounded-md">
+      <div className="w-[500px] min-h-[300px] bg-[#FDF8F3] border-[3px] border-[#743F24] pt-16 pb-0 px-0 flex flex-col items-center justify-between shadow-sm rounded-md">
         <div className="flex flex-col items-center w-full">
           {/* 2. 로고 영역:*/}
-          <div className="w-[435px] flex items-center justify-center gap-1 mb-5 mt-5">
+          <div className="w-[435px] flex items-center justify-center gap-1 mb-5">
             <img src={logo} alt="logo" className="w-12 h-12 object-contain" />
             <h1 className="font-normal text-7xl text-[#6F4E37] tracking-[-0.06em] leading-none drop-shadow-[0.5px_0.5px_0px_#6F4E37] font-nerko">
               CoconutTalk
@@ -38,21 +38,21 @@ const SignupStart = () => {
 
           {/* 3. 이메일 회원가입 버튼*/}
           <button
-            className="w-[380px] h-[60px] flex items-center justify-center bg-white tracking-widest rounded shadow-md mb-8 hover:bg-[#743F24] transition-colors"
+            className="w-[380px] h-[60px] flex items-center justify-center font-bold font-sans text-lg bg-white tracking-widest rounded shadow-md mb-8 cursor-pointer hover:!bg-[#743F24] hover:text-white transition-all"
             onClick={() => setStep("TERMS")}
           >
             이메일로 회원가입
           </button>
 
           {/* 구분선 */}
-          <div className="w-[380px] flex items-center gap-4 mb-8">
+          {/* <div className="w-[380px] flex items-center gap-4 mb-8">
             <div className="flex-1 h-[1px] bg-gray-300"></div>
             <span className="text-gray-400 font-bold text-sm">또는</span>
             <div className="flex-1 h-[1px] bg-gray-300"></div>
-          </div>
+          </div> */}
 
           {/* 5. 소셜 로그인 버튼 리스트 (넓이 362px 고정 및 중앙 정렬) */}
-          <div className="w-full flex flex-col items-center gap-3">
+          {/* <div className="w-full flex flex-col items-center gap-3">
             <button
               onClick={() => handleSocialLogin('kakao')}
               className="w-[300px] h-[45px] bg-[#FEE500] text-[#3c1e1e] font-bold rounded-lg flex items-center justify-center gap-3 shadow-sm hover:opacity-90"
@@ -74,10 +74,8 @@ const SignupStart = () => {
               <img src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png" className="w-5 h-5" alt="google" />
               Google로 시작하기
             </button>
-          </div>
+          </div> */}
         </div>
-
-
 
         {/* 하단 안내 텍스트: justify-between 덕분에 박스의 pb-10 지점까지 바짝 내려갑니다 */}
         <p className="text-[10px] text-gray-400 text-center leading-tight pb-4">

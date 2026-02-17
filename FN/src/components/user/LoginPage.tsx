@@ -45,18 +45,18 @@ const LoginPage: React.FC = () => {
     return (
         <div className="min-h-screen flex flex-col justify-center items-center p-6 bg-[#fff9ed] relative">
             <div className="w-[500px] bg-white border-2 border-[#6F4E37] rounded-md p-4 my-4" >
-                <div className="flex items-center justify-center gap-1 mb-4">
+                <div className="flex items-center justify-center gap-1 mb-8">
                     <img src={logo} alt="logo" className="w-12 h-12 object-contain" />
                     <h1 className="text-7xl font-nerko text-[#6F4E37] tracking-tight leading-none">
                         CoconutTalk
                     </h1>
                 </div>
                 <div className="mb-4">
-                    <form className="flex flex-col mx-3 my-1" onSubmit={handleLogin}>
+                    <form className="flex flex-col items-center my-1" onSubmit={handleLogin}>
                         <input 
                             type="text" 
                             placeholder='코코넛톡 계정(이메일)' 
-                            className="border rounded-sm p-2 my-2"
+                            className="border rounded-sm p-2 my-2 w-80"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             required
@@ -64,12 +64,12 @@ const LoginPage: React.FC = () => {
                         <input 
                             type="password"
                             placeholder='비밀번호' 
-                            className="border rounded-sm p-2 my-2" 
+                            className="border rounded-sm p-2 my-2 w-80" 
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             required
                         />
-                        <button type="submit" className="border rounded-md p-2 my-2 hover:bg-[#6F4E37] hover:text-white">
+                        <button type="submit" className="border rounded-md p-2 my-2 w-80 hover:bg-[#6F4E37] hover:text-white">
                             로그인
                         </button>
                     </form>

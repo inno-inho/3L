@@ -116,7 +116,7 @@ const SignupEmail = () => {
             </div>
 
             {/* 메인 박스 (relative 추가로 모달 위치 기준 잡음) */}
-            <div className="w-[500px] min-h-[380px] bg-white border-[2px] border-[#743F24] pt-16 pb-12 px-10 flex flex-col shadow-sm relative overflow-hidden">
+            <div className="w-[500px] min-h-[380px] bg-white border-[2px] border-[#743F24] pt-16 pb-12 px-10 flex flex-col shadow-sm relative overflow-hidden rounded-md">
 
                 {viewStep === "EMAIL" && (
                     <div className="flex flex-col animate-fade-in w-full">

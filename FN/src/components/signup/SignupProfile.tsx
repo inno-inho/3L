@@ -125,22 +125,22 @@ const SignupProfile = () => {
             </div>
 
             {/* 2. 브라운 설명 박스 (너비를 입력 폼보다 넓게 설정) */}
-            <div className="w-[650px] bg-[#743F24] text-white p-3 text-[11px] leading-relaxed mb-7 shadow-md">
-                회원가입 관련 정보 입력 시, 필수항목은 반드시 작성하셔야 회원가입이 가능합니다.
-                SMS, 이메일 및 코코넛톡 수신 동의 여부 '아니오' 선택 시, 관련 알림들 서비스 운영 및
-                이용과 관련된 각종 알림 수신이 제한될 수 있습니다.
+            <div className="w-[650px] bg-[#6F4E37] rounded-md text-white p-3 text-[12px] leading-relaxed mb-7 shadow-md">
+                회원가입 관련 정보 입력 시, 필수항목은 반드시 작성하셔야 회원가입이 가능합니다. <br/>
+                SMS, 이메일 및 코코넛톡 수신 동의 여부 '아니오' 선택 시, <br/> 
+                관련 알림들 서비스 운영 및 이용과 관련된 각종 알림 수신이 제한될 수 있습니다.
             </div>
-            <div className="w-[650px] bg-white border-2 border-[#743F24] p-10 px-12">
+            <div className="w-[650px] bg-white border-2 border-[#6F4E37] p-10 px-12 rounded-md">
                 <form id="signup-form" onSubmit={handleSignup} className="space-y-7">
                     {/* 이메일 (아이디) - 읽기 전용 또는 자동입력 */}
                     <div className="flex flex-col">
                         <div className="flex items-center">
-                            <label className="w-32 h-12 flex items-center justify-center bg-[#743F24] text-white text-sm font-bold shrink-0">아이디</label>
+                            <label className="w-32 h-12 flex items-center justify-center bg-[#6F4E37]/30 text-[#6F4E37] text-sm font-bold shrink-0 rounded-l-md">아이디</label>
                             <input
                                 name="email"
                                 value={formData.email}
                                 readOnly
-                                className="flex-1 h-12 border border-[#E5E7EB] border-l-0 px-4 bg-gray-50 outline-none text-gray-400"
+                                className="flex-1 h-12 border border-[#E5E7EB] border-l-0 px-4 bg-gray-50 outline-none text-gray-400 rounded-r-md"
                             />
                         </div>
                     </div>
@@ -148,13 +148,13 @@ const SignupProfile = () => {
                     {/* 닉네임 구역 */}
                     <div className="flex flex-col">
                         <div className="flex items-center">
-                            <label className="w-32 h-12 flex items-center justify-center bg-[#743F24] text-white text-sm font-bold shrink-0">닉네임</label>
+                            <label className="w-32 h-12 flex items-center justify-center bg-[#6F4E37]/30 text-[#6F4E37] text-sm font-bold shrink-0 rounded-l-md">닉네임</label>
                             <input
                                 name="nickname"
                                 value={formData.nickname}
                                 onChange={handleChange}
                                 placeholder="닉네임을 입력해주세요"
-                                className="flex-1 h-12 border border-[#E5E7EB] border-l-0 px-4 outline-[#743F24] placeholder-gray-300"
+                                className="flex-1 h-12 border border-[#E5E7EB] border-l-0 px-4 outline-[#6F4E37] placeholder-gray-300 rounded-r-md"
                                 required
                             />
                         </div>
@@ -163,13 +163,13 @@ const SignupProfile = () => {
                     {/* 비밀번호 구역 (안내 문구 추가) */}
                     <div className="flex flex-col">
                         <div className="flex items-center">
-                            <label className="w-32 h-12 flex items-center justify-center bg-[#743F24] text-white text-sm font-bold shrink-0">비밀번호</label>
+                            <label className="w-32 h-12 flex items-center justify-center bg-[#6F4E37]/30 text-[#6F4E37] text-sm font-bold shrink-0 rounded-l-md">비밀번호</label>
                             <input
                                 type="password"
                                 name="password"
                                 onChange={handleChange}
                                 placeholder="비밀번호"
-                                className="flex-1 h-12 border border-[#E5E7EB] border-l-0 px-4 outline-[#743F24] placeholder-gray-300"
+                                className="flex-1 h-12 border border-[#E5E7EB] border-l-0 px-4 outline-[#6F4E37] placeholder-gray-300 rounded-r-md"
                                 required
                             />
                         </div>
@@ -184,13 +184,13 @@ const SignupProfile = () => {
                     {/* 비밀번호 확인 구역 (실시간 메시지 추가) */}
                     <div className="flex flex-col">
                         <div className="flex items-center">
-                            <label className="w-32 h-12 flex items-center justify-center bg-[#743F24] text-white text-sm font-bold shrink-0">비밀번호 확인</label>
+                            <label className="w-32 h-12 flex items-center justify-center bg-[#6F4E37]/30 text-[#6F4E37] text-sm font-bold shrink-0 rounded-l-md">비밀번호 확인</label>
                             <input
                                 type="password"
                                 name="passwordConfirm"
                                 onChange={handleChange}
                                 placeholder="비밀번호 확인"
-                                className="flex-1 h-12 border border-[#E5E7EB] border-l-0 px-4 outline-[#743F24] placeholder-gray-300"
+                                className="flex-1 h-12 border border-[#E5E7EB] border-l-0 px-4 outline-[#6F4E37] placeholder-gray-300 rounded-r-md"
                                 required
                             />
                         </div>
@@ -207,11 +207,11 @@ const SignupProfile = () => {
                     {/* 이름 (username) */}
                     <div className="flex flex-col">
                         <div className="flex items-center">
-                            <label className="w-32 h-12 flex items-center justify-center bg-[#743F24] text-white text-sm font-bold shrink-0">이름</label>
+                            <label className="w-32 h-12 flex items-center justify-center bg-[#6F4E37]/30 text-[#6F4E37] text-sm font-bold shrink-0 rounded-l-md">이름</label>
                             <input
                                 name="username"
                                 onChange={handleChange}
-                                className="flex-1 h-12 border border-[#E5E7EB] border-l-0 px-4 outline-[#743F24]"
+                                className="flex-1 h-12 border border-[#E5E7EB] border-l-0 px-4 outline-[#6F4E37] rounded-r-md"
                                 required
                             />
                         </div>
@@ -219,8 +219,8 @@ const SignupProfile = () => {
 
                     {/* 생년월일 */}
                     <div className="flex items-center h-12">
-                        <label className="w-32 h-full flex items-center justify-center bg-[#743F24] text-white text-sm font-bold shrink-0">생년월일</label>
-                        <div className="flex-1 h-full flex gap-2 px-4 border border-[#E5E7EB] border-l-0 items-center">
+                        <label className="w-32 h-full flex items-center justify-center bg-[#6F4E37]/30 text-[#6F4E37] text-sm font-bold shrink-0 rounded-l-md">생년월일</label>
+                        <div className="flex-1 h-full flex gap-2 px-4 border border-[#E5E7EB] border-l-0 items-center rounded-r-md">
                             <select name="birthYear" onChange={handleChange} className="flex-1 outline-none text-sm bg-transparent">
                                 {Array.from({ length: 2010 - 1950 + 1 }, (_, i) => 2010 - i).map(y => (
                                     <option key={y} value={y}>{y}년</option>))}
@@ -236,13 +236,13 @@ const SignupProfile = () => {
 
                     {/* 성별 */}
                     <div className="flex items-center h-12">
-                        <label className="w-32 h-full flex items-center justify-center bg-[#743F24] text-white text-sm font-bold shrink-0">성별</label>
+                        <label className="w-32 h-full flex items-center justify-center bg-[#6F4E37]/30 text-[#6F4E37]e text-sm font-bold shrink-0 rounded-l-md">성별</label>
                         <div className="flex-1 h-full flex gap-10 px-6 border border-[#E5E7EB] border-l-0 items-center">
                             <label className="flex items-center gap-2 text-sm cursor-pointer">
-                                <input type="radio" name="gender" value="male" onChange={handleChange} className="accent-[#743F24]" /> 남자
+                                <input type="radio" name="gender" value="male" onChange={handleChange} className="accent-[#6F4E37]" /> 남자
                             </label>
                             <label className="flex items-center gap-2 text-sm cursor-pointer">
-                                <input type="radio" name="gender" value="female" onChange={handleChange} className="accent-[#743F24]" /> 여자
+                                <input type="radio" name="gender" value="female" onChange={handleChange} className="accent-[#6F4E37]" /> 여자
                             </label>
                         </div>
                     </div>
@@ -251,12 +251,12 @@ const SignupProfile = () => {
                     {/* 연락처 */}
                     <div className="flex flex-col">
                         <div className="flex items-center">
-                            <label className="w-32 h-12 flex items-center justify-center bg-[#743F24] text-white text-sm font-bold shrink-0">연락처</label>
+                            <label className="w-32 h-12 flex items-center justify-center bg-[#6F4E37]/30 text-[#6F4E37] text-sm font-bold shrink-0 rounded-l-md">연락처</label>
                             <input
                                 name="phone"
                                 placeholder="-없이 숫자만 입력"
                                 onChange={handleChange}
-                                className="flex-1 h-12 border border-[#E5E7EB] border-l-0 px-4 outline-[#743F24] placeholder-gray-300"
+                                className="flex-1 h-12 border border-[#E5E7EB] border-l-0 px-4 outline-[#6F4E37] placeholder-gray-300 rounded-r-md"
                                 required
                             />
                         </div>
@@ -264,10 +264,10 @@ const SignupProfile = () => {
 
                     {/* 수신여부(선택) */}
                     <div className="flex items-center h-12">
-                        <label className="w-32 h-full flex items-center justify-center bg-[#743F24] text-white text-[14px] font-bold shrink-0">
+                        <label className="w-32 h-full flex items-center justify-center bg-[#6F4E37]/30 text-[#6F4E37] text-[14px] font-bold shrink-0 rounded-l-md">
                             수신여부(선택)
                         </label>
-                        <div className="flex-1 h-full flex gap-10 px-6 border border-[#E5E7EB] border-l-0 items-center">
+                        <div className="flex-1 h-full flex gap-10 px-6 border border-[#E5E7EB] border-l-0 items-center rounded-r-md">
                             <label className="flex items-center gap-2 text-sm cursor-pointer">
                                 <input
                                     type="checkbox"
@@ -275,7 +275,7 @@ const SignupProfile = () => {
                                     value="yes"
                                     checked={formData.agreement === "yes"}
                                     onChange={handleChange}
-                                    className="w-4 h-4 accent-[#743F24]"
+                                    className="w-4 h-4 accent-[#6F4E37]"
                                 /> 예
                             </label>
                             <label className="flex items-center gap-2 text-sm cursor-pointer">
@@ -285,7 +285,7 @@ const SignupProfile = () => {
                                     value="no"
                                     checked={formData.agreement === "no"}
                                     onChange={handleChange}
-                                    className="w-4 h-4 accent-[#743F24]"
+                                    className="w-4 h-4 accent-[#6F4E37]"
                                 /> 아니오
                             </label>
                         </div>
@@ -298,7 +298,7 @@ const SignupProfile = () => {
                 <button
                     type="submit"
                     form="signup-form"
-                    className="w-[250px] bg-[#743F24] text-white font-bold py-4 mt-6 hover:bg-[#5a311b] transition-colors"
+                    className="w-[250px] rounded-md bg-[#6F4E37] text-white font-bold py-3 mt-6 hover:bg-[#5a311b] transition-colors"
                 >
                     가입하기
                 </button>

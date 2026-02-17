@@ -82,7 +82,7 @@ const ChatPage = () => {
 
     return (
         <>
-            <div className='flex h-[calc(100vh-100px)] w-full overflow-hidden p-4 gap-4'>
+            <div className='flex h-[calc(100vh-100px)] w-full overflow-hidden gap-4'>
                 <ChatRoomList
                     rooms={rooms}
                     selectedId={selectedRoomId}

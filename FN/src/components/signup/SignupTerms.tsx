@@ -49,7 +49,7 @@ const SignupTerms = () => {
     const isRequiredChecked = agreements.age && agreements.terms && agreements.privacy;
 
     return (
-        <div className="min-h-screen flex flex-col justify-center items-center p-4 bg-white">
+        <div className="min-h-screen flex flex-col justify-center items-center p-4 bg-white ">
             {/* 1. 상단 로고 (시안과 동일하게 배치) */}
             <div className="flex items-center justify-center gap-1 mb-3">
                 <img src={logo} alt="logo" className="w-10 h-10 object-contain" />
@@ -59,7 +59,7 @@ const SignupTerms = () => {
             </div>
 
             {/* 2. 메인 약관 박스 */}
-            <div className="w-[500px] min-h-[580px] bg-white border-[2px] border-[#743F24] p-12 flex flex-col shadow-sm">
+            <div className="w-[500px] min-h-[580px] bg-white border-[2px] border-[#743F24] p-12 flex flex-col shadow-sm rounded-md">
                 <h2 className="text-[26px] font-bold text-gray-800 mb-12 leading-tight">
                     코코넛톡 계정<br />서비스 약관에 동의해 주세요
                 </h2>
