@@ -88,7 +88,7 @@ const ChatWindow = ({ roomInfo, currentUser }: ChatWindowProps) => {
             brokerURL: `${protocol}//${host}/ws`,
 
             connectHeaders: {
-                // Authorization: token ? `Bearer ${token}` : ""        // 유저 기능이랑 토큰관련 백엔드 로직 끝나면 추가해야함
+                Authorization: token ? `Bearer ${token}` : ""        // 유저 기능이랑 토큰관련 백엔드 로직 끝나면 추가해야함
             },
 
             // 연결 성공 시 로직

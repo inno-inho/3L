@@ -3,14 +3,14 @@ package com.example.demo.controller;
 import com.example.demo.domain.dto.LoginRequest;
 import com.example.demo.domain.dto.LoginResponse;
 import com.example.demo.domain.dto.SignupRequest;
+import com.example.demo.domain.dto.UserResponseDto;
 import com.example.demo.service.AuthService;
+import com.nimbusds.openid.connect.sdk.UserInfoResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.*;
 
 /*
 * 인증 관련 API 엔드포인트
@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Controller + @ResponseBody가 합쳐진 상태
 메서드의 반환값을 View가 아닌 "JSON / HTTP 응답 바디"로 바로 반환
 * */
-@RequestMapping("/auth")
+@RequestMapping("/api/auth")
 /*
 * - 이 Controller의 모든 API는 "/auth"로 시작
 * - 아래 @PostMapping("/signup")과 합쳐져서 최종경로는 "/auth/signup"이 됨
@@ -95,4 +95,21 @@ public class AuthController {
          */
         return ResponseEntity.ok(response);
     }
+
+    // ############################################
+    // 회원 정보 가져오기
+    // ############################################
+    @GetMapping("/user")
+    public ResponseEntity<UserResponseDto> getCurrentUser(Authentication authentication) {
+        // 토큰 인증 정보에서 이메일 추출
+        String email = authentication.getName();
+
+        // 서비스 호출해서 데이터 가져오기
+        UserResponseDto userResponseDto = authService.getUserInfo(email);
+
+        // 응답 반환
+        return ResponseEntity.ok(userResponseDto);
+    }
+
+
 }

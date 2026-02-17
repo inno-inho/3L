@@ -30,21 +30,24 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
         // 1. 사용자가 보낸 요청 헤더에서 JWT 토큰을 꺼내옴 (예: Authorization: Bearer xxxxx)
         // resolveToken 메서드는 우리가 JwtTokenProvider에 만들어둔 '토큰 추출기'
         String token = jwtTokenProvider.resolveToken((HttpServletRequest) request);
-        System.out.println("추출된 토큰: " + token);
+//        System.out.println("추출된 토큰: " + token);
+        // 토큰이 있을때만 로직 실행
         // 2. 토큰이 비어있지 않고, 유효한 토큰인지 검사 (만료되지 않았는지, 위조되지 않았는지)
-        if (token != null && jwtTokenProvider.validateToken(token)) {
+        if (token != null) {
+            if (jwtTokenProvider.validateToken(token)) {
 
-            // 3. 토큰이 완벽하다면, 토큰 안에 적힌 사용자 정보(이메일 등)를 꺼내서 '인증 객체'생성
-            // 이 'Authentication' 객체는 "이 사람은 인증된 사람이다"라는 증명서와 동일(일시적임, 요청마다 새롭게 생성됨)
-            Authentication authentication = jwtTokenProvider.getAuthentication(token);
+                // 3. 토큰이 완벽하다면, 토큰 안에 적힌 사용자 정보(이메일 등)를 꺼내서 '인증 객체'생성
+                // 이 'Authentication' 객체는 "이 사람은 인증된 사람이다"라는 증명서와 동일(일시적임, 요청마다 새롭게 생성됨)
+                Authentication authentication = jwtTokenProvider.getAuthentication(token);
 
-            // 4. [매우 중요] 스프링 시큐리티의 '보관함(SecurityContextHolder)'에 이 증명서를 넣어둠
-            // 이렇게 보관함에 넣어두면, 이 요청(ex>글쓰기)이 끝날 때까지 서버는 "이 사용자는 인증됨" 상태로 인식
-                                    //프로필 편집과 같은 새로운 요청이 생길 때마다 SecurityContext가 새로 생김
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-            System.out.println("인증성공 : " + authentication.getName());
-        } else{
-            System.out.println("인증 실패 또는 토큰 없음");
+                // 4. [매우 중요] 스프링 시큐리티의 '보관함(SecurityContextHolder)'에 이 증명서를 넣어둠
+                // 이렇게 보관함에 넣어두면, 이 요청(ex>글쓰기)이 끝날 때까지 서버는 "이 사용자는 인증됨" 상태로 인식
+                //프로필 편집과 같은 새로운 요청이 생길 때마다 SecurityContext가 새로 생김
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+                System.out.println("인증성공 : " + authentication.getName());
+            } else{
+                System.out.println("인증 실패 또는 토큰 없음");
+            }
         }
 
         // 5. 다음 단계로 (다른 필터가 있으면 다음 필터로, 없으면 실제 컨트롤러로)

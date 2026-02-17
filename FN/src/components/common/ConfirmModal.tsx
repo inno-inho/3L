@@ -1,6 +1,6 @@
 import React from 'react';
 import { Modal, Button } from 'react-bootstrap';
-import coconuttalk from "@/assets/image/coconuttalk.png";
+import coconuttalk from "@/assets/image/coconuttalk.png"
 
 interface ConfirmModalProps {
     show: boolean;
