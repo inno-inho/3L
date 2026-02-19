@@ -156,7 +156,7 @@ GET    api/chatrooms
 GET    api/chatrooms?email={user.email}  // 채팅방 목록 불러오기
 GET    api/chatrooms/{roomId}
 POST   api/chatrooms/{roomId}/join
-POST   api/chatrooms/{roomId}/leave
+Delete api/chatrooms/{roomId}/members/{userEmail}
 PUT    api/chatrooms/{roomId}/name
 POST   api/chatrooms/{roomId}/invite
 POST   api/chatrooms/{roomId}/kick
