@@ -159,7 +159,6 @@ POST   api/chatrooms/{roomId}/join
 Delete api/chatrooms/{roomId}/members/{userEmail}
 PUT    api/chatrooms/{roomId}/name
 POST   api/chatrooms/{roomId}/invite
-POST   api/chatrooms/{roomId}/kick
 PUT    api/chatrooms/{roomId}/owner
 ```
 
