@@ -79,3 +79,37 @@ Ml
 ├─data
 └─models
 ```
+
+### Modal 쓰는 법
+
+ShowAlert(단순히 확인버튼만 있는 거)
+ConfirmAlert(확인 취소 버튼이 있어서 사용자에게 선택하게 하는 거)
+
+1. 불러오기
+- `import { useModal } from "../../context/ModalContext";`
+
+2. 모달들 상태 설정하기
+- 'const { showAlert, showConfirm } = useModal();'
+
+3. ShowModal 쓰기
+- ```
+  // 실제 삭제 API 호출 로직(ConfrimModal 안에서의 확인 버튼을 누를)
+    const executeDelete = async (messageId: string) => {
+        try {
+            await api.delete(`/chatrooms/messages/${messageId}?email=${currentUser?.email}`);
+        } catch (error) {
+            console.error("삭제 실패: ", error);
+            showAlert("삭제 실패", "메시지 삭제 중 오류가 발생했습니다.");
+        }
+    };
+  ```
+
+4. ConfirmAlert 쓰기
+- ```
+  const onDeleteClick = (messageId: string) => {
+        showConfirm("메시지 삭제", "정말 이 메시지를 삭제하시겠습니까?", () => {
+            executeDelete(messageId);
+        })
+    }
+  ```
+**잘 모르겠으면 ChatWindow에 2개 다 써져 있으니까 그거 봐주세요**
