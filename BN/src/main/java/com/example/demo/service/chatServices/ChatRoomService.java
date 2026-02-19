@@ -96,4 +96,52 @@ public class ChatRoomService {
                 })
                 .toList();
     }
+
+    // ########################################
+    // 방 이름 수정
+    // ########################################
+    @Transactional
+    public void updateRoomName (String roomId, String newName) {
+        ChatRoomEntity chatRoomEntity = chatRoomRepository.findById(roomId)
+                .orElseThrow(() -> new RuntimeException("방을 찾을 수 없습니다."));
+
+        chatRoomEntity.setRoomName(newName);
+        log.info("[ChatRoomService] 방 이름 변경: {} -> {}", roomId, newName);
+    }
+
+    // ########################################
+    // 멤버 강퇴(혹은 스스로 나가기)
+    // ########################################
+    @Transactional
+    public void kickMember(String roomId, String userEmail) {
+        // 해당 멤버 찾기
+        ChatRoomMemberEntity chatRoomMemberEntity = chatRoomMemberRepository.findByRoomIdAndUserEmail(roomId, userEmail)
+                .orElseThrow(() -> new RuntimeException("참여 정보를 찾을 수 없습니다."));
+
+        // 삭제
+        chatRoomMemberRepository.delete(chatRoomMemberEntity);
+
+        // 방에 알림 메시지 남기기
+        ChatRoomEntity chatRoomEntity = chatRoomRepository.findById(roomId).get();
+        chatRoomEntity.setLastMessage(userEmail + "님이 퇴장하셨습니다.");
+        chatRoomEntity.setLastMessageTime(LocalDateTime.now());
+
+        log.info("[ChatRoomService] 멤버 퇴장/강퇴 완료: 방 ID = {}, 이메일 = {}", roomId, userEmail);
+    }
+
+    // ########################################
+    // 멤버 초대
+    // ########################################
+    @Transactional
+    public void inviteMembers (String roomId, List<String> memberEmails) {
+        for (String email : memberEmails) {
+            // 이미 방에 있는지 확인 후 초대하는 로직 (ChatRoomMemberService에 구현)
+            chatRoomMemberService.inviteUser(roomId, email);
+        }
+
+        // 초대한 인원수만큼 알림 메시지 업데이트 가능
+        ChatRoomEntity chatRoomEntity = chatRoomRepository.findById(roomId).get();
+        chatRoomEntity.setLastMessage(memberEmails.size() + "명의 멤버가 초대되었습니다.");
+        chatRoomEntity.setLastMessageTime(LocalDateTime.now());
+    }
 }

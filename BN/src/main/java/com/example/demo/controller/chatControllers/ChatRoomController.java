@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/chatrooms")
@@ -42,6 +43,44 @@ public class ChatRoomController {
     @GetMapping
     public ResponseEntity<List<ChatRoomDto>> getMyRooms(@RequestParam String email) {
         return ResponseEntity.ok(chatRoomService.findAllRooms(email));
+    }
+
+    // ########################################
+    // 방 이름 수정
+    // ########################################
+    @PatchMapping("/{roomId}/name")
+    public ResponseEntity<Void> updateRoomName (
+            @PathVariable String roomId,
+            @RequestBody Map<String, String> request) {
+        String newName = request.get("roomName");
+        chatRoomService.updateRoomName(roomId, newName);
+
+        return ResponseEntity.ok().build();
+    }
+
+    // ########################################
+    // 멤버 강퇴(또는 스스로 나가기)
+    // ########################################
+    @DeleteMapping("/{roomId}/members/{userEmail}")
+    public ResponseEntity<Void> kickMember (
+            @PathVariable String roomId,
+            @PathVariable String userEmail) {
+        chatRoomService.kickMember(roomId, userEmail);
+
+        return ResponseEntity.ok().build();
+    }
+
+
+    // ########################################
+    // 멤버 초대
+    // ########################################
+    @PostMapping("/{roomId}/invite-update")
+    public ResponseEntity<Void> inviteMembers (
+            @PathVariable String roomId,
+            @RequestBody List<String> memberEmails) {
+        chatRoomService.inviteMembers(roomId, memberEmails);
+
+        return ResponseEntity.ok().build();
     }
 
 }

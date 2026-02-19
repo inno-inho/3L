@@ -18,9 +18,10 @@ import { useModal } from "../../context/ModalContext";
 interface ChatWindowProps {
     roomInfo: ChatRoomDto;
     currentUser: User | null;
+    onRoomInfoUpdate: (updatedRoom: ChatRoomDto) => void; 
 }
 
-const ChatWindow = ({ roomInfo, currentUser }: ChatWindowProps) => {
+const ChatWindow = ({ roomInfo, currentUser, onRoomInfoUpdate }: ChatWindowProps) => {
 
     // 모달 함수를 useModal(ModalContext)에서 들고온다
     const { showAlert, showConfirm } = useModal();
@@ -356,6 +357,7 @@ const ChatWindow = ({ roomInfo, currentUser }: ChatWindowProps) => {
                     isSearchMode={isSearchMode}
                     setIsSearchMode={setIsSearchMode}
                     roomInfo={roomInfo}
+                    onRoomInfoUpdate={onRoomInfoUpdate}
                     searchQuery={searchQuery}
                     searchResults={searchResults}
                     currentSearchIndex={currentSearchIndex}

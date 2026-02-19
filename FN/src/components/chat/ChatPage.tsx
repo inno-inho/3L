@@ -16,7 +16,6 @@ const ChatPage = () => {
     // 공용 모달 상태 관리
     const { showAlert } = useModal();
     
-    //
     // 방 목록 상태
     const [rooms, setRooms] = useState<ChatRoomDto[]>([]);
     // 처음 입장시에는 채팅방 선택 안되있음
@@ -45,6 +44,15 @@ const ChatPage = () => {
         fetchRooms();
     }, [fetchRooms]);
     
+    // 방 정보(이름 등)가 수정되었을 때 호출할 함수
+    const handleRoomUpdate = (updatedRoom: ChatRoomDto) => {
+        setRooms(prevRooms => 
+            prevRooms.map(room =>
+                room.roomId === updatedRoom.roomId ? updatedRoom : room
+            )
+        );
+    };
+
     // 방 만들기 버튼 클릭 시 실행될 함수
     const handleRoomCreate = async (roomName: string, selectedEmails: string[]) => {
         try {
@@ -98,6 +106,7 @@ const ChatPage = () => {
                         key={selectedRoom.roomId}
                         roomInfo={selectedRoom}
                         currentUser={user}
+                        onRoomInfoUpdate={handleRoomUpdate}
                     />
                 ) : (
                     <ChatEmptyState />

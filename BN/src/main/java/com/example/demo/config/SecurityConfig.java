@@ -53,10 +53,13 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                                 .requestMatchers("/api/auth/user").authenticated()
                                 .requestMatchers("/api/auth/login", "/api/auth/signup").permitAll()
-//                                .requestMatchers("/api/auth/**").permitAll() // 혹시 모를 다른 auth 경로 허용
                                 .requestMatchers("/ws/**").permitAll()
                                 .requestMatchers("/uploads/**").permitAll()
 
+                                // 채팅룸 권한 설정
+                                .requestMatchers(HttpMethod.PATCH, "/api/chatrooms/**").authenticated()
+                                .requestMatchers("/api/chatrooms/**").authenticated()
+                        
                                 // [공지사항] 권한 설정
                                 // 조회(Read)는 인증된 모든 사용자 가능
                                 .requestMatchers(HttpMethod.GET, "/api/notices/**").authenticated()
@@ -71,7 +74,7 @@ public class SecurityConfig {
 
                                 // 나머지 모든 요청은 인증 필요
                                 .anyRequest().authenticated()
-                        // .anyRequest().permitAll()
+
                 )
 
                 // 3. 필터 추가: ID/PW 검사 필터(UsernamePasswordAuthenticationFilter) 전에

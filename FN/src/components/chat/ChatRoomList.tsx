@@ -1,10 +1,9 @@
+import { useState } from 'react';
 import type { ChatRoomDto } from "../../types/chat";
 import { Plus } from 'lucide-react';    // 아이콘 라이브러리
 import coconuttalk from "@/assets/image/coconuttalk.png";
 
 import search from "@/assets/image/search.svg"
-
-
 
 interface ListProps {
     rooms: ChatRoomDto[];
@@ -14,6 +13,13 @@ interface ListProps {
 }
 
 const ChatRoomList = ({ rooms, selectedId, onSelect, onCreateRomm }: ListProps) => {
+    // 검색어 상태 관리
+    const [ searchTerm, setSearchTerm ] = useState("");
+
+    // 검색어에 따라 필터링된 방 목록 계산
+    const filteredRooms = rooms.filter(room => 
+        room.roomName.toLowerCase().includes(searchTerm.toLowerCase())
+    );
 
 
     return (
@@ -26,48 +32,59 @@ const ChatRoomList = ({ rooms, selectedId, onSelect, onCreateRomm }: ListProps) 
                     {/* 검색창 */}
                     <div className="relative mt-4">
                         <img src={search} alt="돋보기" className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" />
-                        <input className="w-full bg-[#F5F5F5] rounded-xl pl-10 pr-4 py-2 text-sm font-semibold outline-none" placeholder="Search Messenger" />
+                        <input 
+                            className="w-full bg-[#F5F5F5] rounded-xl pl-10 pr-4 py-2 text-sm font-semibold outline-none" 
+                            placeholder="채팅방 이름을 검색하세요" 
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
                     </div>
                 </div>
                 <div className="flex-1 overflow-y-auto mt-4">
-                    {rooms.map(room => (
-                        <div
-                            key={room.roomId}
-                            onClick={() => onSelect(room.roomId)}
-                            className={`flex items-center p-4 mx-2 rounded-2xl cursor-pointer transition-all ${selectedId === room.roomId ? 'bg-[#FDF5E6]' : 'hover:bg-gray-50'}`}
-                        >
-                            {/* 프로필 이미지 영역*/}
-                            <div className="w-12 h-12 rounded-2xl overflow-hidden bg-gray-200 mr-3 shrink-0">
-                                {room.roomImageUrls && room.roomImageUrls.length <= 1 ? (
-                                    // 1:1채팅방이거나 프로필 이미지가 하나 이하인 경우
-                                    <img 
-                                        src={room.roomImageUrls[0] || coconuttalk}
-                                        className="w-full h-full object-cover"
-                                        alt="profile"
-                                    />
-                                ) : (
-                                    // 그룹 채팅방
-                                    <div className="grid grid-cols-2 gap-0.5 w-full h-full">
-                                        {room.roomImageUrls.slice(0, 4).map((url, i) => (
-                                            <img key={i} src={url} className="w-full h-full object-cover" alt="group"/>
-                                        ))}        
-                                    </div>
-                                )}
-                                
-                                
-                            </div>
-                            <div className="flex-1 min-w-0">
-                                <div className="flex justify-between items-center">
-                                    <div className="flex items-center gap-1 min-w-0">
-                                        <span className="truncate font-bold text-[#4A3F35] max-w-full">{room.roomName}</span>
-                                        <span className="text-xs text-gray-400 font-medium shrink-0">{room.userCount}</span>
-                                    </div>
-                                    <span className="text-[10px] text-gray-400">{room.lastMessageTime}</span>
+                    {filteredRooms.length > 0 ? (
+
+                        filteredRooms.map(room => (
+                            <div
+                                key={room.roomId}
+                                onClick={() => onSelect(room.roomId)}
+                                className={`flex items-center p-4 mx-2 rounded-2xl cursor-pointer transition-all ${selectedId === room.roomId ? 'bg-[#FDF5E6]' : 'hover:bg-gray-50'}`}
+                            >
+                                {/* 프로필 이미지 영역*/}
+                                <div className="w-12 h-12 rounded-2xl overflow-hidden bg-gray-200 mr-3 shrink-0">
+                                    {room.roomImageUrls && room.roomImageUrls.length <= 1 ? (
+                                        // 1:1채팅방이거나 프로필 이미지가 하나 이하인 경우
+                                        <img 
+                                            src={room.roomImageUrls[0] || coconuttalk}
+                                            className="w-full h-full object-cover"
+                                            alt="profile"
+                                        />
+                                    ) : (
+                                        // 그룹 채팅방
+                                        <div className="grid grid-cols-2 gap-0.5 w-full h-full">
+                                            {room.roomImageUrls.slice(0, 4).map((url, i) => (
+                                                <img key={i} src={url} className="w-full h-full object-cover" alt="group"/>
+                                            ))}        
+                                        </div>
+                                    )}
+                                    
+                                    
                                 </div>
-                                <p className="text-xs text-gray-500 truncate mt-1">{room.lastMessage}</p>
+                                <div className="flex-1 min-w-0">
+                                    <div className="flex justify-between items-center">
+                                        <div className="flex items-center gap-1 min-w-0">
+                                            <span className="truncate font-bold text-[#4A3F35] max-w-full">{room.roomName}</span>
+                                            <span className="text-xs text-gray-400 font-medium shrink-0">{room.userCount}</span>
+                                        </div>
+                                        <span className="text-[10px] text-gray-400">{room.lastMessageTime}</span>
+                                    </div>
+                                    <p className="text-xs text-gray-500 truncate mt-1">{room.lastMessage}</p>
+                                </div>
                             </div>
-                        </div>
-                    ))}
+                        ))
+                    ) : (
+                        <div className='text-center text-gary-400 mt-10 test-sm'>검색 결과가 없습니다</div>
+                    )}
+                        
             </div>
             <button
                 onClick={onCreateRomm}
