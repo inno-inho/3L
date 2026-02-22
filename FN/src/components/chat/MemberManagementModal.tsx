@@ -43,12 +43,35 @@ const MemberManagementModal = ({ roomInfo, currentUserEmail, isOwner, onClose, o
         );
     };
 
+    // 방장 권한 위임 버튼
+    const handleTransferOwner = async (targetEmail: string, targetName: string) => {
+        showConfirm(
+            "방장 위임",
+            `'${targetName}님에게 방장 권한을 넘기시겠습니까?`,
+            async () => {
+                try {
+                    await api.post(`/chatrooms/${roomInfo.roomId}/transfer-owner`, null, {
+                        params: {
+                            nextOwnerEmail: targetEmail,
+                            requesterEmail: currentUserEmail
+                        }
+                    });
+                    showAlert("완료", "방장이 변경되었습니다.");
+                    onUpdate?.({ ...roomInfo, ownerEmail: targetEmail });   // 로컬 상태(화면) 업데이트
+                    onClose();  // 모달 닫기
+                } catch (error) {
+                    showAlert("오류", "방장 위임에 실패했습니다.");
+                }
+            }
+        );
+    };
+
 
 
     return (
         <>
             <div className='fixed inset-0 z-[100] flex items-center justify-center bg-black/50'>
-                <div className='w-[350px] bg-white rounded-2xl overflow-hidden shadow-2xl'>
+                <div className='w-[400px] bg-white rounded-2xl overflow-hidden shadow-2xl'>
                     <div className='p-5 border-b border-gray-100 flex justify-between items-center'>
                         <h3 className='font-bold text-[#4A3F35]'>멤버 관리</h3>
                         <button onClick={onClose} className='text-gray-400 hover:text-gray-600'>X</button>
@@ -73,12 +96,21 @@ const MemberManagementModal = ({ roomInfo, currentUserEmail, isOwner, onClose, o
 
                                 {/* 방장이고 본인이 아닐 때에만 '내보내기' 버튼 노출 */}
                                 {isOwner && member.email !== currentUserEmail && (
-                                    <button
-                                        onClick={() => handleKick(member.email, member.name)}
-                                        className='text-[11px] text-red-400 hover:bg-red-50 px-2 py-1 rounded-lg transition-colors'
-                                    >
-                                        내보내기
-                                    </button>
+                                    <div className='flex gap-2'>
+                                        <button
+                                            onClick={() => handleTransferOwner(member.email, member.name)}
+                                            className='text-[11px] px-2 py-1 bg-yellow-100 text-yellow-700 rounded-md hover:bg-yellow-200'
+                                        >
+                                            방장위임
+                                        </button>
+
+                                        <button
+                                            onClick={() => handleKick(member.email, member.name)}
+                                            className='text-[11px] text-red-400 hover:bg-red-50 px-2 py-1 rounded-lg transition-colors'
+                                        >
+                                            내보내기
+                                        </button>
+                                    </div>
                                 )}
                             </div>
                         ))}

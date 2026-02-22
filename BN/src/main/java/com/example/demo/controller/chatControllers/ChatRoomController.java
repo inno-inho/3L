@@ -91,4 +91,17 @@ public class ChatRoomController {
         return ResponseEntity.ok().build();
     }
 
+    // #########################################
+    // 방장 권환 위임
+    // #########################################
+    @PostMapping("/{roomId}/transfer-owner")
+    public ResponseEntity<?> transferOwner (
+            @PathVariable String roomId,
+            @RequestParam String nextOwnerEmail,
+            @RequestParam String requesterEmail) {
+        chatRoomService.transferOwner(roomId, nextOwnerEmail, requesterEmail);
+
+        return ResponseEntity.ok().build();
+    }
+
 }

@@ -218,4 +218,34 @@ public class ChatRoomService {
         chatRoomEntity.setLastMessageTime(LocalDateTime.now());
     }
 
+    // ##############################################
+    // 방장 권한 위임
+    // ##############################################
+    @Transactional
+    public void transferOwner(String roomId, String nextOwnerEmail, String requesterEmail) {
+        ChatRoomEntity chatRoomEntity = chatRoomRepository.findById(roomId)
+                .orElseThrow(() -> new RuntimeException("방을 찾을 수 없습니다."));
+
+        // 요청자가 현재 방장인지 확인
+        if (!requesterEmail.equals(chatRoomEntity.getOwnerEmail())) {
+            throw new RuntimeException("방장 권한을 넘길 권한이 없습니다.");
+        }
+
+        // 위임받을 유저가 현재 방에 존재하는지 확인
+        boolean isMember = chatRoomMemberRepository.existsByRoomIdAndUserEmailAndActiveTrue(roomId, nextOwnerEmail);
+        if (!isMember) {
+            throw new RuntimeException("방에 참여 중인 멤버에게만 위임할 수 있습니다.");
+        }
+
+        // 방장 변경
+        chatRoomEntity.setOwnerEmail(nextOwnerEmail);
+
+        // 시스템 메시지 남기기
+        String nextOwnerName = chatCommonService.resolveSenderName(nextOwnerEmail);
+        chatRoomEntity.setLastMessage("방장이" + nextOwnerName + "님으로 변경되었습니다.");
+        chatRoomEntity.setLastMessageTime(LocalDateTime.now());
+
+        log.info("[chatRoomService_TransferOwner] 방장 위임 완료: {} -> {}", requesterEmail, nextOwnerEmail, roomId);
+
+    }
 }
