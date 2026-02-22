@@ -146,7 +146,7 @@ POST   api/friends/{userId}
 PATCH api/friends/{userId}/accept
 DELETE api/friends/{userId}
 POST   api/friends/{userId}/block
-GET    api/friends
+GET    api/friends/{email}
 ```
 
 ### 5.4 채팅방
