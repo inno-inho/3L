@@ -37,7 +37,7 @@ const ChatSearchHeader = ({
 
     const { user } = useAuth();
 
-    const { showAlert } = useModal();
+    const { showAlert, showConfirm } = useModal();
 
     const [ isMemberModalOpen, setIsMemberModalOpen ] = useState(false);
     const [ isInviteModalOpen, setIsInviteModalOpen ] = useState(false);
@@ -91,6 +91,26 @@ const ChatSearchHeader = ({
             setEditedName(roomInfo.roomName);
             setIsEditingName(false);
         }
+    }
+
+    const handleLeaveRoom = async () => {
+        showConfirm(
+            "채팅방 나가기",
+            "정말 이 채팅방을 나가시겠습니까?",
+            async () => {
+                // 확인을 눌렀을 때 실행되는 로직
+                try {
+                    await api.post(`/api/chatrooms/${roomInfo.roomId}/leave?userEmail=${user?.email}`);
+
+                    // 성공 알림 후 새로고침 
+                    showAlert("성공", "채팅방에서 나갔습니다.");
+
+                    window.location.reload();
+                } catch(error) {
+                    showAlert("오류", "방 나가기에 실패했습니다.");
+                }
+            }
+        )
     }
 
     console.log("현재 방 정보(roomInfo): ", roomInfo);
@@ -200,7 +220,22 @@ const ChatSearchHeader = ({
                             isOwner={user?.email === roomInfo.ownerEmail}   // 방장 여부 전달
                             onInviteClick={handleOpenInviteModal}
                             onManageClick={handleOpenManageModal}
+                            onLeaveClick={handleLeaveRoom}
                         />
+
+                        {/* 멤버 관리 모달(강퇴 기능) */}
+                        {isMemberModalOpen && (
+                            <MemberManagementModal 
+                                roomInfo={roomInfo}
+                                currentUserEmail={user?.email || ""}
+                                isOwner={user?.email === roomInfo.ownerEmail}
+                                onClose={() => setIsMemberModalOpen(false)}
+                                onUpdate={(updatedRoom) => onRoomInfoUpdate?.(updatedRoom)}
+                            />
+                        )}
+
+                        {/* 초대하기 모달 */}
+                        
                     </div>
                 </>
             ) : (
@@ -261,18 +296,6 @@ const ChatSearchHeader = ({
                         </button>
                     </div>
                 </>
-            )}
-
-            {/* 멤버관리 모달 */}
-            {isMemberModalOpen && (
-                <MemberManagementModal
-                    roomInfo={roomInfo}
-                    currentUserEmail={user?.email || ""}
-                    onClose={() => setIsMemberModalOpen(false)}
-                    onUpdate={() => {
-                        if (onRoomInfoUpdate) onRoomInfoUpdate(roomInfo);
-                    }}
-                />
             )}
         </div>
     );

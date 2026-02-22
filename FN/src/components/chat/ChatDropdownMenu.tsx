@@ -7,10 +7,11 @@ interface ChatDropdownMenuProps {
     chatRoomType: string;
     onInviteClick: () => void;
     onManageClick: () => void;
+    onLeaveClick: () => void;
     isOwner: boolean;
 }
 
-const ChatDropdownMenu = ( { isOpen, chatRoomType, onInviteClick, onManageClick, isOwner } : ChatDropdownMenuProps) => {
+const ChatDropdownMenu = ( { isOpen, chatRoomType, onInviteClick, onManageClick, onLeaveClick, isOwner } : ChatDropdownMenuProps) => {
     
     if (!isOpen) return null;   // 안 열려있으면 걍 아무것도 아닌 거
 
@@ -33,7 +34,7 @@ const ChatDropdownMenu = ( { isOpen, chatRoomType, onInviteClick, onManageClick,
                 {/* 멤버 초대하기 */}
                 <div
                     onClick={onInviteClick}
-                    className='px-4 py-4 flex justify-between items-center border-b border-gray-50 hover:bg-slate-50'
+                    className='px-4 py-4 flex justify-between items-center border-b border-gray-50 hover:bg-slate-50 cursor-pointer'
                 >
                     <span className='text-[#6F4E37] text-[12px] group-hover:fong-bold transition-all'>멤버 초대하기</span>
                 </div>
@@ -42,14 +43,17 @@ const ChatDropdownMenu = ( { isOpen, chatRoomType, onInviteClick, onManageClick,
                 {chatRoomType === 'GROUP' && isOwner && (
                     <div
                         onClick={onManageClick}
-                        className='px-4 py-4 flex justify-between items-center border-b border-gray-50 hover:bg-slate-50'
+                        className='px-4 py-4 flex justify-between items-center border-b border-gray-50 hover:bg-slate-50 cursor-pointer'
                     >
                         <span className='text-[#6F4E37] text-[12px] group-hover:font-bold transition-all'>멤버 관리하기</span>
                     </div>
                 )}
 
                 {/* 채팅방 나가기 */}
-                <div className='px-4 py-4 flex justify-between items-center border-b border-gray-50 hover:bg-slate-50'>
+                <div 
+                    className='px-4 py-4 flex justify-between items-center border-b border-gray-50 hover:bg-red-50 cursor-pointer'
+                    onClick={onLeaveClick}
+                >
                     <span className='text-[#6F4E37] text-[12px]'>채팅방 나가기</span>
                 </div>
             </div>
