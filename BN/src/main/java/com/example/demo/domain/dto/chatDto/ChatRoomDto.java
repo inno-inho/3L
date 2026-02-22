@@ -38,5 +38,17 @@ public class ChatRoomDto {
     private List<String> roomImageUrls;
 
     @Schema(description = "채팅방에 참여중인 멤버들 닉네임", example = "이노, 헤렌, 사랑해, 마니마니, 평생......")
-    private List<String> memberNames;
+    private List<MemberInfo> memberNames;
+
+    @Data
+    public static class MemberInfo {
+        private String email;
+        private String name;
+    }
+
+    @Schema(description = "채팅방에 참여중인 멤버들 이메일", example = "[\\\"user1@test.com\\\", \\\"user2@test.com\\\"]")
+    private List<String> memberEmails;
+
+    @Schema(description = "방장의 이메일 (권한 확인용)", example = "owner@test.com")
+    private String ownerEmail;
 }

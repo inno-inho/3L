@@ -32,7 +32,7 @@ public class ChatRoomService {
     // 채팅방 생성
     // #########################################
     @Transactional
-    public ChatRoomDto createRoom(String roomName, List<String> memberEmails, String creatorEmail) {
+    public ChatRoomDto createRoom(String roomName, List<String> memberEmails, String requesterEmail) {
         String roomId = UUID.randomUUID().toString();
 
         LocalDateTime now = LocalDateTime.now();
@@ -44,9 +44,13 @@ public class ChatRoomService {
             finalRoomName = null;
         }
 
+        // 3명 이상일 때만 방장(Creator)을 설정
+        String ownerEmail = (memberEmails.size() > 2) ? requesterEmail : null;
+
         ChatRoomEntity chatRoomEntity = ChatRoomEntity.builder()
                 .roomId(roomId)
-                .roomName(roomName)
+                .roomName(finalRoomName)
+                .ownerEmail(ownerEmail)   // 방장 지정
                 .chatRoomType(memberEmails.size() > 2 ? ChatMessageDto.ChatType.GROUP : ChatMessageDto.ChatType.FRIEND)
                 .createdAt(now)
                 .lastMessage("채팅방이 생성되었습니다.")
@@ -56,13 +60,19 @@ public class ChatRoomService {
 
         // 멤버 추가
         for (String email : memberEmails) {
-            chatRoomMemberService.inviteUser(roomId, email);
+            if (email.equals(requesterEmail)) {
+                // 방장은 메시지 없이 입장 처리
+                chatRoomMemberService.joinRoomWithoutMessage(roomId, email);
+            } else {
+                // 그 외는 메시지랑 같이 처리
+                chatRoomMemberService.joinRoom(roomId, email);
+            }
         }
 
         // 인원 수 계산 후 번환 메서드
         int userCount = memberEmails.size();
 
-        return chatCommonService.convertToRoomDto(chatRoomEntity, creatorEmail, userCount);
+        return chatCommonService.convertToRoomDto(chatRoomEntity, requesterEmail, userCount);
     }
 
     // #############################################
@@ -113,35 +123,99 @@ public class ChatRoomService {
     // 멤버 강퇴(혹은 스스로 나가기)
     // ########################################
     @Transactional
-    public void kickMember(String roomId, String userEmail) {
+    public void kickMember(String roomId, String targetEmail, String requestUserEmail) {
         // 해당 멤버 찾기
-        ChatRoomMemberEntity chatRoomMemberEntity = chatRoomMemberRepository.findByRoomIdAndUserEmail(roomId, userEmail)
+        ChatRoomEntity chatRoomEntity = chatRoomRepository.findById(roomId)
                 .orElseThrow(() -> new RuntimeException("참여 정보를 찾을 수 없습니다."));
 
-        // 삭제
-        chatRoomMemberRepository.delete(chatRoomMemberEntity);
+        // 권한 확인: 요청저가 방장이거나, 혹은 본이이 스스로 나가는 경우에만 허용
+        // 1:1 채팅은 ownerEmail이 없으므로 체크 예외 처리
+        if (chatRoomEntity.getOwnerEmail() != null) {
+            if (!chatRoomEntity.getOwnerEmail().equals(requestUserEmail) && !targetEmail.equals(requestUserEmail)) {
+                throw new RuntimeException("강퇴 권한이 없거나 잘못된 요청입니다.");
+            }
+        }
+
+        // 채팅방 멤버(참여 정보) 삭제
+        ChatRoomMemberEntity chatRoomMemberEntity = chatRoomMemberRepository.findByRoomIdAndUserEmail(roomId, targetEmail)
+                .orElseThrow(() -> new RuntimeException("참여 정보를 찾을 수 없습니다."));
+
+        // 삭제(quit 메시지도 발행하기 위해서)
+        chatRoomMemberService.leaveRoom(roomId, targetEmail);
 
         // 방에 알림 메시지 남기기
-        ChatRoomEntity chatRoomEntity = chatRoomRepository.findById(roomId).get();
-        chatRoomEntity.setLastMessage(userEmail + "님이 퇴장하셨습니다.");
+        chatRoomEntity.setLastMessage(targetEmail + "님이 퇴장하셨습니다.");
         chatRoomEntity.setLastMessageTime(LocalDateTime.now());
 
-        log.info("[ChatRoomService] 멤버 퇴장/강퇴 완료: 방 ID = {}, 이메일 = {}", roomId, userEmail);
+        log.info("[ChatRoomService] 멤버 퇴장/강퇴 완료: 방 ID = {}, 이메일 = {}", roomId, targetEmail);
     }
 
     // ########################################
     // 멤버 초대
     // ########################################
     @Transactional
-    public void inviteMembers (String roomId, List<String> memberEmails) {
+    public void inviteMembers (String roomId, List<String> memberEmails, String requesterEmail) {
+        ChatRoomEntity chatRoomEntity = chatRoomRepository.findById(roomId)
+                .orElseThrow(() -> new RuntimeException("방을 찾을 수 없습니다."));
+
         for (String email : memberEmails) {
             // 이미 방에 있는지 확인 후 초대하는 로직 (ChatRoomMemberService에 구현)
-            chatRoomMemberService.inviteUser(roomId, email);
+            chatRoomMemberService.joinRoom(roomId, email);
+        }
+
+        // 1:1 방이었는데 인원이 추가되어 그룹방이 되는 경우
+        int totalCount = chatRoomMemberRepository.countByRoomIdAndActiveTrue(roomId);
+        if (totalCount > 2 && chatRoomEntity.getChatRoomType() == ChatMessageDto.ChatType.FRIEND) {
+            chatRoomEntity.setChatRoomType(ChatMessageDto.ChatType.GROUP);
+            // 만약 방장이 없다면 초대한 사람을 방장으로 지정
+            if (chatRoomEntity.getOwnerEmail() == null) {
+                chatRoomEntity.setOwnerEmail(requesterEmail);
+            }
         }
 
         // 초대한 인원수만큼 알림 메시지 업데이트 가능
-        ChatRoomEntity chatRoomEntity = chatRoomRepository.findById(roomId).get();
         chatRoomEntity.setLastMessage(memberEmails.size() + "명의 멤버가 초대되었습니다.");
         chatRoomEntity.setLastMessageTime(LocalDateTime.now());
     }
+
+    // ######################################################
+    // 방장이 스스로 나갈 때 방장 권한을 다른 사람에게 넘기는 로직
+    // ######################################################
+    @Transactional
+    public void leaveRoom(String roomId, String userEmail) {
+        ChatRoomEntity chatRoomEntity = chatRoomRepository.findById(roomId)
+                .orElseThrow(() -> new RuntimeException("방을 찾을 수 없습니다."));
+
+
+        // 방장 위임 로직
+        if (ChatMessageDto.ChatType.GROUP.equals(chatRoomEntity.getChatRoomType())
+                && userEmail.equals(chatRoomEntity.getOwnerEmail())){
+
+            List<ChatRoomMemberEntity> otherMembers = chatRoomMemberRepository.findByRoomIdAndActiveTrue(roomId)
+                    .stream()
+                    .filter(m -> !m.getUserEmail().equals(userEmail))
+                    .toList();
+
+            if (!otherMembers.isEmpty()) {
+                // 다른 사람이 있다면 위임
+                String nextOwner = otherMembers.get(0).getUserEmail();
+                chatRoomEntity.setOwnerEmail(nextOwner);
+                log.info("[LeaveRoom] 방장 위임: {} -> {}", userEmail, nextOwner);
+            } else {
+                // 나밖에 없었다면 방 삭제 후 종료
+                chatRoomRepository.delete(chatRoomEntity);
+                log.info("[LeaveRoom] 마지막 멤버 퇴장으로 방 삭제: {}", roomId);
+                return;
+            }
+        }
+
+        // 실제 나가는 처리 (ChatRoomMemberService 호출)
+        // 이 메서드 안에서 멤버 삭제(Hard/Soft Delete)와 "OO님이 퇴장하셨습니다" 메시지 발행을 다 해줍니다.
+        chatRoomMemberService.leaveRoom(roomId, userEmail);
+
+        // 방의 마지막 메시지 업데이트 (목록 보기에 출력용)
+        chatRoomEntity.setLastMessage(userEmail + "님이 퇴장하셨습니다.");
+        chatRoomEntity.setLastMessageTime(LocalDateTime.now());
+    }
+
 }

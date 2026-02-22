@@ -1,6 +1,6 @@
 package com.example.demo.controller.chatControllers;
 
-import com.example.demo.domain.dto.chatDto.ChatRoomCreateRequest;
+import com.example.demo.domain.dto.chatDto.ChatRoomCreateRequestDto;
 import com.example.demo.domain.dto.chatDto.ChatRoomDto;
 import com.example.demo.service.chatServices.ChatRoomService;
 import lombok.RequiredArgsConstructor;
@@ -21,17 +21,11 @@ public class ChatRoomController {
     // 채팅방 샏성
     // #######################################
     @PostMapping
-    public ResponseEntity<ChatRoomDto> createRoom(@RequestBody ChatRoomCreateRequest chatRoomCreateRequest) {
-        // 프론트엔드 ChatPage에서 [...selectedEmails, user?.email] 형태로 보냈으므로
-        // 리스트의 마지막 요소가 방장의 이메일
-
-        List<String> emails = chatRoomCreateRequest.getMemberEmails();
-        String creatorEmail = emails.get(emails.size() - 1);
-
+    public ResponseEntity<ChatRoomDto> createRoom(@RequestBody ChatRoomCreateRequestDto chatRoomCreateRequestDto) {
         ChatRoomDto chatRoomDto = chatRoomService.createRoom(
-                chatRoomCreateRequest.getRoomName(),
-                emails,
-                creatorEmail
+                chatRoomCreateRequestDto.getRoomName(),
+                chatRoomCreateRequestDto.getMemberEmails(),
+                chatRoomCreateRequestDto.getRequesterEmail() // 명확한 데이터 사용
         );
 
         return ResponseEntity.ok(chatRoomDto);
@@ -64,8 +58,9 @@ public class ChatRoomController {
     @DeleteMapping("/{roomId}/members/{userEmail}")
     public ResponseEntity<Void> kickMember (
             @PathVariable String roomId,
-            @PathVariable String userEmail) {
-        chatRoomService.kickMember(roomId, userEmail);
+            @PathVariable String userEmail,
+            @RequestParam String requestUserEmail) {
+        chatRoomService.kickMember(roomId, userEmail, requestUserEmail);
 
         return ResponseEntity.ok().build();
     }
@@ -77,8 +72,21 @@ public class ChatRoomController {
     @PostMapping("/{roomId}/invite-update")
     public ResponseEntity<Void> inviteMembers (
             @PathVariable String roomId,
-            @RequestBody List<String> memberEmails) {
-        chatRoomService.inviteMembers(roomId, memberEmails);
+            @RequestBody List<String> memberEmails,
+            @RequestParam String requesterEmail) {
+        chatRoomService.inviteMembers(roomId, memberEmails, requesterEmail);
+
+        return ResponseEntity.ok().build();
+    }
+
+    // #########################################
+    // 방 나가기
+    // #########################################
+    @PostMapping("/{roomId}/leave")
+    public ResponseEntity<Void> leaveRoom (
+            @PathVariable String roomId,
+            @RequestParam String userEmail) {
+        chatRoomService.leaveRoom(roomId, userEmail);
 
         return ResponseEntity.ok().build();
     }

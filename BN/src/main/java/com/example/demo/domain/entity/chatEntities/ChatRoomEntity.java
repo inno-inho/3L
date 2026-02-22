@@ -31,4 +31,6 @@ public class ChatRoomEntity {
     @CollectionTable(name = "chat_room_images", joinColumns = @JoinColumn(name = "room_id"))
     private List<String> roomImageUrls;
 
+    @Column(name = "owner_email")
+    private String ownerEmail;
 }

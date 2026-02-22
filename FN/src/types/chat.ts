@@ -44,6 +44,11 @@ export interface ChatRoomDto{
     userCount: number;
     roomImageUrls: string[];
     memberNames: string[];
+    ownerEmail: string;
+    members?: {
+        email: string;
+        name: string;
+    }[];
 }
 
 // typing이면 표시하게 만들기 위한 인터페이서

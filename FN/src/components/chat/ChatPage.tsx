@@ -55,13 +55,21 @@ const ChatPage = () => {
 
     // 방 만들기 버튼 클릭 시 실행될 함수
     const handleRoomCreate = async (roomName: string, selectedEmails: string[]) => {
+        if (!user?.email) {
+            showAlert("오류", "로그인 정보가 없습니다.");
+            return;
+        }
+        
         try {
             // 서버에 보낼 데이터 구성
             const payload = {
                 roomName: roomName,
                 // 초대한 친구들 + 나 자신(방장)의 이메일 포함
-                memberEmails: [...selectedEmails, user?.email]
+                memberEmails: [...selectedEmails, user?.email],
+                requesterEmail: user.email 
             };
+
+            console.log("보내는 데이터:", payload);
 
             // 서버에 저장 요청
             const response = await api.post('/chatrooms', payload);   

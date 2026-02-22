@@ -59,7 +59,7 @@ public class SecurityConfig {
                                 // 채팅룸 권한 설정
                                 .requestMatchers(HttpMethod.PATCH, "/api/chatrooms/**").authenticated()
                                 .requestMatchers("/api/chatrooms/**").authenticated()
-                        
+
                                 // [공지사항] 권한 설정
                                 // 조회(Read)는 인증된 모든 사용자 가능
                                 .requestMatchers(HttpMethod.GET, "/api/notices/**").authenticated()

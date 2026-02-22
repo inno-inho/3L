@@ -6,6 +6,8 @@ import ChatDropdownMenu from "./ChatDropdownMenu";
 import api from "@/api/api";
 import type { ChatRoomDto } from "../../types/chat";
 import { useModal } from '@/context/ModalContext';
+import MemberManagementModal from './MemberManagementModal';
+import { useAuth } from '@/context/AuthContext';
 
 interface Props {
     isSearchMode: boolean;
@@ -33,7 +35,24 @@ const ChatSearchHeader = ({
     const [editedName, setEditedName] = useState(roomInfo.roomName);
     const inputRef = useRef<HTMLInputElement>(null);
 
+    const { user } = useAuth();
+
     const { showAlert } = useModal();
+
+    const [ isMemberModalOpen, setIsMemberModalOpen ] = useState(false);
+    const [ isInviteModalOpen, setIsInviteModalOpen ] = useState(false);
+
+    // 드롭다운에서 '멤버 관리하기' 클릭 시
+    const handleOpenManageModal = () => {
+        setIsMemberModalOpen(true); // 모달은 열고
+        setChatIsDropdownOpen(false);   // 메뉴는 닫기
+    };
+
+    // 드롭다운에서 '대화상대 초대 클릭 시'
+    const handleOpenInviteModal = () => {
+        setIsInviteModalOpen(true);
+        setChatIsDropdownOpen(false);
+    }
 
     // 방 정보가 바뀌면 입력 필드 상태도 업데이트
     useEffect(() => {
@@ -130,19 +149,26 @@ const ChatSearchHeader = ({
 
                             {/*  인원수 및 멤버 리스트*/}
                             {roomInfo.userCount > 2 && (
-                                <div className="flex items-center ml-2">
+                                <div
+                                    className="flex items-center ml-2"
+                                    onClick={() => setIsMemberModalOpen(true)}    
+                                >
                                     <span className="text-xs text-gray-900 p-3">
                                         {roomInfo.userCount}명
                                     </span>
-                                    {roomInfo.userCount > 2 && roomInfo.memberNames && (
+                                    {roomInfo.userCount > 2 && roomInfo.memberNames && roomInfo.memberNames.length > 0 && (
                                         <div className="text-[11px] text-gray-400 mt-0.5 truncate max-w-[250px]">
-                                            {roomInfo.memberNames.slice(0, 5).join(", ")}
+                                            {roomInfo.memberNames
+                                            .slice(0, 5)
+                                            .map((member: any) => member.name || member)
+                                            .join(", ")
+                                            }
                                             {roomInfo.memberNames.length > 5 && "..."}
                                         </div>
                                     )}
                                 </div>
                             )}
-                            
+
                             {/* 검색 아이콘 버튼 */}
                             <button
                                 className="h-8 w-8 pl-3"
@@ -154,6 +180,7 @@ const ChatSearchHeader = ({
                             </button>
                         </div>
                     </div>
+
                     {/* 누르면 드롭다운메뉴 나오는 곳 ... */}
                     <div
                         className="relative"
@@ -170,6 +197,9 @@ const ChatSearchHeader = ({
                         <ChatDropdownMenu
                             isOpen={isChatDropdownOpen}
                             chatRoomType={roomInfo.chatRoomType}
+                            isOwner={user?.email === roomInfo.ownerEmail}   // 방장 여부 전달
+                            onInviteClick={handleOpenInviteModal}
+                            onManageClick={handleOpenManageModal}
                         />
                     </div>
                 </>
@@ -231,6 +261,18 @@ const ChatSearchHeader = ({
                         </button>
                     </div>
                 </>
+            )}
+
+            {/* 멤버관리 모달 */}
+            {isMemberModalOpen && (
+                <MemberManagementModal
+                    roomInfo={roomInfo}
+                    currentUserEmail={user?.email || ""}
+                    onClose={() => setIsMemberModalOpen(false)}
+                    onUpdate={() => {
+                        if (onRoomInfoUpdate) onRoomInfoUpdate(roomInfo);
+                    }}
+                />
             )}
         </div>
     );

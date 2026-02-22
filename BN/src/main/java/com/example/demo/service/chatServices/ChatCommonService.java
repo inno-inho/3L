@@ -60,7 +60,7 @@ public class ChatCommonService {
                 .messageType(chatMessageEntity.getMessageType() != null ? chatMessageEntity.getMessageType() : ChatMessageDto.MessageType.TEXT) // 기본값 설정
                 .roomId(chatMessageEntity.getRoomId())
                 .sender(chatMessageEntity.getSender())
-                .senderName(chatMessageEntity.getSender()) // 우선 이메일을 이름으로 세팅 (유저 기능 연동 전까지)
+                .senderName(chatMessageEntity.getSenderName() != null ? chatMessageEntity.getSenderName() : chatMessageEntity.getSender()) // 우선 이메일을 이름으로 세팅 (유저 기능 연동 전까지)
                 .message(chatMessageEntity.getMessage())
                 .files(fileResponses)
                 .metadata(chatMessageEntity.getMetadata())
@@ -81,6 +81,17 @@ public class ChatCommonService {
     public ChatRoomDto convertToRoomDto(ChatRoomEntity chatRoomEntity, String userEmail ,int userCount) {
         String displayRoomName = chatRoomEntity.getRoomName();
         List<String> displayUrlImages = new ArrayList<>();
+
+        // 참여 중인 모든 멤버의 정보를 개체(MemberInfo) 리스트로 생성
+        List<ChatRoomDto.MemberInfo> memberInfos = chatRoomMemberRepository.findByRoomIdAndActiveTrue(chatRoomEntity.getRoomId())
+                .stream()
+                .map(m -> {
+                    ChatRoomDto.MemberInfo info = new ChatRoomDto.MemberInfo();
+                    info.setEmail(m.getUserEmail());
+                    info.setName(resolveSenderName(m.getUserEmail()));  // 닉네임 조회
+                    return info;
+                })
+                .toList();
 
         // 1:1 채팅방(Type: FRIEND)인 경우 로직
         if (chatRoomEntity.getChatRoomType() == ChatMessageDto.ChatType.FRIEND) {
@@ -133,7 +144,8 @@ public class ChatCommonService {
                 .lastMessageTime(formatTime(chatRoomEntity.getLastMessageTime()))
                 .userCount(userCount)
                 .roomImageUrls(displayUrlImages) // 필요시 멤버 프로필 사진 로직 추가
-                .memberNames(memberNames)
+                .memberNames(memberInfos)
+                .ownerEmail(chatRoomEntity.getOwnerEmail())
                 .build();
     }
 

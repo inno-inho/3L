@@ -32,27 +32,24 @@ public class ChatRoomMemberController {
     // ##############################
     // 채팅방 나가기
     // ##############################
-    @PostMapping("/{roomId}/leave")
-    public ResponseEntity<Void> leaveRoom(
-            @PathVariable String roomId,
-            @RequestParam String email) {
-        chatRoomMemberService.leaveRoom(roomId, email);
-
-        return ResponseEntity.ok().build();
-    }
+//    @PostMapping("/{roomId}/leave")
+//    public ResponseEntity<Void> leaveRoom(
+//            @PathVariable String roomId,
+//            @RequestParam String email) {
+//        chatRoomMemberService.leaveRoom(roomId, email);
+//
+//        return ResponseEntity.ok().build();
+//    }
 
     // ##############################
-    // 채팅방 나가기
+    // 채팅방 초대하기
     // ##############################
     @PostMapping("/{roomId}/invite")
     public ResponseEntity<Void> inviteUser (
             @PathVariable String roomId,
             @RequestParam String email) {
-        chatRoomMemberService.inviteUser(roomId, email);
+        chatRoomMemberService.joinRoom(roomId, email);
 
         return ResponseEntity.ok().build();
     }
-
-
-
 }
