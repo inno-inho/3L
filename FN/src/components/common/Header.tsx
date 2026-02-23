@@ -45,7 +45,7 @@ const Header: React.FC = () => {
                         onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                     >
                             <ProfileImage
-                                url={user?.userProfileImageUrl}
+                                url={user?.profileImageUrl}
                                 nickname={user?.nickname}
                                 size='sm'
                             />

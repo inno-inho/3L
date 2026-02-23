@@ -3,6 +3,7 @@ package com.example.demo.domain.repository;
 import com.example.demo.domain.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 /*
@@ -26,4 +27,7 @@ public interface UserRepository extends JpaRepository<User,Long> { //<Entity타�
             //이메일 중복 여부 확인메서드
 
     Optional<User> findByEmail(String email);
+
+    // 닉네임 또는 이메일에 키워드가 포함된 유저 찾기 (유저 검색용)
+    List<User> findByNicknameContainingOrEmailContaining(String nicknameKeyword, String emailKeyword);
 }

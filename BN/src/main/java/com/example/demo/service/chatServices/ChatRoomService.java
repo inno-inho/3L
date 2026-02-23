@@ -241,7 +241,7 @@ public class ChatRoomService {
 
         // 시스템 메시지 남기기
         String nextOwnerName = chatCommonService.resolveSenderName(nextOwnerEmail);
-        chatRoomEntity.setLastMessage("방장이" + nextOwnerName + "님으로 변경되었습니다.");
+        chatRoomEntity.setLastMessage("방장이 " + nextOwnerName + "님으로 변경되었습니다.");
         chatRoomEntity.setLastMessageTime(LocalDateTime.now());
 
         log.info("[chatRoomService_TransferOwner] 방장 위임 완료: {} -> {}", requesterEmail, nextOwnerEmail, roomId);
