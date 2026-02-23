@@ -59,7 +59,7 @@ public class FriendController {
     }
 
     // ###################################
-    // 친구 신청 목록
+    // 친구 신청 받아주기
     // ###################################
     @PostMapping("/accept")
     public ResponseEntity<String> acceptFriend (
@@ -100,4 +100,34 @@ public class FriendController {
 
         return ResponseEntity.ok("친구 신청을 거절했습니다.");
     }
+
+    // ##################################
+    // 내 친구 목록 조회(진짜 친구들)
+    // ##################################
+    @GetMapping("/list")
+    public ResponseEntity<List<UserResponseDto>> getFriendList(Authentication authentication) {
+        String myEmail = authentication.getName();
+
+        List<UserResponseDto> friends = friendService.getAcceptedFriends(myEmail);
+
+        return ResponseEntity.ok(friends);
+    }
+
+
+    // ####################################
+    // 유저 차단
+    // ####################################
+    @PostMapping("/block")
+    public ResponseEntity<String> blockUser(
+            @RequestParam String targetEmail,
+            Authentication authentication) {
+
+        // 차단을 수행하는 본인의 이메일
+        String requestEmail = authentication.getName();
+
+        friendService.blockUser(requestEmail, targetEmail);
+
+        return ResponseEntity.ok("해당 사용자를 차단하였습니다.");
+    }
+
 }

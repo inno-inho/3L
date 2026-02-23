@@ -2,9 +2,9 @@ package com.example.demo.domain.Repository;
 
 import com.example.demo.domain.entity.FriendEntity;
 import com.example.demo.domain.entity.FriendStatus;
-import io.lettuce.core.dynamic.annotation.Param;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
@@ -24,6 +24,8 @@ public interface FriendRepository extends JpaRepository<FriendEntity, Long> {
             "AND f.friendStatus = 'ACCEPTED'")
     List<FriendEntity> findAllAcceptedFriends(@Param("email") String email);
 
+
+
     // 나에게 온 친구 신청 목록 (수락 대기 중인 것)
     List<FriendEntity> findByFriendEmailAndFriendStatus(String friendEmail, FriendStatus friendStatus);
 
@@ -36,4 +38,7 @@ public interface FriendRepository extends JpaRepository<FriendEntity, Long> {
             "(f.requesterEmail = :myEmail OR f.friendEmail = :myEmail) " +
             "AND f.friendStatus = 'BLOCKED')")
     boolean isAmIBlocked(@Param("myEmail") String myEmail, @Param("targetEmail") String targetEmail);
+
+    // 내가 차단한 유저 목록 조회
+    List<FriendEntity> findByBlockedByAndFriendStatus(String blockedBy, FriendStatus friendStatus);
 }

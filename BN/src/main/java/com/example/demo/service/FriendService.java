@@ -98,6 +98,29 @@ public class FriendService {
         }
     }
 
+    // ########################################
+    // 친구 목록 조회(친구 요청 수락한 진짜 친구)
+    // ########################################
+    @Transactional(readOnly = true)
+    public List<UserResponseDto> getAcceptedFriends(String myEmail) {
+        // ACCEPTED 상태인 모든 관계 조회
+        List<FriendEntity> relations = friendRepository.findAllAcceptedFriends(myEmail);
+
+        return relations.stream()
+                .map(relation -> {
+                    // 관계 중 내가 아닌 상대방의 이메일 찾기
+                    String friendEmail = relation.getRequesterEmail().equals(myEmail)
+                            ? relation.getFriendEmail()
+                            : relation.getRequesterEmail();
+
+                    // 상대방의 유저 정보 조회
+                    User friend = userRepository.findByEmail(friendEmail)
+                            .orElseThrow(() -> new IllegalArgumentException("친구의 정보를 찾을 수 없습닏나."));
+                    return convertToDto(friend);
+                })
+                .toList();
+    }
+
     // #########################################
     // 차단 기능
     // #########################################
