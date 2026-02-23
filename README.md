@@ -135,18 +135,20 @@ GET    api/auth/user                         // 회원정보 조회
 GET    api/user/{email}
 PUT    api/user/{email}
 DELETE api/user/{email}
-GET    api/user/search
 PUT    api/user/profile/image
 PUT    api/user/nickname
 ```
 
 ### 5.3 친구
 ```
-POST   api/friends/{userId}
-PATCH api/friends/{userId}/accept
-DELETE api/friends/{userId}
-POST   api/friends/{userId}/block
-GET    api/friends/{email}
+GET    api/friends/search    // 친구찾기(유저 찾기) O
+POST   api/friends/request   // 친구 신청 보내기 O
+GET    api/friends/pending   // 내가 받은 친구 신청 목록 읽어오기 O
+POST   api/friends/accept     // 친구 신청 수락하기 O
+DELETE api/friends/delete   // 친구 삭제하기   param:targetEmail: friendEmail
+POST   api/friends/reject  // 친구 신청 거절하기 O
+GET    api/friends/list    // 친구 목록 가져오기(진짜 친구 목록)
+POST   api/friends/block   // 유저 차단   param:targetEmail
 ```
 
 ### 5.4 채팅방
