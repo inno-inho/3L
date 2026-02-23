@@ -46,7 +46,21 @@ const Sidebar = ({ currentUser }: SidebarProps ) => {
                     </div>
                     {/* 친구목록 아이콘 */}
                     <div className='w-12 h-12 flex items-center justify-center rounded-2xl cursor-pointer hover:bg-[#f2ebe0] transition-colors opacity-50 hover:opacity-100'>
-                        <img src={users} alt='접속상태인 친구목록' className='w-7 h-7'/>
+                        <NavLink 
+                            to="/friends"
+                            className={({ isActive }) => `
+                            relative w-12 h-12 flex items-center justify-center rounded-2xl cursor-pointer transition-colors 
+                            ${isActive ? 'bg-[#EBDCCB]' : 'hover:bg-[#f2ebe0]'}`}
+                        >
+                            {({ isActive }) => (
+                                <>
+                                    <img src={users} alt='접속상태인 친구목록' className='w-7 h-7'/>
+                                    {isActive && (
+                                        <div className='absolute -right-4 w-1 h-8 bg-[#8B4513] rounded-l-full' />
+                                    )}
+                                </>
+                            )}
+                        </NavLink>
                     </div>
                 </div>
 
