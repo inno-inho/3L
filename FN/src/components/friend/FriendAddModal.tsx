@@ -42,7 +42,7 @@ const FriendAddModal = ({ onClose }: { onClose: () => void }) => {
     return (
         <>
             <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/20">
-                <div className="bg-white w-72 p-5 rounded-[24px] shadow-2xl border-2 border-[#8B4513]">
+                <div className="bg-white w-102 p-5 rounded-[24px] shadow-2xl border-2 border-[#8B4513]">
                     <h3 className="font-bold text-[#5D4037] mb-4 text-center">새로운 친구 찾기</h3>
 
                     {/* 검색 바 */}
