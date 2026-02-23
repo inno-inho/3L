@@ -19,7 +19,7 @@ const FriendListPage = () => {
                         onClick={() => setIsRequestModalOpen(true)}
                         className="relative bg-white border border-[#8B4513] text-[#8B4513] px-4 py-2 rounded-xl hover:bg-[#fdfaf5] transition-colors"
                     >
-                        친구 요청
+                        친구 추가 요청 확인하기
                         {requestCount > 0 && (
                             <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
                                 {requestCount}
@@ -32,6 +32,12 @@ const FriendListPage = () => {
                         className="bg-[#8B4513] text-white px-4 py-2 rounded-xl hover:bg-[#6F3611] transition-colors"
                     >
                         + 친구 추가
+                    </button>
+
+                    <button 
+                        className="bg-black text-white px-4 py-2 rounded-xl hover:bg-[#6F3611] transition-colors"
+                    >
+                        차단한 친구 관리
                     </button>
                 
             
