@@ -18,7 +18,7 @@ public class ChatRoomController {
     private final ChatRoomService chatRoomService;
 
     // #######################################
-    // 채팅방 샏성
+    // 채팅방 생성
     // #######################################
     @PostMapping
     public ResponseEntity<ChatRoomDto> createRoom(@RequestBody ChatRoomCreateRequestDto chatRoomCreateRequestDto) {
@@ -32,7 +32,7 @@ public class ChatRoomController {
     }
 
     // ########################################
-    // 내 채팅방 목록 가져오기 (테스트 확인용)
+    // 내 채팅방 목록 가져오기
     // ########################################
     @GetMapping
     public ResponseEntity<List<ChatRoomDto>> getMyRooms(@RequestParam String email) {
@@ -53,7 +53,7 @@ public class ChatRoomController {
     }
 
     // ########################################
-    // 멤버 강퇴(또는 스스로 나가기)
+    // 멤버 강퇴
     // ########################################
     @DeleteMapping("/{roomId}/members/{userEmail}")
     public ResponseEntity<Void> kickMember (

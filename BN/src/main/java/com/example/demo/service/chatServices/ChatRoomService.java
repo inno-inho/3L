@@ -186,7 +186,6 @@ public class ChatRoomService {
         ChatRoomEntity chatRoomEntity = chatRoomRepository.findById(roomId)
                 .orElseThrow(() -> new RuntimeException("방을 찾을 수 없습니다."));
 
-
         // 방장 위임 로직
         if (ChatMessageDto.ChatType.GROUP.equals(chatRoomEntity.getChatRoomType())
                 && userEmail.equals(chatRoomEntity.getOwnerEmail())){

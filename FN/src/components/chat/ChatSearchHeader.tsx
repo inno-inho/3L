@@ -100,13 +100,18 @@ const ChatSearchHeader = ({
             async () => {
                 // 확인을 눌렀을 때 실행되는 로직
                 try {
-                    await api.post(`/api/chatrooms/${roomInfo.roomId}/leave?userEmail=${user?.email}`);
+                    await api.post(`/chatrooms/${roomInfo.roomId}/leave`, null, {
+                        params: {
+                            userEmail: user?.email
+                        }
+                    })
 
                     // 성공 알림 후 새로고침 
                     showAlert("성공", "채팅방에서 나갔습니다.");
 
-                    window.location.reload();
+                    window.location.href = "/chatPage";
                 } catch(error) {
+                    console.error("방 나가기 에러", error);
                     showAlert("오류", "방 나가기에 실패했습니다.");
                 }
             }
