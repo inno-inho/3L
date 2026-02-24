@@ -24,6 +24,9 @@ public interface ChatRoomMemberRepository extends JpaRepository<ChatRoomMemberEn
     // 초대할 때 이미 있는 멤버인지 확인하는거
     boolean existsByRoomIdAndUserEmail(String roomId, String userEmail);
 
+    // 특정 방에 해당 유저가 참여 중인지 확인
+    boolean existsByRoomIdAndUserEmailAndActiveTrue(String roomId, String userEmail);
+
     // 1:1 채팅 시상대방 정보 가져오기
     @Query("SELECT m FROM ChatRoomMemberEntity m WHERE m.roomId = :roomId AND m.userEmail != :userEmail")
     Optional<ChatRoomMemberEntity> findOpponent(

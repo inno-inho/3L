@@ -1,8 +1,9 @@
-import React from 'react';
 import { NavLink } from 'react-router-dom';
+import React, { useState } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import type { User } from '../../context/AuthContext';
+import FriendListModal from '../friend/FriendListPage';
 
 import ProfileImage from './ProfileImage';
 import chats from '@/assets/image/chats.svg';
@@ -15,11 +16,17 @@ interface SidebarProps {
     currentUser: User | null;
 }
 
-const Sidebar = ({ currentUser }: SidebarProps ) => {
+const Sidebar = ({ currentUser }: SidebarProps) => {
     const navigate = useNavigate();
     const location = useLocation();
     const { user } = useAuth();
-    const isActive = (path: string) => location.pathname === path;
+    const isActive = (path: string) => {
+        // 메인 페이지(/)가 아니라도, 해당 경로로 시작하면 true 반환
+        if (path !== '/') {
+            return location.pathname.startsWith(path);
+        }
+        return location.pathname === path;
+    };
 
     return (
         <div className="mx-2 py-4 pl-2 h-full flex flex-col"> 
@@ -45,22 +52,15 @@ const Sidebar = ({ currentUser }: SidebarProps ) => {
                     )}        
                     </div>
                     {/* 친구목록 아이콘 */}
-                    <div className='w-12 h-12 flex items-center justify-center rounded-2xl cursor-pointer hover:bg-[#f2ebe0] transition-colors opacity-50 hover:opacity-100'>
-                        <NavLink 
-                            to="/friends"
-                            className={({ isActive }) => `
-                            relative w-12 h-12 flex items-center justify-center rounded-2xl cursor-pointer transition-colors 
-                            ${isActive ? 'bg-[#EBDCCB]' : 'hover:bg-[#f2ebe0]'}`}
-                        >
-                            {({ isActive }) => (
-                                <>
-                                    <img src={users} alt='접속상태인 친구목록' className='w-7 h-7'/>
-                                    {isActive && (
-                                        <div className='absolute -right-4 w-1 h-8 bg-[#8B4513] rounded-l-full' />
-                                    )}
-                                </>
-                            )}
-                        </NavLink>
+                    <div
+                        className={`relative w-12 h-12 flex items-center justify-center rounded-2xl cursor-pointer transition-colors
+                            ${isActive('/friends') ? 'bg-[#EBDCCB]' : 'hover:bg-[#f2ebe0] opacity-50 hover:opacity-100'}`}
+                        onClick={() => navigate('/friends')}
+                    >
+                        <img src={users} alt='친구목록' className='w-7 h-7' />
+                        {isActive('/friends') && (
+                            <div className='absolute -right-4 w-1 h-8 bg-[#8B4513] rounded-l-full' />
+                        )}
                     </div>
                 </div>
 
@@ -105,7 +105,7 @@ const Sidebar = ({ currentUser }: SidebarProps ) => {
                     </div>
                 </div>
             </div>
-        </div>
+        </>
     );
 };
 

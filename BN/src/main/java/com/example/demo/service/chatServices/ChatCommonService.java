@@ -5,6 +5,7 @@ import com.example.demo.domain.dto.chatDto.ChatMessageDto;
 import com.example.demo.domain.dto.chatDto.ChatRoomDto;
 import com.example.demo.domain.entity.chatEntities.ChatMessageEntity;
 import com.example.demo.domain.entity.chatEntities.ChatRoomEntity;
+import com.example.demo.domain.entity.chatEntities.ChatRoomMemberEntity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -15,6 +16,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -22,6 +24,7 @@ import java.util.Locale;
 public class ChatCommonService {
 
     private final ChatRoomMemberRepository chatRoomMemberRepository;
+    private final com.example.demo.domain.repository.UserRepository userRepository;
 
     // 정규식 패턴 (URL 추출용)
     private static final String URL_REGEX = "https?://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]";
@@ -57,7 +60,7 @@ public class ChatCommonService {
                 .messageType(chatMessageEntity.getMessageType() != null ? chatMessageEntity.getMessageType() : ChatMessageDto.MessageType.TEXT) // 기본값 설정
                 .roomId(chatMessageEntity.getRoomId())
                 .sender(chatMessageEntity.getSender())
-                .senderName(chatMessageEntity.getSender()) // 우선 이메일을 이름으로 세팅 (유저 기능 연동 전까지)
+                .senderName(chatMessageEntity.getSenderName() != null ? chatMessageEntity.getSenderName() : chatMessageEntity.getSender()) // 우선 이메일을 이름으로 세팅 (유저 기능 연동 전까지)
                 .message(chatMessageEntity.getMessage())
                 .files(fileResponses)
                 .metadata(chatMessageEntity.getMetadata())
@@ -79,6 +82,17 @@ public class ChatCommonService {
         String displayRoomName = chatRoomEntity.getRoomName();
         List<String> displayUrlImages = new ArrayList<>();
 
+        // 참여 중인 모든 멤버의 정보를 개체(MemberInfo) 리스트로 생성
+        List<ChatRoomDto.MemberInfo> memberInfos = chatRoomMemberRepository.findByRoomIdAndActiveTrue(chatRoomEntity.getRoomId())
+                .stream()
+                .map(m -> {
+                    ChatRoomDto.MemberInfo info = new ChatRoomDto.MemberInfo();
+                    info.setEmail(m.getUserEmail());
+                    info.setName(resolveSenderName(m.getUserEmail()));  // 닉네임 조회
+                    return info;
+                })
+                .toList();
+
         // 1:1 채팅방(Type: FRIEND)인 경우 로직
         if (chatRoomEntity.getChatRoomType() == ChatMessageDto.ChatType.FRIEND) {
             // Optional을 변수로 꺼내서 ifPresent 대신에 직접 제어
@@ -86,15 +100,41 @@ public class ChatCommonService {
 
             if(opponentOptional.isPresent()) {
                 var opponent = opponentOptional.get();
+                // 상대방의 실제 닉네임을 조회하여 방 제목으로 설정
                 displayRoomName = resolveSenderName(opponent.getUserEmail());   // 상대방 이름으로
-                displayUrlImages.add("http://via.placeholder.com/150");         // 상대방 프로필로, user기능 만들면 실제 url 참조
+
+                // 상대방 프로필 이미지 설정
+                String profileImage = userRepository.findByEmail(opponent.getUserEmail())
+                        .map(user -> user.getProfileImageUrl())
+                        .orElse("http://via.placeholder.com/150");
+                displayUrlImages.add(profileImage);
             }
         } else {
+            // 방 제목이 없거나, 이메일 형식으로 잘못 들어온 경우 참여자 명단으로 제목 생성
+            if (displayRoomName == null || displayRoomName.trim().isEmpty() || displayRoomName.contains("@")) {
+                List<ChatRoomMemberEntity> members = chatRoomMemberRepository.findByRoomIdAndActiveTrue(chatRoomEntity.getRoomId());
+
+                displayRoomName = members.stream()
+                        .filter(m -> !m.getUserEmail().equals(userEmail)) // 본인 제외
+                        .map(m -> resolveSenderName(m.getUserEmail()))   // 닉네임으로 변환
+                        .limit(3) // 최대 3명까지만 나열
+                        .collect(java.util.stream.Collectors.joining(", "));
+
+                if (userCount > 3) displayRoomName += "..."; // 3명 초과 시 생략 표시
+
+            }
+
             // 그룹방일 경우 기존 이미지 리스트 사용
             if (chatRoomEntity.getRoomImageUrls() != null) {
                 displayUrlImages.addAll(chatRoomEntity.getRoomImageUrls());
             }
         }
+
+        // 해당 방에 참여 중인 모든 멤버의 닉네임 리스트 가져오기
+        List<String> memberNames = chatRoomMemberRepository.findByRoomIdAndActiveTrue(chatRoomEntity.getRoomId())
+                .stream()
+                .map(m -> resolveSenderName(m.getUserEmail()))
+                .toList();
 
         return ChatRoomDto.builder()
                 .roomId(chatRoomEntity.getRoomId())
@@ -104,6 +144,8 @@ public class ChatCommonService {
                 .lastMessageTime(formatTime(chatRoomEntity.getLastMessageTime()))
                 .userCount(userCount)
                 .roomImageUrls(displayUrlImages) // 필요시 멤버 프로필 사진 로직 추가
+                .memberNames(memberInfos)
+                .ownerEmail(chatRoomEntity.getOwnerEmail())
                 .build();
     }
 
@@ -192,18 +234,12 @@ public class ChatCommonService {
         }
     }
 
+    // DB에서 유저정보 찾을 시 닉네임으로 찾아오는 로직
     public String resolveSenderName(String userEmail) {
-        // 유저 서비스/레포지토리가 생긴다면 여기서 닉네임 조회
-        // String nickname = userRepository.findByEmail(userEmail).map(User::getNickname).orElse(null);
-        String nickname = null;
-
-        // 결정 로직: 닉네임이 있으면 닉네임, 없으면 닉네임
-        if (nickname != null && !nickname.isEmpty()) {
-            return nickname;
-        }
-
-        // 이메일도 없다면 "알 수 업음", 있다면 이메일 반환
-        return (userEmail != null) ? userEmail : "알 수 없는 사용자";
+        // DB에서 유저를 찾아 닉네임을 반환, 없으면 이메일 반환
+        return userRepository.findByEmail(userEmail)
+                .map(user -> user.getNickname())
+                .orElse(userEmail);
     }
 
 

@@ -36,29 +36,39 @@ public class ChatRoomMemberService {
     // ######################################
     @Transactional
     public void joinRoom(String roomId, String userEmail) {
+        saveMemberIfNotExists(roomId, userEmail);
+        sendSystemMessage(roomId, userEmail, ChatMessageDto.MessageType.ENTER);
+    }
+
+    // 중복 입장 메시지 방지를 위한 공통 저장 로직
+    private void saveMemberIfNotExists (String roomId, String userEmail) {
+
         Optional<ChatRoomMemberEntity> chatRoomMemberEntityOptional = chatRoomMemberRepository.findByRoomIdAndUserEmail(roomId, userEmail);
 
         // 처음 진입이거나 다시 들어온 경우
-        if (chatRoomMemberEntityOptional.isEmpty() || !chatRoomMemberEntityOptional.get().isActive()) {
+        if (chatRoomMemberEntityOptional.isEmpty()) {
             // 시스템 메시지 생성
-            ChatRoomMemberEntity enterMessage = ChatRoomMemberEntity.builder()
+            ChatRoomMemberEntity chatRoomMemberEntity = ChatRoomMemberEntity.builder()
                     .roomId(roomId)
                     .userEmail(userEmail)
                     .active(true)
                     .joinedAt(LocalDateTime.now())
                     .lastReadAt(LocalDateTime.now())
                     .build();
-            chatRoomMemberRepository.save(enterMessage);
+            chatRoomMemberRepository.save(chatRoomMemberEntity);
         } else {
-            chatRoomMemberEntityOptional.get().activate();
-            chatRoomMemberEntityOptional.get().setLastReadAt(LocalDateTime.now());
+            ChatRoomMemberEntity existingMember = chatRoomMemberEntityOptional.get();
+            existingMember.activate();
+            chatRoomMemberRepository.save(existingMember);
         }
-
-        log.info("채팅방 입장: {}에 {}가 입장함", roomId, userEmail);
-        // 입장 시스템 메시지 생성 및 발행
-        sendSystemMessage(roomId, userEmail, ChatMessageDto.MessageType.ENTER);
     }
 
+    // 메시지 없이 DB에 참여 정보만 저장
+    @Transactional
+    public void joinRoomWithoutMessage(String roomId, String userEmail) {
+        saveMemberIfNotExists(roomId, userEmail);
+        log.info("방 생성자 입장: {}", userEmail);
+    }
 
 
 
@@ -68,7 +78,8 @@ public class ChatRoomMemberService {
     @Transactional
     public void leaveRoom(String roomId, String userEmail) {
         chatRoomMemberRepository.findByRoomIdAndUserEmail(roomId, userEmail).ifPresent(member -> {
-            member.deactivate();
+            // 멤버 삭제
+            chatRoomMemberRepository.delete(member);
 
             log.info("채팅방 퇴장: {}에서 {}가 퇴장함", roomId, userEmail);
 
@@ -79,20 +90,37 @@ public class ChatRoomMemberService {
     // #####################################
     // 채팅방에 유저 초대할 시
     // #####################################
-    @Transactional
-    public void inviteUser(String roomId, String inviteeEmail) {
-        if (!chatRoomMemberRepository.existsByRoomIdAndUserEmail(roomId, inviteeEmail)) {
-            chatRoomMemberRepository.save(ChatRoomMemberEntity.builder()
-                    .roomId(roomId)
-                    .userEmail(inviteeEmail)
-                    .active(true)
-                    .joinedAt(LocalDateTime.now())
-                    .lastReadAt(LocalDateTime.now())
-                    .build());
-        }
-
-        log.info("채팅방으로 초대: {}으로 {}가 초대 받음, ChatRoomService", roomId, inviteeEmail);
-    }
+//    @Transactional
+//    public void inviteUser(String roomId, String inviteeEmail, String requestEmail) {
+//       // 멤버 저장
+//       Optional<ChatRoomMemberEntity> memberOpt = chatRoomMemberRepository.findByRoomIdAndUserEmail(roomId, inviteeEmail);
+//
+//       if (memberOpt.isEmpty()) {
+//           chatRoomMemberRepository.save(ChatRoomMemberEntity.builder()
+//                   .roomId(roomId)
+//                   .userEmail(inviteeEmail)
+//                   .active(true)
+//                   .joinedAt(LocalDateTime.now())
+//                   .lastReadAt(LocalDateTime.now())
+//                   .build());
+//       }
+//
+//       // 메시지 내용 구성
+//        String requesterName = chatCommonService.resolveSenderName(requestEmail);   // 초대자
+//        String inviteeName = chatCommonService.resolveSenderName(inviteeEmail); // 초대 받은 사람
+//
+//        ChatMessageEntity chatMessageEntity = ChatMessageEntity.builder()
+//                .roomId(roomId)
+//                .sender(requestEmail)
+//                .senderName(requesterName)
+//                .message(inviteeName)   // 초대받은 사람의 이름
+//                .messageType(ChatMessageDto.MessageType.INVITE)
+//                .createdAt(LocalDateTime.now())
+//                .build();
+//
+//        chatMessageRepository.save(chatMessageEntity);
+//        applicationEventPublisher.publishEvent(new ChatMessageEvent(roomId, chatCommonService.convertToDto(chatMessageEntity)));
+//    }
 
     // ###############################################
     // 공통 시스템 메시지 전송 로직

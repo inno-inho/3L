@@ -41,7 +41,7 @@ const DropdownMenu = ({ isOpen, onClose, onLogout }: DropdownMenuProps) => {
                         onClose();
                     }}
                 >
-                    새로고침
+                    프로필 변경
                 </button>
 
                 {/* 하단 구분선 및 로그아웃 */}

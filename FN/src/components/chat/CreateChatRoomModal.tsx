@@ -11,9 +11,9 @@ interface Friend {
 
 // 가짜 친구 데이터 목록
 const dummyFriends: Friend[] = [
-    { email: 'zergling2565@gmail.com', nickname: '이노이노', profile_image_url: 'https://via.placeholder.com/40' },
+    { email: 'zergling1111@naver.com', nickname: '이노1', profile_image_url: 'https://via.placeholder.com/40' },
+    { email: 'zergling2222@naver.com', nickname: '이노2', profile_image_url: 'https://via.placeholder.com/40' },
     { email: 'zergling2565@naver.com', nickname: '이노', profile_image_url: 'https://via.placeholder.com/40' },
-    { email: 'member3@test.com', nickname: '사랑해', profile_image_url: 'https://via.placeholder.com/40' },
     { email: 'member4@test.com', nickname: '마니마니', profile_image_url: 'https://via.placeholder.com/40' }
 ];
 

@@ -5,15 +5,14 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 import { AuthProvider } from './context/AuthContext';
 
-import ConnectionTest from './components/test/ConnectionTest';
 import NoticeForm from './components/notice/NoticeForm';
 import NoticeList from './components/notice/NoticeList';
 import NoticeDetail from './components/notice/NoticeDetail';
 import LoginPage from './components/user/LoginPage';
 import MainLayout from './components/common/MainLayout';
 import ChatPage from './components/chat/ChatPage';
+import FriendListPage from './components/friend/FriendListPage';
 import { ModalProvider } from './context/ModalContext';
-import FriendsPage from './components/friends/FriendsPage';
 
 import SettingsLayout from './components/settings/SettingsLayout';
 import Profile from './components/settings/Profile';
@@ -51,8 +50,7 @@ const App: React.FC = () => {
               <Route element={<MainLayout />} >
                 {/* CHAT */}
                 <Route path='/chatPage' element={<ChatPage />} />
-                {/* FRIENDS */}
-                <Route path='/friends' element={<FriendsPage />} />
+                <Route path="/friends" element={<FriendListPage />} />
                 {/* NOTICE */}
                 <Route path="/notices" element={<NoticeList />} />
                 <Route path="/notices/write" element={<NoticeForm />} />
@@ -65,8 +63,6 @@ const App: React.FC = () => {
                   <Route path="security" element={<Security />} />
                   <Route path="support" element={<CustomerCenter />} />
                 </Route>
-                {/* test용 */}
-                <Route path='/test' element={<ConnectionTest />} />
               </Route>
               {/* 없는 주소 접근 시 */}
               <Route path="*" element={<Navigate to="/" />} />
