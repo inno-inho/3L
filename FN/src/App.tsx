@@ -11,7 +11,7 @@ import NoticeDetail from './components/notice/NoticeDetail';
 import LoginPage from './components/user/LoginPage';
 import MainLayout from './components/common/MainLayout';
 import ChatPage from './components/chat/ChatPage';
-import FriendListPage from './components/friend/FriendListPage';
+import FriendPage from './components/friend/FriendPage';
 import { ModalProvider } from './context/ModalContext';
 
 import SettingsLayout from './components/settings/SettingsLayout';
@@ -50,7 +50,7 @@ const App: React.FC = () => {
               <Route element={<MainLayout />} >
                 {/* CHAT */}
                 <Route path='/chatPage' element={<ChatPage />} />
-                <Route path="/friends" element={<FriendListPage />} />
+                <Route path="/friends" element={<FriendPage />} />
                 {/* NOTICE */}
                 <Route path="/notices" element={<NoticeList />} />
                 <Route path="/notices/write" element={<NoticeForm />} />

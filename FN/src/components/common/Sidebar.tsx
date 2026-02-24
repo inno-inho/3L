@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import type { User } from '../../context/AuthContext';
-import FriendListModal from '../friend/FriendListPage';
+import FriendListModal from '../friend/FriendPage';
 
 import ProfileImage from './ProfileImage';
 import chats from '@/assets/image/chats.svg';
@@ -34,7 +34,7 @@ const Sidebar = ({ currentUser }: SidebarProps) => {
                 {/* 최상단 코코넛톡 로그 */}
                 <div className='mb-10'>
                     <ProfileImage
-                        url={user?.userProfileImageUrl}
+                        url={user?.profileImageUrl}
                         size='md'
                     />
                 </div>
@@ -105,7 +105,7 @@ const Sidebar = ({ currentUser }: SidebarProps) => {
                     </div>
                 </div>
             </div>
-        </>
+        </div>
     );
 };
 

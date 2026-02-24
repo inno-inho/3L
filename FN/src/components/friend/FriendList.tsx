@@ -12,10 +12,14 @@ const FriendList = ({ friendships, onSelect }: Props) => {
             {friendships.map((friendship) => (
                 <div
                     key={friendship.id} 
-                    className="p-4 text-left border-b cursor-pointer hover:bg-gray-100"
+                    className="p-4 text-left cursor-pointer hover:bg-gray-100"
                     onClick={() => onSelect(friendship.friend)}
                 >
-                    {friendship.friend.name}
+                    <div className="flex justify-start items-center gap-4">
+                        <img src={friendship.friend.profileImage} alt="profile" className="w-12 h-12 rounded-full object-cover" />
+                        <span className="text-left text-lg">{friendship.friend.name}</span>
+                    </div>
+                    
                 </div>
             ))}
         </div>
