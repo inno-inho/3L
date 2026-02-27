@@ -6,6 +6,7 @@ import ChatDropdownMenu from "./ChatDropdownMenu";
 import api from "@/api/api";
 import type { ChatRoomDto } from "../../types/chat";
 import { useModal } from '@/context/ModalContext';
+import InviteMemberModal from './InviteMemberModal';
 import MemberManagementModal from './MemberManagementModal';
 import { useAuth } from '@/context/AuthContext';
 
@@ -240,7 +241,13 @@ const ChatSearchHeader = ({
                         )}
 
                         {/* 초대하기 모달 */}
-                        
+                        <InviteMemberModal 
+                            show={isInviteModalOpen}
+                            onHide={() => setIsInviteModalOpen(false)}
+                            roomId={roomInfo.roomId}
+                            currentMemberEmails={roomInfo.memberNames?.map((m: any) => m.email || m) || []}
+                            onUpdate={(updateRoom: ChatRoomDto) => onRoomInfoUpdate?.(updateRoom)}
+                        />
                     </div>
                 </>
             ) : (

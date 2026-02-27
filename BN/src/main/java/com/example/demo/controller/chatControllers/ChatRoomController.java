@@ -1,5 +1,6 @@
 package com.example.demo.controller.chatControllers;
 
+import com.example.demo.domain.dto.InviteRequestDto;
 import com.example.demo.domain.dto.chatDto.ChatRoomCreateRequestDto;
 import com.example.demo.domain.dto.chatDto.ChatRoomDto;
 import com.example.demo.service.chatServices.ChatRoomService;
@@ -42,6 +43,16 @@ public class ChatRoomController {
     // ########################################
     // 방 이름 수정
     // ########################################
+    @GetMapping("/{roomId}")
+    public ResponseEntity<ChatRoomDto> getRoomDetail(
+            @PathVariable String roomId,
+            @RequestParam String email) {
+        return ResponseEntity.ok(chatRoomService.getRoomDetail(roomId, email));
+    }
+
+    // ########################################
+    // 방 이름 수정
+    // ########################################
     @PatchMapping("/{roomId}/name")
     public ResponseEntity<Void> updateRoomName (
             @PathVariable String roomId,
@@ -65,16 +76,18 @@ public class ChatRoomController {
         return ResponseEntity.ok().build();
     }
 
-
     // ########################################
     // 멤버 초대
     // ########################################
     @PostMapping("/{roomId}/invite-update")
     public ResponseEntity<Void> inviteMembers (
             @PathVariable String roomId,
-            @RequestBody List<String> memberEmails,
-            @RequestParam String requesterEmail) {
-        chatRoomService.inviteMembers(roomId, memberEmails, requesterEmail);
+            @RequestBody InviteRequestDto inviteRequestDto) {
+        chatRoomService.inviteMembers(
+                roomId,
+                inviteRequestDto.getInviteeEmails(),
+                inviteRequestDto.getRequesterEmail()
+        );
 
         return ResponseEntity.ok().build();
     }

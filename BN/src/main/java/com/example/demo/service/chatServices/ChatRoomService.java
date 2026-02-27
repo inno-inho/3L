@@ -120,6 +120,21 @@ public class ChatRoomService {
     }
 
     // ########################################
+    // 현재 방의 정보 조회하기
+    // ########################################
+    @Transactional(readOnly = true)
+    public ChatRoomDto getRoomDetail(String roomId, String userEmail) {
+        ChatRoomEntity chatRoomEntity = chatRoomRepository.findById(roomId)
+                .orElseThrow(() -> new RuntimeException("방을 찾을 수 없습니다."));
+
+        // 현재 방의 활성 인원수 계산
+        int userCount = chatRoomMemberRepository.countByRoomIdAndActiveTrue(roomId);
+
+        return chatCommonService.convertToRoomDto(chatRoomEntity, userEmail, userCount);
+    }
+
+
+    // ########################################
     // 멤버 강퇴(혹은 스스로 나가기)
     // ########################################
     @Transactional

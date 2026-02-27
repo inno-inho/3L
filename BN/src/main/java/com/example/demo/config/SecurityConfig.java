@@ -56,6 +56,9 @@ public class SecurityConfig {
                                 .requestMatchers("/ws/**").permitAll()
                                 .requestMatchers("/uploads/**").permitAll()
 
+                                // 친구 관련 권한 설정
+                                .requestMatchers("api/friends/**").authenticated()
+
                                 // 채팅룸 권한 설정
                                 .requestMatchers(HttpMethod.PATCH, "/api/chatrooms/**").authenticated()
                                 .requestMatchers("/api/chatrooms/**").authenticated()
