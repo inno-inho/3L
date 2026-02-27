@@ -1,5 +1,5 @@
 import api from "./api";
-import type { NoticeDetailDto, NoticeCreateRequest, NoticePageResponse } from "@/types/notice";
+import type { NoticeDetailDto, NoticePageResponse } from "@/types/notice";
 
 
 // 공지 목록 조회 

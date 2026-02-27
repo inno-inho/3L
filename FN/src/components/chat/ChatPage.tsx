@@ -1,7 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import Sidebar from '@/components/common/Sidebar';
-
 import ChatRoomList from './ChatRoomList';
 import ChatEmptyState from './ChatEmptyState';
 import ChatWindow from './ChatWindow';
@@ -100,7 +98,7 @@ const ChatPage = () => {
 
     return (
         <>
-            <div className='flex h-[calc(100vh-100px)] w-full overflow-hidden p-4 gap-4'>
+            <div className='flex h-[calc(100vh-100px)] w-full overflow-hidden gap-4'>
                 <ChatRoomList
                     rooms={rooms}
                     selectedId={selectedRoomId}

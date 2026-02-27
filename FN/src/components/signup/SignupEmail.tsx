@@ -110,13 +110,13 @@ const SignupEmail = () => {
             {/* 상단 로고 */}
             <div className="flex items-center justify-center gap-1 mb-3">
                 <img src={logo} alt="logo" className="w-10 h-10 object-contain" />
-                <h1 className="text-[42px] font-[1000] text-[#6F4E37] tracking-[-0.06em] leading-none">
+                <h1 className="text-[42px] font-normal font-nerko text-[#6F4E37] tracking-[-0.06em] leading-none">
                     CoconutTalk
                 </h1>
             </div>
 
             {/* 메인 박스 (relative 추가로 모달 위치 기준 잡음) */}
-            <div className="w-[500px] min-h-[380px] bg-white border-[2px] border-[#743F24] pt-16 pb-12 px-10 flex flex-col shadow-sm relative overflow-hidden">
+            <div className="w-[500px] min-h-[380px] bg-white border-[2px] border-[#743F24] pt-16 pb-12 px-10 flex flex-col shadow-sm relative overflow-hidden rounded-md">
 
                 {viewStep === "EMAIL" && (
                     <div className="flex flex-col animate-fade-in w-full">
