@@ -262,4 +262,7 @@ public class ChatRoomService {
         log.info("[chatRoomService_TransferOwner] 방장 위임 완료: {} -> {}", requesterEmail, nextOwnerEmail, roomId);
 
     }
+
+
+
 }

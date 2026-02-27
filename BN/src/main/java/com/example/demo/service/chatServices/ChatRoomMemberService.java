@@ -87,41 +87,6 @@ public class ChatRoomMemberService {
         });
     }
 
-    // #####################################
-    // 채팅방에 유저 초대할 시
-    // #####################################
-//    @Transactional
-//    public void inviteUser(String roomId, String inviteeEmail, String requestEmail) {
-//       // 멤버 저장
-//       Optional<ChatRoomMemberEntity> memberOpt = chatRoomMemberRepository.findByRoomIdAndUserEmail(roomId, inviteeEmail);
-//
-//       if (memberOpt.isEmpty()) {
-//           chatRoomMemberRepository.save(ChatRoomMemberEntity.builder()
-//                   .roomId(roomId)
-//                   .userEmail(inviteeEmail)
-//                   .active(true)
-//                   .joinedAt(LocalDateTime.now())
-//                   .lastReadAt(LocalDateTime.now())
-//                   .build());
-//       }
-//
-//       // 메시지 내용 구성
-//        String requesterName = chatCommonService.resolveSenderName(requestEmail);   // 초대자
-//        String inviteeName = chatCommonService.resolveSenderName(inviteeEmail); // 초대 받은 사람
-//
-//        ChatMessageEntity chatMessageEntity = ChatMessageEntity.builder()
-//                .roomId(roomId)
-//                .sender(requestEmail)
-//                .senderName(requesterName)
-//                .message(inviteeName)   // 초대받은 사람의 이름
-//                .messageType(ChatMessageDto.MessageType.INVITE)
-//                .createdAt(LocalDateTime.now())
-//                .build();
-//
-//        chatMessageRepository.save(chatMessageEntity);
-//        applicationEventPublisher.publishEvent(new ChatMessageEvent(roomId, chatCommonService.convertToDto(chatMessageEntity)));
-//    }
-
     // ###############################################
     // 공통 시스템 메시지 전송 로직
     // ###############################################
@@ -141,4 +106,5 @@ public class ChatRoomMemberService {
         applicationEventPublisher.publishEvent(new ChatMessageEvent(roomId, chatCommonService.convertToDto(chatMessageEntity)));
 
     }
+
 }
