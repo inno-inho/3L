@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import api from "@/api/api";
 import { useAuth } from "@/context/AuthContext";
-import { useModal } from "@/context/ModalContext";
 
 interface FriendRequestModalProps {
     email: string;
@@ -10,8 +9,25 @@ interface FriendRequestModalProps {
 
 const FriendRequestModal = ({ onClose, onRefreshFriends }: { onClose: () => void, onRefreshFriends: () => void }) => {
     const { user } = useAuth();
-    const [requests, setRequests] = useState<FriendRequestModalProps[]>([]);
-    const { showAlert } = useModal();
+    // const [requests, setRequests] = useState<FriendRequestModalProps[]>([]);
+    const [actionMessage, setActionMessage] = useState("");
+    const [actionType, setActionType] = useState<"success" | "error" | "">("");
+
+    // 요청왔을 때 확인용 - 삭제 예정
+    const [requests, setRequests] = useState([
+        {
+            email: "apple123@gmail.com",
+            nickname: "코코넛러버"
+        },
+        {
+            email: "banana77@gmail.com",
+            nickname: "바나나킥"
+        },
+        {
+            email: "carrot99@gmail.com",
+            nickname: "당근당근"
+        }
+    ]);
 
 
     useEffect(() => {
@@ -32,36 +48,51 @@ const FriendRequestModal = ({ onClose, onRefreshFriends }: { onClose: () => void
         try {
             if (action === 'ACCEPT') {
                 await api.post(`/friends/accept?requesterEmail=${requesterEmail}`);
-
-                showAlert("친구 요청 수락", `${requesterEmail}님과 친구가 되었습니다!`);
+                setActionMessage(`${requesterEmail}님과 친구가 되었습니다!`)
+                setActionType("success");
+                onRefreshFriends();
             } else {
                 await api.post(`/friends/reject?requesterEmail=${requesterEmail}`);
-                
-                showAlert("친구 요청 거절", `${requesterEmail}님의 친구 요청을 거절하였습니다.`)
+                setActionMessage(`${requesterEmail}님의 친구 요청을 거절하였습니다.`);
+                setActionType("success");
             }
 
             // 성공 시 리스트에서 제거
             setRequests(prev => prev.filter(req => req.email !== requesterEmail));
-            if (action === 'ACCEPT') onRefreshFriends();
+            // if (action === 'ACCEPT') onRefreshFriends();
         } catch (error) {
-            showAlert("친구 요청", "요청 처리에 실패하였습니다.");
+            setActionMessage("요청 처리에 실패하였습니다.");
+            setActionType("error");
         }
     };
 
     return (
         <>
-            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-                <div className="bg-white w-[400px] rounded-2xl shadow-xl p-6">
-                    <h3 className="text-xl font-bold text-[#4A2C2A]">받은 친구 요청</h3>
-                    <button
-                        onClick={onClose}
-                        className="text-gray-400 hover:text-gray-600"
-                    >
-                        X
-                    </button>
-
+            <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+                <div className="bg-white w-full max-w-[400px] rounded-2xl shadow-xl p-6">
+                    <div className="relative flex justify-center mb-4">
+                        <h3 className="text-xl font-bold">받은 친구 요청</h3>
+                        
+                        <button 
+                            onClick={onClose} 
+                            className="absolute right-0 text-gray-600 hover:text-gray-900 font-bold"
+                        >
+                            ✕
+                        </button>
+                    </div>
+                    {actionMessage && (
+                        <div className={`mb-3 p-2 text-sm rounded-md text-center ${
+                            actionType === "success"
+                                ? "bg-green-50 text-green-600"
+                                : "bg-red-50 text-red-600"
+                        }`}>
+                            {actionMessage}
+                        </div>
+                    )}
+                    
                     <div className="max-h-[300px] overflow-y-auto">
                         {requests.length > 0 ? (
+                            
                             requests.map(req => (
                                 <div
                                     key={req.email}
@@ -69,23 +100,24 @@ const FriendRequestModal = ({ onClose, onRefreshFriends }: { onClose: () => void
                                 >
                                     <div>
                                         <p className="font-bold text-[#4A2C2A]">{req.nickname}</p>
-                                        <p className="text-xs text-gray-500">{req.email}</p>
+                                        <p className="text-s text-gray-500">{req.email}</p>
                                     </div>
                                     <div className="flex gap-2">
                                         <button
                                             onClick={() => handleAction(req.email, 'ACCEPT')}
-                                            className="bg-[#8B4513] text-white px-3 py-1 rounded-lg text-sm"
+                                            className="bg-[#8B4513] text-white px-3 py-2 rounded-lg text-sm hover:bg-[#6f3710] transition"
                                         >
                                             수락
                                         </button>
                                         <button
                                             onClick={() => handleAction(req.email, 'REJECT')}
-                                            className="bg-gray-200 text-gray-600 px-3 py-1 rounded-lg text-sm"
+                                            className="bg-gray-200 text-gray-600 px-3 py-2 rounded-lg text-sm hover:bg-gray-300 transition"
                                         >
                                             거절
                                         </button>
                                     </div>
                                 </div>
+                                
                             ))
                         ) : (
                             <p className="text-center py-10 text-gray-400">받은 요청이 없습니다.</p>

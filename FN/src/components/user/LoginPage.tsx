@@ -44,7 +44,7 @@ const LoginPage: React.FC = () => {
 
     return (
         <div className="min-h-screen flex flex-col justify-center items-center p-6 bg-[#fff9ed] relative">
-            <div className="w-[500px] bg-white border-2 border-[#6F4E37] rounded-md p-4 my-4" >
+            <div className="w-[500px] bg-white border-2 border-[#6F4E37] rounded-md p-4 my-4 shadow-md" >
                 <div className="flex items-center justify-center gap-1 mb-8">
                     <img src={logo} alt="logo" className="w-12 h-12 object-contain" />
                     <h1 className="text-7xl font-nerko text-[#6F4E37] tracking-tight leading-none">
@@ -56,7 +56,7 @@ const LoginPage: React.FC = () => {
                         <input 
                             type="text" 
                             placeholder='코코넛톡 계정(이메일)' 
-                            className="border rounded-sm p-2 my-2 w-80"
+                            className="border rounded-sm p-2 my-2 w-80 focus:outline-none focus:ring-2 focus:ring-[#6F4E37]"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             required
@@ -64,20 +64,22 @@ const LoginPage: React.FC = () => {
                         <input 
                             type="password"
                             placeholder='비밀번호' 
-                            className="border rounded-sm p-2 my-2 w-80" 
+                            className="border rounded-sm p-2 my-2 w-80 focus:outline-none focus:ring-2 focus:ring-[#6F4E37]" 
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             required
                         />
-                        <button type="submit" className="border rounded-md p-2 my-2 w-80 hover:bg-[#6F4E37] hover:text-white">
+                        <button 
+                            type="submit" 
+                            className="bg-[#6F4E37]/90 hover:bg-[#6F4E37] text-white border rounded-md p-2 my-2 w-80">
                             로그인
                         </button>
                     </form>
 
-                    <div className="flex items-center my-4 px-3">
-                        <div className="flex-grow border-t border-gray-300" />
-                        <span className="mx-4 text-sm text-gray-500">또는</span>
-                        <div className="flex-grow border-t border-gray-300" />
+                    <div className="flex items-center mt-4 mb-2 w-80 mx-auto">
+                        <div className="flex-grow border-t border-gray-200" />
+                        <span className="mx-4 text-sm text-gray-400">또는</span>
+                        <div className="flex-grow border-t border-gray-200" />
                     </div>
 
                     {/* <div className="flex flex-col mb-3 mx-3">
@@ -92,9 +94,9 @@ const LoginPage: React.FC = () => {
                         <Link to="#" className="px-2 hover:text-gray-600 hover:underline">비밀번호 재설정</Link>
                     </div>
                 </div>
-                <div className="w-full mt-15 px-3 pt-4 border-t-2 border-[#6F4E37] text-lg">
-                    계정이 없으신가요?
-                    <Link to="/auth/signup" className="ml-1 font-bold text-[#6F4E37] hover:underline"> 회원가입</Link>
+                <div className="w-full mt-15 px-3 pt-4 border-t-2 border-[#6F4E37]">
+                    <span className="mr-1">계정이 없으신가요?</span>
+                    <Link to="/auth/signup" className="text-[#6F4E37] font-semibold hover:underline text-lg"> 회원가입</Link>
                 </div>
             </div>
         </div>

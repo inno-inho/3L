@@ -111,7 +111,7 @@ const FriendPage = () => {
 
             {/* 친구 추가 모달 */}
             {isAddModalOpen && (
-                <FriendAddModal onClose={() => setIsAddModalOpen(false)} />
+                <FriendAddModal onClose={() => setIsAddModalOpen(false)}/>
             )}
 
             {isRequestModalOpen && (
