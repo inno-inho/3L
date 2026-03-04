@@ -141,42 +141,44 @@ PUT    api/user/nickname
 
 ### 5.3 친구
 ```
-GET    api/friends/search    // 친구찾기(유저 찾기) O
-POST   api/friends/request   // 친구 신청 보내기 O
-GET    api/friends/pending   // 내가 받은 친구 신청 목록 읽어오기 O
-POST   api/friends/accept     // 친구 신청 수락하기 O
-DELETE api/friends/delete   // 친구 삭제하기   param:targetEmail: friendEmail
-POST   api/friends/reject  // 친구 신청 거절하기 O
-GET    api/friends/list    // 친구 목록 가져오기(진짜 친구 목록)
-POST   api/friends/block   // 유저 차단   param:targetEmail
+GET    /api/friends/search    // 친구찾기(유저 찾기) O
+POST   /api/friends/request   // 친구 신청 보내기 O
+GET    /api/friends/pending   // 내가 받은 친구 신청 목록 읽어오기 O
+POST   /api/friends/accept     // 친구 신청 수락하기 O
+DELETE /api/friends/delete   // 친구 삭제하기   param:targetEmail: friendEmail
+POST   /api/friends/reject  // 친구 신청 거절하기 O
+GET    /api/friends/list    // 친구 목록 가져오기(진짜 친구 목록)
+POST   /api/friends/block   // 유저 차단   param:targetEmail
+GET    /api/friends/blocked-list   // 차단한 유저들의 목록 불러오기
+DELETE /api/friends/unblock  // 차단한 친구의 차단상태를 해제 param:targetEmail
 ```
 
 ### 5.4 채팅방
 ```
-POST   api/chatrooms
-GET    api/chatrooms
-GET    api/chatrooms?email={user.email}  // 채팅방 목록 불러오기
-GET    api/chatrooms/{roomId}
-POST   api/chatrooms/{roomId}/join
-Delete api/chatrooms/{roomId}/members/{userEmail}
-PUT    api/chatrooms/{roomId}/name
-POST   api/chatrooms/{roomId}/invite
-PUT    api/chatrooms/{roomId}/owner
+POST   /api/chatrooms
+GET    /api/chatrooms
+GET    /api/chatrooms?email={user.email}  // 채팅방 목록 불러오기
+GET    /api/chatrooms/{roomId}
+POST   /api/chatrooms/{roomId}/join
+Delete /api/chatrooms/{roomId}/members/{userEmail}
+PUT    /api/chatrooms/{roomId}/name
+POST   /api/chatrooms/{roomId}/invite
+PUT    /api/chatrooms/{roomId}/owner
 ```
 
 ### 5.5 채팅 옵션
 ```
-PUT    api/chatrooms/{roomId}/mute
-PUT    api/chatrooms/{roomId}/pin
+PUT    /api/chatrooms/{roomId}/mute
+PUT    /api/chatrooms/{roomId}/pin
 ```
 
 ### 5.6 메시지
 ```
-GET    api/chatrooms/{roomId}/messages
-POST   api/chatrooms/{roomId}/messages
-DELETE api/messages/{messageId}
-DELETE api/messages/{messageId}/all
-GET    api/chatrooms/{roomId}/search
+GET    /api/chatrooms/{roomId}/messages
+POST   /api/chatrooms/{roomId}/messages
+DELETE /api/messages/{messageId}
+DELETE /api/messages/{messageId}/all
+GET    /api/chatrooms/{roomId}/search
 ```
 
 ### 5.7 WebSocket
