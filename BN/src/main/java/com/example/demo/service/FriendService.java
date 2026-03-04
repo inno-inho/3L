@@ -149,6 +149,33 @@ public class FriendService {
         }
     }
 
+    // ##################################
+    // 차단 목록 조회 로직
+    // ##################################
+    @Transactional(readOnly = true)
+    public List<UserResponseDto> getBlockedList(String myEmail) {
+        return friendRepository.findByBlockedByAndFriendStatus(myEmail, FriendStatus.BLOCKED)
+                .stream()
+                .map(relation -> {
+                    User target = userRepository.findByEmail(relation.getFriendEmail())
+                            .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
+
+                    return convertToDto(target);
+                })
+                .toList();
+    }
+
+    // 차단 해제 로직
+    @Transactional
+    public void unblockUser(String myEmail, String targetEmail) {
+        FriendEntity friendEntity = friendRepository.findByRequesterEmailAndFriendEmail(myEmail, targetEmail)
+                .filter(f -> f.getFriendStatus() == FriendStatus.BLOCKED)
+                .orElseThrow(() -> new IllegalArgumentException("차단 관계가 아닙니다."));
+
+        friendRepository.delete(friendEntity);
+    }
+
+
     // ###################################
     // 친구 삭제 (이미 수락된 관계를 끊음)
     // ###################################
