@@ -1,61 +1,39 @@
 import { useState } from 'react';
-import api from '@/api/api';
-
+import { searchUsers, requestFriend } from "@/api/friendApi";
 
 const FriendAddModal = ({ onClose }: { onClose: () => void }) => {
     const [keyword, setKeyword] = useState('');
     const [results, setResults] = useState<any[]>([]); // 친구 검색창 빈배열상태
     const [loading, setLoading] = useState(false);
     const [searchError, setSearchError] = useState(""); // 검색 에러
-
     const [requestedEmails, setRequestedEmails] = useState<string[]>([]);
     const [requestError, setRequestError] = useState(""); // 친구 신청 에러
     
-    // 친구 리스트 확인용 데이터 - 삭제 예정
-    const dummyUsers = [
-        { email: "coco1@gmail.com", nickname: "코코넛왕" },
-        { email: "bsw1031@gmail.com", nickname: "rombird" },
-        { email: "jcw0927@naver.com", nickname: "more as mill" },
-        { email: "gdw0118@gmail.com", nickname: "임새롬" },
-        { email: "verylongemailaddress123456@gmail.com", nickname: "엄청긴닉네임테스트입니다" }
-    ];
-
+    
     // 유저 검색 요청
     const handleSearch = async () => {
         if (!keyword.trim()) return;
-
-        // 1. 더미데이터 검색 확인
         setLoading(true);
         setSearchError("");
-        try{
-            const filtered = dummyUsers.filter(user => 
-                user.email.includes(keyword) || 
-                user.nickname.includes(keyword)
-            );
-            setResults(filtered);
-        } catch(error){
+
+        try {
+            const users = await searchUsers(keyword); 
+            setResults(users);
+        } catch (error) {
+            console.error('검색 실패:', error);
             setSearchError("검색에 실패했습니다.");
         } finally {
             setLoading(false);
         }
-
-        // 2. 실제 사용시 주석해제
-        // try {
-        //     const response = await api.get(`/friends/search?keyword=${keyword}`);
-        //     setResults(response.data);
-        // } catch (error) {
-        //     console.error('검색 실패:', error);
-        //     setSearchError("검색에 실패했습니다.");
-        // }
     };
 
     // 친구 신청 요청 
     const handleRequest = async (email: string) => {
         try {
-            await api.post(`/friends/request?targetEmail=${email}`);
+            await requestFriend(email);
+
             setRequestError(""); 
             setRequestedEmails(prev => [...prev, email]);
-
         } catch(error) {
             setRequestError("친구 신청에 실패했습니다.");
         }
@@ -65,7 +43,7 @@ const FriendAddModal = ({ onClose }: { onClose: () => void }) => {
         <>
             <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40">
                 <div className="bg-white w-full max-w-[400px] p-5 rounded-2xl shadow-xl">
-                    <div className="relative flex items-center justify-center mb-4">
+                    <div className="relative flex justify-center mb-4">
                         <h3 className="font-bold text-xl">새로운 친구 찾기</h3>
                         <button
                             onClick={onClose}
@@ -75,7 +53,6 @@ const FriendAddModal = ({ onClose }: { onClose: () => void }) => {
                         </button>
                     </div>
                     
-
                     {/* 검색 바 */}
                     <div className="flex gap-2 mb-2 bg-[#F5F5F5] p-2 rounded-md">
                         <input

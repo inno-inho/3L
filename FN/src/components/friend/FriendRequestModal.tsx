@@ -1,41 +1,21 @@
-import React, { useState, useEffect } from "react";
-import api from "@/api/api";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
+import { getFriendRequests, acceptFriendRequest, rejectFriendRequest } from '@/api/friendApi';
+import type { FriendRequestModalProps } from '@/types/friend';
 
-interface FriendRequestModalProps {
-    email: string;
-    nickname: string;
-}
 
 const FriendRequestModal = ({ onClose, onRefreshFriends }: { onClose: () => void, onRefreshFriends: () => void }) => {
     const { user } = useAuth();
-    // const [requests, setRequests] = useState<FriendRequestModalProps[]>([]);
+    const [requests, setRequests] = useState<FriendRequestModalProps[]>([]);
     const [actionMessage, setActionMessage] = useState("");
     const [actionType, setActionType] = useState<"success" | "error" | "">("");
-
-    // 요청왔을 때 확인용 - 삭제 예정
-    const [requests, setRequests] = useState([
-        {
-            email: "apple123@gmail.com",
-            nickname: "코코넛러버"
-        },
-        {
-            email: "banana77@gmail.com",
-            nickname: "바나나킥"
-        },
-        {
-            email: "carrot99@gmail.com",
-            nickname: "당근당근"
-        }
-    ]);
-
-
+  
     useEffect(() => {
         // 나에게 온 요청 목록 조회 API 호출
         const fetchRequests = async () => {
             try {
-                const response = await api.get('/friends/pending');
-                setRequests(response.data);
+                const data = await getFriendRequests();
+                setRequests(data);
             } catch (error) {
                 console.error("요청 로드 실패", error);
             }
@@ -47,12 +27,12 @@ const FriendRequestModal = ({ onClose, onRefreshFriends }: { onClose: () => void
     const handleAction = async (requesterEmail: string, action: 'ACCEPT' | 'REJECT') => {
         try {
             if (action === 'ACCEPT') {
-                await api.post(`/friends/accept?requesterEmail=${requesterEmail}`);
+                await acceptFriendRequest(requesterEmail);
                 setActionMessage(`${requesterEmail}님과 친구가 되었습니다!`)
                 setActionType("success");
                 onRefreshFriends();
             } else {
-                await api.post(`/friends/reject?requesterEmail=${requesterEmail}`);
+                await rejectFriendRequest(requesterEmail);
                 setActionMessage(`${requesterEmail}님의 친구 요청을 거절하였습니다.`);
                 setActionType("success");
             }
@@ -99,7 +79,7 @@ const FriendRequestModal = ({ onClose, onRefreshFriends }: { onClose: () => void
                                     className="flex items-center justify-between p-3 border-b border-gray-100"
                                 >
                                     <div>
-                                        <p className="font-bold text-[#4A2C2A]">{req.nickname}</p>
+                                        <p className="font-bold">{req.nickname}</p>
                                         <p className="text-s text-gray-500">{req.email}</p>
                                     </div>
                                     <div className="flex gap-2">
