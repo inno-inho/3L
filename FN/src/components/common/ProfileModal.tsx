@@ -36,7 +36,7 @@ const ProfileModal = ({ userEmail, userName, profileImg, onClose }: ProfileModal
             } else if (actionType === 'BLOCK') {
                 await api.post(`/friends/block?targetEmail=${userEmail}`);
                 successMessage = "해당 사용자를 차단했습니다.";
-            } else if (actionType = 'DELETE') {
+            } else if (actionType === 'DELETE') {
                 await api.delete(`/friends/delete?friendEmail=${userEmail}`);
                 successMessage = "친구 관계를 해제했습니다.";
             }
@@ -76,7 +76,7 @@ const ProfileModal = ({ userEmail, userName, profileImg, onClose }: ProfileModal
     return (
         <>
             <div 
-                className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 px-4" 
+                className="fixed inset-0 z-[90] flex items-center justify-center bg-black/60 px-4" 
                 onClick={onClose}
             >
                 <div 
