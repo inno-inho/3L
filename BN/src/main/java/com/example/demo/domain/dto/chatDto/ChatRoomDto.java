@@ -28,6 +28,9 @@ public class ChatRoomDto {
     @Schema(description = "마지막 메시지 전송 시간", example = "오후 4:30")
     private String lastMessageTime;
 
+    @Schema(description = "마지막 메시지 보낸 사람", example = "이노3")
+    private String lastMessageSender;
+
     @Schema(description = "사용자가 읽지 않은 메시지 총 개수", example = "5")
     private int unreadCount;
 

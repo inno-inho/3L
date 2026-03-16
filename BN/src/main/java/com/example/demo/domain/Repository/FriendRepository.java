@@ -41,4 +41,8 @@ public interface FriendRepository extends JpaRepository<FriendEntity, Long> {
 
     // 내가 차단한 유저 목록 조회
     List<FriendEntity> findByBlockedByAndFriendStatus(String blockedBy, FriendStatus friendStatus);
+
+    // 내가 차단한 이메일 목록
+    @Query("SELECT f.friendEmail FROM FriendEntity f WHERE f.blockedBy = :myEmail AND f.friendStatus = 'BLOCKED'")
+    List<String> findAllBlockedEmailsByMe(@Param("myEmail") String myEmail);
 }

@@ -19,9 +19,11 @@ interface ChatWindowProps {
     roomInfo: ChatRoomDto;
     currentUser: User | null;
     onRoomInfoUpdate: (updatedRoom: ChatRoomDto) => void; 
+    blockedEmails: string[];
+    
 }
 
-const ChatWindow = ({ roomInfo, currentUser, onRoomInfoUpdate }: ChatWindowProps) => {
+const ChatWindow = ({ roomInfo, currentUser, onRoomInfoUpdate, blockedEmails }: ChatWindowProps) => {
 
     // 모달 함수를 useModal(ModalContext)에서 들고온다
     const { showAlert, showConfirm } = useModal();
@@ -52,7 +54,7 @@ const ChatWindow = ({ roomInfo, currentUser, onRoomInfoUpdate }: ChatWindowProps
     // 드롭다운 메뉴 상태 관리
     const [isChatDropdownOpen, setChatIsDropdownOpen] = useState(false);
     const chatDropdownRef = useRef<HTMLDivElement>(null);
-
+ 
     // 답장 데이터 타입 정의(메시지 ID와 내용 일부)
     const [replyTarget, setReplyTarget] = useState<ChatMessageDto | null>(null);
 
@@ -67,6 +69,12 @@ const ChatWindow = ({ roomInfo, currentUser, onRoomInfoUpdate }: ChatWindowProps
         previewUrl: string
     }[]>([]);
 
+    // 차단 이메일 목록 참조
+    const blockedEmailsRef = useRef(blockedEmails);
+
+    useEffect(() => {
+        blockedEmailsRef.current = blockedEmails;
+    }, [blockedEmails]);
 
     // 웹 소켓 클라이언트
     const client = useRef<Client | null>(null);
@@ -104,7 +112,14 @@ const ChatWindow = ({ roomInfo, currentUser, onRoomInfoUpdate }: ChatWindowProps
 
                     console.log("수신 데이터: ", newMessages);
                     // 메시지 리스트를 업데이트하면 실시간으로 메시지가 화면에 뜸
+
+                    // 실시간 수신 메시지가 차단된 유저의 것이라면 내용 치환
+                    if (blockedEmailsRef.current.includes(newMessages.sender)) {
+                        newMessages.message = "차단한 사용자의 메시지입니다.";
+                        newMessages.messageType = "TEXT";
+                    }
                     setMessages((prev) => {
+                        
                         // 이미 리스트에 해당 ID가 있는지 확인 (삭제 등으로 인한 업데이트 메시지인지 확인)
                         const isExisting = prev.some(m => m.messageId === newMessages.messageId);
 
@@ -142,9 +157,6 @@ const ChatWindow = ({ roomInfo, currentUser, onRoomInfoUpdate }: ChatWindowProps
         }
     }, [messages]);
 
-
-
-
     // 스크롤 위치를 감지하여 버튼 표시 여부 결정
     const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
         const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
@@ -179,12 +191,29 @@ const ChatWindow = ({ roomInfo, currentUser, onRoomInfoUpdate }: ChatWindowProps
     useEffect(() => {
         const fetchChatHistory = async () => {
             try {
-                const response = await api.get(`/chatrooms/${roomInfo.roomId}/messages`);
+                const response = await api.get(`/chatrooms/${roomInfo.roomId}/messages`, {
+                    params: { size: 50 },
+                    headers: { 
+                        'Email': currentUser?.email || ""
+                    }
+                });
+
+                // DB에서 가져온 원본 메시지를 blockedEmails 기준으로 변조
+                const processed = response.data.map((msg: ChatMessageDto) => {
+                    if (blockedEmails.includes(msg.sender)) {
+                        return {
+                            ...msg,
+                            message: "차단한 사용자의 메시지입니다.",
+                            messageType: "TEXT"
+                        };
+                    }
+                    return msg;
+                });
 
                 // 메시지 불러온거 세팅하기
                 // 데이터가 최신 -> 과거 순으로 오므로 
                 // 프론트엔드 화면에 마자게 과거 -> 최신순으로 뒤집는다
-                const sortedMessages = [...response.data].reverse();
+                const sortedMessages = [...processed].reverse();
                 setMessages(sortedMessages);
 
                 // 데이터 로딩 직후에는 강제로 바닥으로 이동
@@ -198,7 +227,7 @@ const ChatWindow = ({ roomInfo, currentUser, onRoomInfoUpdate }: ChatWindowProps
             fetchChatHistory();
         }
 
-    }, [roomInfo.roomId])
+    }, [roomInfo.roomId, blockedEmails]);
 
     // 답장 취소 함수
     const handleCancelReply = () => setReplyTarget(null);
@@ -346,6 +375,20 @@ const ChatWindow = ({ roomInfo, currentUser, onRoomInfoUpdate }: ChatWindowProps
         }
     };
 
+    // // 컴포넌트 마운트 시 차단 목록 가져오기
+    // useEffect(() => {
+    //     const fetchBlockedList = async () => {
+    //         try {
+    //             const response = await api.get("/friends/blocked-list");
+    //             // UserResponseDto 리스트에서 email만 따로 빼서 저장
+    //             const emails = response.data.map((user: any) => user.email);
+    //             setBlockedEmails(emails);
+    //         } catch (error) {
+    //             console.error("차단 목록 조회 실패: ", error);
+    //         }
+    //     };
+    //     fetchBlockedList();
+    // }, []);
 
 
     return (

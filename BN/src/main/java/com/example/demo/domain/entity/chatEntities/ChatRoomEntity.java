@@ -27,6 +27,9 @@ public class ChatRoomEntity {
     private String lastMessage;
     private LocalDateTime lastMessageTime;
 
+    @Column(name = "last_message_sender")
+    private String lastMessageSender;
+
     @ElementCollection // 이게 없으면 List<String>을 DB에 저장하지 못함
     @CollectionTable(name = "chat_room_images", joinColumns = @JoinColumn(name = "room_id"))
     private List<String> roomImageUrls;

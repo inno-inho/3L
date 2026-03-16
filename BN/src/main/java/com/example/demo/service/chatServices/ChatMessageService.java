@@ -1,5 +1,6 @@
 package com.example.demo.service.chatServices;
 
+import com.example.demo.domain.Repository.FriendRepository;
 import com.example.demo.domain.Repository.chatRepository.ChatMessageRepository;
 import com.example.demo.domain.Repository.Local_S3_FileService.FileService;
 import com.example.demo.domain.Repository.chatRepository.ChatRoomRepository;
@@ -34,6 +35,7 @@ public class ChatMessageService {
     private final RedisTemplate<String, Object> redisTemplate;
     private final ApplicationEventPublisher applicationEventPublisher;      // 방송국 역할
     private final ChatRoomRepository chatRoomRepository;
+    private final FriendRepository friendRepository;
 
 
     // ####################################
@@ -116,6 +118,7 @@ public class ChatMessageService {
 
         chatRoomEntity.setLastMessage(lastMessage);
         chatRoomEntity.setLastMessageTime(chatMessageEntity.getCreatedAt());
+        chatRoomEntity.setLastMessageSender(chatMessageEntity.getSender());     // 발신자를 저장
         // JPA의 dirty Checking으로 인해 따로 save하지 않아도 트랜잭션 종료 시 업데이트됨
         // Dirty Checking? JPA는 트랜잭션 안에서 엔티티를 조회하면 그 엔티티를 영속 상태로 관리.
         // 처음 조회했을 때 스냅샷 저장 하고 이후 값아 바뀌었는지 계속해서 추적하기 때문에
@@ -141,8 +144,11 @@ public class ChatMessageService {
     // 채팅내역 불러오기
     // ####################################
     @Transactional(readOnly = true)
-    public List<ChatMessageDto> getChatHistory(String roomId, Long lastMessageId, int size) {
+    public List<ChatMessageDto> getChatHistory(String roomId, Long lastMessageId, int size, String currentUserEmail) {
         PageRequest pageRequest = PageRequest.of(0, size);  // Page는 항상 0으로 고정
+
+        // 내가 차단한 유저들의 이메일 목록을 먼저 가져옴
+        List<String> blockedEmails = friendRepository.findAllBlockedEmailsByMe(currentUserEmail);
 
         List<ChatMessageEntity> chatMessageEntities;
         if (lastMessageId == null){
@@ -154,7 +160,19 @@ public class ChatMessageService {
         }
 
         return chatMessageEntities.stream()
-                .map(chatCommonService::convertToDto)
+                .map(entity -> {
+                    ChatMessageDto chatMessageDto = chatCommonService.convertToDto(entity);
+
+                    // 메시지 발신자가 차단 목록에 있는지 확인
+                    if (blockedEmails.contains(entity.getSender())) {
+                        // 차단한 사용자의 경우 내용 및 타입 변경 (이미지/파일 등도 텍스트로 치환)
+                        chatMessageDto.setMessage("차단한 사용자의 메시지입니다.");
+                        chatMessageDto.setMessageType(ChatMessageDto.MessageType.TEXT);
+                        chatMessageDto.setFiles(null);
+                    }
+
+                    return chatMessageDto;
+                })
                 .toList();
     }
 

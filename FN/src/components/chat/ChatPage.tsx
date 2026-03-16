@@ -21,8 +21,27 @@ const ChatPage = () => {
     // 모달 상태 관리
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
      
+    // 차단 목록 상태
+    const [blockedEmails, setBlockedEmails] = useState<string[]>([]);
+
     // selectedRoomId와 일치하는 방 객체 설정
     const selectedRoom = rooms.find(r => r.roomId === selectedRoomId);
+
+    // 차단 목록 가져오는 함수
+    const fetchBlockedUsers = useCallback(async () => {
+        if (!user?.email) return;
+        try {
+            const response = await api.get(`/friends/blocked-list`);
+
+            console.log('차단 목록 응답 확인:', response.data);
+            
+            // 응답 데이터가 객체 배열이라면 이메일만 추출
+            setBlockedEmails(response.data.map((b: any) => b.email));
+        } catch (error) {
+            console.error("차단 목록 로드 실패:", error);
+        }
+    }, [user?.email]);
+
 
     // 방 목록 가져오기 함수(최초 로드와 생성 후 재호출용)
     const fetchRooms = useCallback(async () => {
@@ -40,7 +59,8 @@ const ChatPage = () => {
 
     useEffect(() => {
         fetchRooms();
-    }, [fetchRooms]);
+        fetchBlockedUsers();
+    }, [fetchRooms, fetchBlockedUsers]);
     
     // 방 정보(이름 등)가 수정되었을 때 호출할 함수
     const handleRoomUpdate = (updatedRoom: ChatRoomDto) => {
@@ -89,11 +109,11 @@ const ChatPage = () => {
             // 만든 새 방을 선택 상태로 만들기
             if (newRoomId && newRoomId.roomId) setSelectedRoomId(newRoomId.roomId);
             
-    } catch (error) {
-        console.log("방 생성 실패: ", error);
-        showAlert("오류", "방 생성 중 문제가 발생했습니다.");
-    }
-};
+        } catch (error) {
+            console.log("방 생성 실패: ", error);
+            showAlert("오류", "방 생성 중 문제가 발생했습니다.");
+        }
+    };
 
 
     return (
@@ -104,6 +124,7 @@ const ChatPage = () => {
                     selectedId={selectedRoomId}
                     onSelect={setSelectedRoomId}
                     onCreateRomm={() => setIsCreateModalOpen(true)}    // 모달 열기
+                    blockedEmails={blockedEmails}
                 />
 
                 {/* 선택된 방이 있을 때만 ChatWindow를 띄움 */}
@@ -113,6 +134,7 @@ const ChatPage = () => {
                         roomInfo={selectedRoom}
                         currentUser={user}
                         onRoomInfoUpdate={handleRoomUpdate}
+                        blockedEmails={blockedEmails}
                     />
                 ) : (
                     <ChatEmptyState />

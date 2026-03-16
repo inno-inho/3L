@@ -10,9 +10,10 @@ interface ListProps {
     selectedId: string | null;
     onSelect: (id: string) => void;
     onCreateRomm: () => void;
+    blockedEmails: string[];
 }
 
-const ChatRoomList = ({ rooms, selectedId, onSelect, onCreateRomm }: ListProps) => {
+const ChatRoomList = ({ rooms, selectedId, onSelect, onCreateRomm, blockedEmails }: ListProps) => {
     // 검색어 상태 관리
     const [ searchTerm, setSearchTerm ] = useState("");
 
@@ -77,7 +78,12 @@ const ChatRoomList = ({ rooms, selectedId, onSelect, onCreateRomm }: ListProps) 
                                         </div>
                                         <span className="text-[10px] text-gray-400">{room.lastMessageTime}</span>
                                     </div>
-                                    <p className="text-xs text-gray-500 truncate mt-1">{room.lastMessage}</p>
+
+                                    <p className="text-xs text-gray-500 truncate mt-1">
+                                        {room.lastMessageSender && blockedEmails.includes(room.lastMessageSender)
+                                            ? "차단한 사용자의 메시지입니다."
+                                            : room.lastMessage}
+                                    </p>
                                 </div>
                             </div>
                         ))

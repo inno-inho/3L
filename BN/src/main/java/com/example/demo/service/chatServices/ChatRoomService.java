@@ -1,5 +1,6 @@
 package com.example.demo.service.chatServices;
 
+import com.example.demo.domain.Repository.FriendRepository;
 import com.example.demo.domain.Repository.chatRepository.ChatRoomMemberRepository;
 import com.example.demo.domain.Repository.chatRepository.ChatRoomRepository;
 import com.example.demo.domain.dto.chatDto.ChatMessageDto;
@@ -26,6 +27,7 @@ public class ChatRoomService {
     private final ChatRoomMemberRepository chatRoomMemberRepository;
     private final ChatRoomMemberService chatRoomMemberService;
     private final ChatCommonService chatCommonService;
+    private final FriendRepository friendRepository;
 
 
     // #########################################
@@ -83,6 +85,9 @@ public class ChatRoomService {
         // 내가 참여 중인 방 목록 조회
         List<ChatRoomMemberEntity> chatRoomMemberEntities = chatRoomMemberRepository.findByUserEmailAndActiveTrue(userEmail);
 
+        // 내가 차단한 유저 리스트 가져오기
+        List<String> blockedEmails = friendRepository.findAllBlockedEmailsByMe(userEmail);
+
         return chatRoomMemberEntities.stream()
                 // 방 정보 가져오기
                 .map(member -> chatRoomRepository.findById(member.getRoomId())
@@ -99,10 +104,16 @@ public class ChatRoomService {
                 .map(entity -> {
                     // 채팅방의 인원수 계산 로직
                     int userCount = chatRoomMemberRepository.countByRoomIdAndActiveTrue(entity.getRoomId());
+                    ChatRoomDto chatRoomDto = chatCommonService.convertToRoomDto(entity, userEmail, userCount);
+
+                    // 마지막 메시지 발신자가 차단한 사람이라면 내용 치환
+                    if (entity.getLastMessageSender() != null && blockedEmails.contains(entity.getLastMessageSender())) {
+                        chatRoomDto.setLastMessage("차단한 사용자의 메시지입니다.");
+                    }
 
                     log.info("방 이름: {}, 마지막 시간: {}", entity.getRoomName(), entity.getLastMessageTime());
 
-                    return chatCommonService.convertToRoomDto(entity, userEmail, userCount);
+                    return chatRoomDto;
                 })
                 .toList();
     }

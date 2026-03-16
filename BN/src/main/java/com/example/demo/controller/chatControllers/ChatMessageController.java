@@ -53,8 +53,9 @@ public class ChatMessageController {
     public ResponseEntity<List<ChatMessageDto>> getChatHistory(
             @PathVariable String roomId,
             @RequestParam(required = false) Long lastMessageId,
-            @RequestParam(defaultValue = "50") int size) {
-        List<ChatMessageDto> history = chatMessageService.getChatHistory(roomId, lastMessageId, size);
+            @RequestParam(defaultValue = "50") int size,
+            @RequestHeader("Email") String currentUserEmail) {
+        List<ChatMessageDto> history = chatMessageService.getChatHistory(roomId, lastMessageId, size, currentUserEmail);
 
         return ResponseEntity.ok(history);
     }

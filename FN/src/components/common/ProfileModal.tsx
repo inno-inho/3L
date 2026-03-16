@@ -47,7 +47,7 @@ const ProfileModal = ({ userEmail, userName, profileImg, onClose }: ProfileModal
             // 상태 재 조회
             const res = await api.get(`/friends/relation-status?targetEmail=${userEmail}`);
             setStatus(res.data);
-        } catch(error) {
+        } catch (error) {
             console.error("요청 중 오류", error);
             showAlert("오류", "요청을 처리하는 중 문제가 발생하였습니다.");
         }
@@ -75,11 +75,11 @@ const ProfileModal = ({ userEmail, userName, profileImg, onClose }: ProfileModal
 
     return (
         <>
-            <div 
-                className="fixed inset-0 z-[90] flex items-center justify-center bg-black/60 px-4" 
+            <div
+                className="fixed inset-0 z-[90] flex items-center justify-center bg-black/60 px-4"
                 onClick={onClose}
             >
-                <div 
+                <div
                     className="relative flex w-full max-w-[320px] flex-col items-center overflow-hidden rounded-2xl bg-[#fff9ed] pt-12 pb-8 shadow-2xl transition-all"
                     onClick={(e) => e.stopPropagation()}
                 >
@@ -94,7 +94,7 @@ const ProfileModal = ({ userEmail, userName, profileImg, onClose }: ProfileModal
                     {/* 중앙 프로필 섹션 */}
                     <div className="flex flex-col items-center">
                         <div className="mb-4 h-28 w-28 overflow-hidden rounded-[40px] border-2 border-white/20 bg-white shadow-lg">
-                            <img 
+                            <img
                                 src={profileImg || coconuttalk}
                                 alt="profile"
                                 className="h-full w-full object-cover"
@@ -143,17 +143,26 @@ const ProfileModal = ({ userEmail, userName, profileImg, onClose }: ProfileModal
                             </button>
                         )}
 
-                        {/* 차단하기 (자기 자신이 아닐 때만) */}
-                        {status !== "ME" && (
-                            <button
-                                onClick={() => handleActionClick('BLOCK')}
-                                className="group flex flex-col items-center gap-2 text-red-500 hover:opacity-70"
-                            >
-                                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-red-500/10 group-hover:bg-red-500/20">
-                                    <Ban size={18}/>
+                        {/* 차단하기/ 차단 중 (자기 자신이 아닐 때만) */}
+                        {status === "BLOCKED" ? (
+                            <div className="flex flex-col items-center gap-2 text-gray-400">
+                                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-100">
+                                    <Ban size={18} />
                                 </div>
-                                <span className="text-xs font-medium">차단하기</span>
-                            </button>
+                                <span className="text-ts font-medium">차단 중인 사용자입니다.</span>
+                            </div>
+                        ) : (
+                            status !== "ME" && (
+                                <button
+                                    onClick={() => handleActionClick('BLOCK')}
+                                    className="group flex flex-col items-center gap-2 text-red-500 hover:opacity-70"
+                                >
+                                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-red-500/10 group-hover:bg-red-500/20">
+                                        <Ban size={18} />
+                                    </div>
+                                    <span className="text-xs font-medium">차단하기</span>
+                                </button>
+                            )
                         )}
                     </div>
                 </div>
