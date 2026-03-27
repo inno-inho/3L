@@ -14,7 +14,7 @@ import com.example.demo.domain.dto.UserResponseDto;
 import com.example.demo.domain.entity.Role;
 import com.example.demo.domain.entity.User;
 import com.example.demo.domain.repository.UserRepository;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -186,7 +186,7 @@ public class AuthService {
     // #######################################
     // 유저 정보 불러오기
     // #######################################
-    @Transactional // 읽기 전용으로 성능 최적화
+    @Transactional(readOnly = true) // 읽기 전용으로 성능 최적화
     public UserResponseDto getUserInfo(String email){
 
         // DB에서 해당 이메일을 가진 유저 조회

@@ -44,6 +44,11 @@ public class ChatCommonService {
     // Entity에서 Dto 변환
     // ###############################
     public ChatMessageDto convertToDto(ChatMessageEntity chatMessageEntity) {
+        // 발신자의 프로필 이미지 URL 조회 로직 추가
+        String profileImageUrl = userRepository.findByEmail(chatMessageEntity.getSender())
+                .map(user -> user.getProfileImageUrl())
+                .orElse(null);
+
         // 자식 엔티티 리스트에서 fileUrl 필드만 추출하여 List<String>으로 변환
         List<ChatMessageDto.FileResponse> fileResponses = chatMessageEntity.getFiles().stream()
                 .map(f -> ChatMessageDto.FileResponse.builder()
@@ -60,7 +65,8 @@ public class ChatCommonService {
                 .messageType(chatMessageEntity.getMessageType() != null ? chatMessageEntity.getMessageType() : ChatMessageDto.MessageType.TEXT) // 기본값 설정
                 .roomId(chatMessageEntity.getRoomId())
                 .sender(chatMessageEntity.getSender())
-                .senderName(chatMessageEntity.getSenderName() != null ? chatMessageEntity.getSenderName() : chatMessageEntity.getSender()) // 우선 이메일을 이름으로 세팅 (유저 기능 연동 전까지)
+                .senderName(resolveSenderName(chatMessageEntity.getSender()))
+                .profileImageUrl(profileImageUrl)
                 .message(chatMessageEntity.getMessage())
                 .files(fileResponses)
                 .metadata(chatMessageEntity.getMetadata())

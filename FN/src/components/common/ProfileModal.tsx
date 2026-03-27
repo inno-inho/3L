@@ -2,6 +2,7 @@ import React from "react";
 import { useEffect, useState } from "react";
 import api from "@/api/api";
 
+import ProfileImage from "./ProfileImage";
 import coconuttalk from "@/assets/image/coconuttalk.png";
 import { useModal } from '../../context/ModalContext';
 import { UserPlus, Ban, Check, Clock, X, UserMinus } from "lucide-react"; // 아이콘 라이브러리
@@ -18,12 +19,21 @@ const ProfileModal = ({ userEmail, userName, profileImg, onClose }: ProfileModal
 
     const [status, setStatus] = useState("LOADING"); // NONE, PENDING, ACCEPTED, BLOCKED, ME가 있음
 
+    const [userInfo, setUserInfo] =useState<any>(null);
+
     const { showAlert, showConfirm } = useModal();
 
     useEffect(() => {
         // API 호출로 현재 관계 상태 가져오기
         api.get(`/friends/relation-status?targetEmail=${userEmail}`)
             .then(res => setStatus(res.data));
+
+        // 유저의 최신 프로필 정보 가져오기
+        api.get(`/api/users/info?email=${userEmail}`)
+            .then(res => {
+                setUserInfo(res.data);
+            })
+            .catch(err => console.error("유저 정보 로드 실패", err));    
     }, [userEmail]);
 
     // API 통신을 담당하는 공통 함수
@@ -94,14 +104,21 @@ const ProfileModal = ({ userEmail, userName, profileImg, onClose }: ProfileModal
                     {/* 중앙 프로필 섹션 */}
                     <div className="flex flex-col items-center">
                         <div className="mb-4 h-28 w-28 overflow-hidden rounded-[40px] border-2 border-white/20 bg-white shadow-lg">
-                            <img
-                                src={profileImg || coconuttalk}
-                                alt="profile"
-                                className="h-full w-full object-cover"
+                            <ProfileImage 
+                                url={userInfo?.profileImageUrl || profileImg}
+                                nickname={userName}
+                                size={112}
                             />
                         </div>
+
                         <h3 className="text-xl font-bold text-[#4A3F35]">{userName}</h3>
                         <p className="mt-1 text-sm text-[#4A3F35]">{userEmail}</p>
+                    
+                        {/* 상태 메시지 */}
+                        {userInfo?.statusMessage && (
+                            <p className="mt-2 text-xs text-gray-500">"{userInfo.statusMessage}"</p>
+                        )}
+                
                     </div>
 
                     {/* 하단 액션 버튼들 */}

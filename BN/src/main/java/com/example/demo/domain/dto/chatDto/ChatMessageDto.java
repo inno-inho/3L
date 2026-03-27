@@ -52,6 +52,9 @@ public class ChatMessageDto {
     @Schema(description = "보낸 사람 이름", example = "채팅개발자")
     private String senderName;
 
+    @Schema(description = "보낸 사람 프로필 이미지 URL", example = "https://s3.coconut.com/profiles/inno.jpg")
+    private String profileImageUrl;
+
     @Schema(description = "보낸 사람 초성", example = "ㄱㅇㅂㅊㅈ")
     private String senderInitial;
 

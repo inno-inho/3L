@@ -20,4 +20,10 @@ public class S3FileService implements FileService {
 //        return "aws  버킷 url ";
         return null;
     }
+
+    @Override
+    public void deleteFile(String fileUrl) {
+        // TODO
+        // S3파일 삭제 로직
+    }
 }

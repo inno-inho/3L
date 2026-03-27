@@ -1,8 +1,10 @@
 package com.example.demo.domain.entity;
 
 
+import com.example.demo.domain.dto.UserUpdateDto;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.cglib.core.Local;
 
 import java.time.LocalDateTime;
 
@@ -30,6 +32,8 @@ import java.time.LocalDateTime;
 // access = PROTECTED (접근제한자)를 통해 JPA만 사용가능하도록 설정[for 정상적이지 않은 무분별한 객체 생성 방지]
 
 public class User {
+
+
 
     /* =========================
        기본 키
@@ -149,6 +153,28 @@ public class User {
         this.agreement = agreement;
         this.isOnline = false;
         this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    public void updateProfileImage(String imageUrl) {
+        this.profileImageUrl =imageUrl;
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    public void deleteProfileImage() {
+        this.profileImageUrl = null;
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    public void updateProfile(UserUpdateDto userUpdateDto) {
+        this.nickname = userUpdateDto.getNickname();
+        this.phone = userUpdateDto.getPhone();
+        this.statusMessage = userUpdateDto.getStatusMessage();
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    public void updatePassword(String encodedPassword) {
+        this.password = encodedPassword;
         this.updatedAt = LocalDateTime.now();
     }
 }

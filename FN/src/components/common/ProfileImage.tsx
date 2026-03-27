@@ -13,7 +13,7 @@ const ProfileImage = ({ url, nickname, size = 'md' }: ProfileImageProps) => {
   // 1. 크기(Size) 정의
   const sizeMap = {
     sm: 'w-8 h-8',
-    md: 'w-12 h-12',
+    md: 'w-11 h-11',
     lg: 'w-20 h-20',
   };
 

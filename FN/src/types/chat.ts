@@ -21,7 +21,7 @@ export interface ChatMessageDto{
         fileName: string;
         originalFileName: string;
     }[];
-    thumbnailUrl?: string;
+    profileImageUrl?: string;
     metadata?: ChatMetadata | null;
     deleted: boolean;
     sentTime?: string;

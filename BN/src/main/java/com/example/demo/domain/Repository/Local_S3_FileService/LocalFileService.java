@@ -44,4 +44,17 @@ public class LocalFileService implements FileService {
             throw new RuntimeException("파일 저장 중 오류 발생");
         }
     }
+
+    @Override
+    public void deleteFile(String fileUrl) {
+        if  (fileUrl == null || !fileUrl.startsWith("/uploads/")) return;
+
+        // DB애 저장된 "/uploads/파일명을 실제 경로 "C:/chat_uploads/파일명"으로 변환
+        String fileName = fileUrl.substring(9);
+        File file = new File(uploadDir + fileName);
+
+        if(file.exists()) {
+            file.delete();
+        }
+    }
 }

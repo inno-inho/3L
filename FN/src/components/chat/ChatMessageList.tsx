@@ -13,6 +13,7 @@ import ChatReplyMessages from "./chatTypeComponent/ChatReplyMessages";
 
 import coconuttalk from "@/assets/image/coconuttalk.png";
 import ProfileModal from "../common/ProfileModal";
+import ProfileImage from "../common/ProfileImage";
 
 interface ChatMessageListProps {
     messages: ChatMessageDto[];
@@ -110,13 +111,16 @@ const ChatMessageList = ({
 
 
                                     {!isMine && (
-                                        // <div className="w-10 h-10 bg-gray-200 rounded-full mr-3 mt-1 flex-shrink-0" />
                                         <button
                                             onClick={() => setSelectedUser({ email: msg.sender, name: msg.senderName })}
                                             className="w-10 h-10 bg-gray-200 rounded-full mr-3 mt-1 flex-shrink-0 overflow-hidden hover:ring-2 hover:ring-brown-300 transition-all"
                                         >
                                             {/* 상대방 프로필 이미지 */}
-                                            <img src={msg.thumbnailUrl || coconuttalk} alt="profile" className="w-full h-full object-cover" />
+                                            <ProfileImage 
+                                                url={msg.profileImageUrl}
+                                                nickname={msg.senderName}
+                                                size="md"
+                                            />
                                         </button>
                                     )}
                                     <div className={`group relative flex flex-col ${isMine ? 'items-end' : 'items-start'}`}>

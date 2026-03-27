@@ -56,6 +56,9 @@ public class SecurityConfig {
                                 .requestMatchers("/ws/**").permitAll()
                                 .requestMatchers("/uploads/**").permitAll()
 
+                                // 유저 프로필 관련 권한 설정
+                                .requestMatchers("/api/users/**").authenticated()
+
                                 // 친구 관련 권한 설정
                                 .requestMatchers("/api/friends/**").authenticated()
 

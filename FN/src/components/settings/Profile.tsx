@@ -1,28 +1,104 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import api from "@/api/api";
+import coconuttalk from "@/assets/image/coconuttalk.png";
+import ProfileImage from "../common/ProfileImage";
+import { useModal } from "@/context/ModalContext";
+
 
 const Profile = () => {
+    const [userData, setUserData] = useState<any>(null);
+
+    const [isEditing, setIsEditing] = useState(false);
+
+    const [editForm, setEditForm] = useState({
+        phone: "",
+    }); 
+
+    const { showAlert, showConfirm } = useModal();
+
     // 파일 입력을 위한 Ref
     const fileInputRef = useRef<HTMLInputElement>(null);
 
-    // 프로필 이미지 상태
-    const [ profileImage, setProfileImage ] = useState<string | null>(null);
+    // 초기 데이터 로드
+    useEffect(() => {
+        const fetchUserData = async () => {
+            try {
+                const response = await api.get("/auth/user"); // 기존 API 활용
+                setUserData(response.data);
+            } catch (error) {
+                console.error("유저 정보 로드 실패:", error);
+            }
+        };
+        fetchUserData();
+    }, []);
 
-    // 이미지 클릭 시 input 클릭 이벤트 발생
+    // 편집 모드 토글
+    const toggleEdit = () => {
+        if (!isEditing && userData) {
+            setEditForm({
+                phone: userData.phone || "",
+            });
+        }
+        setIsEditing(!isEditing);
+    }
+
+    // 정보 업데이트 요청 
+    const handleUpdateProfile = async () => {
+        try {
+            await api.patch("/users/profile", editForm);
+            setUserData({ ...userData, ...editForm});
+            setIsEditing(false);
+            showAlert("정보 수정", "계정 정보가 성공적으로 변경되었습니다.");
+        }catch (error) {
+            showAlert("수정 실패", "정보 수정 중 오류가 발생했습니다.");
+        }
+    };
+
     const handleImageClick = () => {
         fileInputRef.current?.click();
     }
 
-    // 파일 선택 시 실행될 함수
-    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // 이미지 파일 업로드
+    const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
-        if (file) {
-            // 브라우저 내에서 미리보기를 위한 임시 URL 생성
-            const previewUrl = URL.createObjectURL(file);
-            setProfileImage(previewUrl);
+        if (!file) return;
 
-            // 여기서 서버로 이미지를 업로드 하는 API 호출
+        const formData = new FormData();
+        formData.append("file", file);
+
+        try {
+            const response = await api.post("/users/profile-image", formData, {
+                headers: { "Content-Type": "multipart/form-data" }
+            });
+
+            // 서버에서 저장된 새로운 이미지 URL을 받아와 상태 업데이트
+            setUserData({ ...userData, ProfileImageUrl: response.data });
+            showAlert("프로필 사진", "프로필 사진이 업데이트 되었습니다.");
+        } catch (error) {
+            console.error("업로드 실패: ", error);
+            showAlert("프로필 사진", "프로필 사진 업로드 중 오류가 발생했습니다.");
         }
     };
+
+    // 이미지 삭제
+    const handleDeleteImage = () => {
+        showConfirm(
+            "프로필 사진 삭제",
+            "사진을 삭제하고 기본 이미지로 변경하시겠습니까?",
+            async () => {
+                try {
+                    await api.delete("/users/profile-image");
+                    setUserData({ ...userData, ProfileImageUrl: null });
+                    showAlert("프로필 사진", "기본 이미지로 변경되었습니다.");
+                } catch (error) {
+                    showAlert("프로필 사진", "사진 삭제 중 오류가 발생했습니다.");
+                }
+            }
+        );
+    };
+
+    // 데이터 로딩 중 렌더링
+    if (!userData) return <div className="p-20 text-center font-bold">사용자 정보를 불러오는 중...</div>
 
     return (
         <div className="mb-10">
@@ -30,28 +106,59 @@ const Profile = () => {
                 <h1 className="text-3xl font-bold my-2">계정정보</h1>
                 <p>로그인, 프로필, 연락처 정보를 확인하고 관리합니다.</p>
             </div>
+
+            <button
+                onClick={isEditing ? handleUpdateProfile : toggleEdit}
+                className={`px-4 py-2 rounded-lg font-bold text-white transition-all ${
+                    isEditing ? "bg-blue-600 hover:bg-blue-700" : "bg-[#743F24] hover:brightness-110"
+                }`}
+            >
+                {isEditing ? "저장하기" : "정보 수정"}
+            </button>
+
+            {/* 유저 정보 박스 */}
             <div className="w-full max-w-xl mx-auto p-4 my-10 border-2 border-[#743F24] rounded-lg flex flex-col">
                 <h2 className="text-2xl text-left font-extrabold mb-4">로그인 정보</h2>
                 <div className="flex justify-between my-3 py-2">
                     <p className="text-xl">대표 이메일</p>
-                    <p className="text-xl">nasangjo@naver.com</p>
+                    <p className="text-xl font-medium">{userData.email}</p>
                 </div>
-                <hr className="my-2 border-2 border-[#743F24]"/>
+                <hr className="my-2 border-2 border-[#743F24]" />
                 <div className="flex justify-between my-3 py-2">
                     <p className="text-xl">전화번호</p>
-                    <p className="text-xl">+82 10-1234-5678</p>
+                    {isEditing ? (
+                        <input 
+                            value={editForm.phone}
+                            onChange={(e) => setEditForm({...editForm, phone: e.target.value})}
+                            className="border-b-2 border-[#743F24] outline-none text-right px-2 text-xl w-1/2"
+                        />
+                    ) : (
+                        <p className="text-xl">{userData.phone || "미등록"}</p>
+                    )}
                 </div>
             </div>
+
+            {/* 프로필 정보 박스 */}
             <div className="w-full max-w-xl mx-auto my-10 p-4 border-2 border-[#743F24] rounded-lg flex flex-col">
                 <h2 className="text-2xl text-left font-extrabold mb-4">프로필 정보</h2>
+                
                 <div className="flex justify-between items-center my-3">
-                    <div className="">
+                    <div className="text-left">
                         <p className="text-xl text-left font-bold">프로필 사진</p>
                         <p>프로필은 코코넛 서비스에서 활용됩니다.</p>
+                        {/* 이미지가 있을 때만 삭제 버튼 노출 */}
+                        {userData?.ProfileImageUrl && (
+                            <button
+                                onClick={handleDeleteImage}
+                                className="mt-2 text-xs text-red-500 hover:underline"
+                            >
+                                사진 삭제
+                            </button>
+                        )}
                     </div>
-                    
+
                     {/* 숨겨진 파일 입력창 */}
-                    <input 
+                    <input
                         type="file"
                         ref={fileInputRef}
                         onChange={handleFileChange}
@@ -60,34 +167,35 @@ const Profile = () => {
                     />
 
                     {/* 클릭 가능한 이미지 */}
-                    <div
+                    <div 
                         className="relative cursor-pointer group"
                         onClick={handleImageClick}
                     >
-                        <img 
-                            src={profileImage || "기본_이미지_경로.png"}
-                            alt="프로필"
-                            className="border size-20 rounded-full object-cover border-[#743F24] hover:brightness-90 transition-all" 
+                        <ProfileImage 
+                            url={userData.ProfileImageUrl}
+                            nickname={userData.nickname}
+                            size="lg"
                         />
-                        {/* 마우스 올렸을 때 나타나는 오버레이 */}
                         <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-30 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
-                            <span className="text-white text-xs">변경</span>
+                            <span className="text-white text-xs font-bold">변경</span>
                         </div>
                     </div>
                 </div>
 
-                <hr className="my-2 border-2 border-[#743F24]"/>
-                
+                <hr className="my-2 border-2 border-[#743F24]" />
+
                 <div className="flex justify-between my-3 py-2">
                     <p className="text-xl font-bold">이름</p>
-                    <p className="text-xl">username</p>
+                    <p className="text-xl">{userData?.username || "로딩 중"}</p>
                 </div>
-                <hr className="my-2 border-2 border-[#743F24]"/>
+                <hr className="my-2 border-2 border-[#743F24]" />
                 <div className="flex justify-between my-3 py-2">
                     <p className="text-xl font-bold">닉네임</p>
-                    <p className="text-xl">nasangjo</p>
+                    <p className="text-xl">{userData?.nickname || "로딩 중"}</p>
                 </div>
-                <hr className="my-2 border-2 border-[#743F24]"/>
+
+                <hr className="my-2 border-2 border-[#743F24]" />
+                
                 <div className="flex justify-between my-3 py-2">
                     <p className="text-xl font-bold">비밀번호 변경</p>
                     <p className="text-xl">2026.01.01 변경</p>
