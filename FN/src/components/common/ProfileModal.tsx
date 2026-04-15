@@ -31,6 +31,7 @@ const ProfileModal = ({ userEmail, userName, profileImg, onClose }: ProfileModal
         // 유저의 최신 프로필 정보 가져오기
         api.get(`/api/users/info?email=${userEmail}`)
             .then(res => {
+                console.log("서버 응답 데이터:", res.data);
                 setUserInfo(res.data);
             })
             .catch(err => console.error("유저 정보 로드 실패", err));    
@@ -83,6 +84,9 @@ const ProfileModal = ({ userEmail, userName, profileImg, onClose }: ProfileModal
         });
     }
 
+    console.log("현재 userInfo 상태:", userInfo);
+    console.log("계산된 이미지 경로:", userInfo?.profileImageUrl);
+
     return (
         <>
             <div
@@ -104,10 +108,18 @@ const ProfileModal = ({ userEmail, userName, profileImg, onClose }: ProfileModal
                     {/* 중앙 프로필 섹션 */}
                     <div className="flex flex-col items-center">
                         <div className="mb-4 h-28 w-28 overflow-hidden rounded-[40px] border-2 border-white/20 bg-white shadow-lg">
-                            <ProfileImage 
-                                url={userInfo?.profileImageUrl || profileImg}
-                                nickname={userName}
-                                size={112}
+                            <img 
+                                // userInfo의 이미지가 있으면 그걸 쓰고 없으면 전달받은 profileImg, 그것도 없다면 기본 로고
+                                src={
+                                    userInfo?.profileImageUrl
+                                    ? (userInfo.profileImageUrl.startsWith('http') ? userInfo.profileImageUrl : `http://localhost:8080${userInfo.profileImageUrl}`)
+                                    : (profileImg && profileImg !== "null" ? profileImg : coconuttalk)
+                                }
+                                alt={`${userName}의 프로필`}
+                                className="w-full h-full object-cover"
+                                onError={(e) => {
+                                    (e.currentTarget as HTMLImageElement).src = coconuttalk;
+                                }}
                             />
                         </div>
 

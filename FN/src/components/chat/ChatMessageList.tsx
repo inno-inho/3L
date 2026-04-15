@@ -37,7 +37,7 @@ const ChatMessageList = ({
     onReplyClick,
 }: ChatMessageListProps) => {
 
-    const [selectedUser, setSelectedUser] = useState<{email: string, name: string} | null>(null);
+    const [selectedUser, setSelectedUser] = useState<{email: string, name: string, profileUrl?: string} | null>(null);
 
     // 답장하는 메시지로 이동하는 핸들러
     const handleJumpToParent = (parentId: string) => {
@@ -112,7 +112,7 @@ const ChatMessageList = ({
 
                                     {!isMine && (
                                         <button
-                                            onClick={() => setSelectedUser({ email: msg.sender, name: msg.senderName })}
+                                            onClick={() => setSelectedUser({ email: msg.sender, name: msg.senderName, profileUrl: msg.profileImageUrl })}
                                             className="w-10 h-10 bg-gray-200 rounded-full mr-3 mt-1 flex-shrink-0 overflow-hidden hover:ring-2 hover:ring-brown-300 transition-all"
                                         >
                                             {/* 상대방 프로필 이미지 */}
@@ -203,7 +203,8 @@ const ChatMessageList = ({
             {selectedUser && (
                 <ProfileModal 
                     userEmail={selectedUser.email}
-                    userName={selectedUser.name} // 이제 selectedUser가 있을 때만 실행되므로 safe합니다.
+                    userName={selectedUser.name}
+                    profileImg={selectedUser.profileUrl} 
                     onClose={() => setSelectedUser(null)}
                 />
             )}
