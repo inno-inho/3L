@@ -1,6 +1,7 @@
 package com.example.demo.controller;
 
 import com.example.demo.domain.Repository.Local_S3_FileService.FileService;
+import com.example.demo.domain.dto.PasswordUpdateDto;
 import com.example.demo.domain.dto.UserResponseDto;
 import com.example.demo.domain.dto.UserUpdateDto;
 import com.example.demo.service.AuthService;
@@ -66,7 +67,25 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
+    // #############################
+    // 패스워드 업데이트
+    // #############################
+    @PatchMapping("/password")
+    public ResponseEntity<String> updatePassword(
+            @RequestBody PasswordUpdateDto passwordUpdateDto,
+            Authentication authentication) {
+
+        try {
+            userService.updatePassword(authentication.getName(), passwordUpdateDto);
+            return ResponseEntity.ok("비밀번호가 성공적으로 변경되었습니다.");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    // #############################
     // 특정 유저 정보 가져오기
+    // #############################
     @GetMapping("/info")
     public ResponseEntity<UserResponseDto> getUserInfoByEmail(@RequestParam("email") String email) {
         // 본인이든 남이든 그 이메잉ㄹ만 알면 그 사람의 닉네임과 프로필 사진 경로를 반환

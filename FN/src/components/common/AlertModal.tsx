@@ -38,7 +38,13 @@ const AlertModal = ({ show, title, message, onHide }: AlertModalProps) => {
 
                     {/* 모달 바디 부분 */}
                     <Modal.Body className='px-6 py-4 text-lg text-[#6B7280]'>
-                        {message}
+                        {typeof message === 'string'
+                            ? message
+                            : (typeof message === 'object' && message !== null
+                                ? JSON.stringify(message)
+                                : "알 수 없는 오류가 발생했습니다."
+                            )
+                        }
                     </Modal.Body>
 
                     {/* 푸터 부분(오른쪽 정렬) */}
