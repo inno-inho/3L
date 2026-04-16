@@ -3,6 +3,7 @@ import api from "@/api/api";
 import coconuttalk from "@/assets/image/coconuttalk.png";
 import ProfileImage from "../common/ProfileImage";
 import { useModal } from "@/context/ModalContext";
+import { formatDate } from "@/utils/date";
 
 
 const Profile = () => {
@@ -19,6 +20,12 @@ const Profile = () => {
 
     // 파일 입력을 위한 Ref
     const fileInputRef = useRef<HTMLInputElement>(null);
+
+    const formatDate = (dateString: string | null) => {
+        if (!dateString) return "정보 없음";
+        const date = new Date(dateString);
+        return `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, '0')}.${String(date.getDate()).padStart(2, '0')}`;
+    };
 
     // 초기 데이터 로드
     useEffect(() => {
@@ -209,8 +216,13 @@ const Profile = () => {
                 <hr className="my-2 border-2 border-[#743F24]" />
                 
                 <div className="flex justify-between my-3 py-2">
-                    <p className="text-xl font-bold">비밀번호 변경</p>
-                    <p className="text-xl">2026.01.01 변경</p>
+                    <p className="text-xl font-bold">최근 비밀번호 변경일자</p>
+                    <p className="text-xl">
+                        {userData?.passwordUpdatedAt
+                            ? `${formatDate(userData.passwordUpdatedAt)} 변경`
+                            : "최근 변경 이력 없음"    
+                        }
+                    </p>
                 </div>
             </div>
         </div>

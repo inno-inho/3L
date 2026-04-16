@@ -1,6 +1,10 @@
 export interface User{
     id: number;
-    name: string;
-    profileImage: string;
+    email: string;
+    username: string;
+    nickname: string;
+    phone?: string;
+    profileImageUrl: string;
     statusMessage: string;
+    passwordUpdatedAt: string | null;
 }

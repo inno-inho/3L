@@ -204,6 +204,7 @@ public class AuthService {
                 .role(user.getRole().name())
                 .gender(user.getGender())
                 .birth(user.getBirth())
+                .passwordUpdatedAt(user.getPasswordUpdatedAt())
                 .build();
     }
 }

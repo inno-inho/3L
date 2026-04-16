@@ -9,6 +9,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+
 @RequiredArgsConstructor
 @Transactional
 @Service
@@ -64,6 +66,7 @@ public class UserService {
 
         // 새 비밀번호 암호화 및 저장
         user.updatePassword(passwordEncoder.encode(passwordUpdateDto.getNewPassword()));
+
     }
 
 }

@@ -124,6 +124,10 @@ public class User {
     private String gender;
     private String agreement;
 
+    // 패스워드 업데이트 한 시간
+    @Column(name = "password_updated_at")
+    private LocalDateTime passwordUpdatedAt;
+
     /**
      * 회원가입 시 사용하는 생성자
      * → 기본값을 여기서 명확하게 설정
@@ -154,6 +158,7 @@ public class User {
         this.isOnline = false;
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
+        this.passwordUpdatedAt = LocalDateTime.now();
     }
 
     public void updateProfileImage(String imageUrl) {
@@ -175,6 +180,7 @@ public class User {
 
     public void updatePassword(String encodedPassword) {
         this.password = encodedPassword;
+        this.passwordUpdatedAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
     }
 }
