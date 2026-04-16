@@ -12,6 +12,7 @@ const Profile = () => {
 
     const [editForm, setEditForm] = useState({
         phone: "",
+        nickname: "",
     }); 
 
     const { showAlert, showConfirm } = useModal();
@@ -37,6 +38,7 @@ const Profile = () => {
         if (!isEditing && userData) {
             setEditForm({
                 phone: userData.phone || "",
+                nickname: userData.nickname || "",
             });
         }
         setIsEditing(!isEditing);
@@ -172,7 +174,7 @@ const Profile = () => {
                         onClick={handleImageClick}
                     >
                         <ProfileImage 
-                            url={userData.ProfileImageUrl}
+                            url={userData.profileImageUrl}
                             nickname={userData.nickname}
                             size="lg"
                         />
@@ -189,9 +191,19 @@ const Profile = () => {
                     <p className="text-xl">{userData?.username || "로딩 중"}</p>
                 </div>
                 <hr className="my-2 border-2 border-[#743F24]" />
+                
+                {/* 닉네임은 변경 가능 */}
                 <div className="flex justify-between my-3 py-2">
                     <p className="text-xl font-bold">닉네임</p>
-                    <p className="text-xl">{userData?.nickname || "로딩 중"}</p>
+                    {isEditing ? (
+                        <input 
+                            value={editForm.nickname}
+                            onChange={(e) => setEditForm({...editForm, nickname: e.target.value})}
+                            className="border-b-2 border-[#743F24] outline-none text-right px-2 text-xl w-1/2"
+                        />
+                    ) : (
+                        <p className="text-xl">{userData?.nickname || "로딩 중"}</p>
+                    )}
                 </div>
 
                 <hr className="my-2 border-2 border-[#743F24]" />
